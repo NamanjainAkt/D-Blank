@@ -17,6 +17,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import { ParticleField } from '@/components/ui/ParticleField';
+import { GlitchText } from '@/components/ui/GlitchText';
+import { GlowButton } from '@/components/ui/GlowButton';
+import { HoverScale } from '@/components/ui/HoverScale';
 import AnimatedContent from '@/components/AnimatedContent';
 import GlareHover from '@/components/GlareHover';
 import { courses, courseCategories, teamMembers, testimonials } from '@/lib/placeholder-data';
@@ -57,6 +61,13 @@ export default function CoursesPage() {
   return (
     <main className="min-h-screen bg-black text-white">
       <section className="relative pt-32 pb-20 overflow-hidden">
+        {/* Particle Field Background */}
+        <ParticleField 
+          particleCount={40} 
+          color="rgba(16, 185, 129, 0.2)" 
+          className="z-0" 
+        />
+        
         <div className="absolute inset-0 bg-gradient-to-b from-violet-950/30 via-black to-black" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[128px]" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-[128px]" />
@@ -69,28 +80,34 @@ export default function CoursesPage() {
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-                Build Your Career in
+                <GlitchText>Build Your Career in</GlitchText>
               </span>
               <br />
               <span className="bg-gradient-to-r from-violet-400 to-emerald-400 bg-clip-text text-transparent">
-                Game Development
+                <GlitchText glitchIntensity={1.5}>Game Development</GlitchText>
               </span>
             </h1>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-10">
               From zero to pro. Master the tools used by world-class studios with hands-on training from industry experts.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-emerald-600 hover:from-violet-500 hover:to-emerald-500" asChild>
-                <Link href="#courses">
+              <Link href="#courses">
+                <GlowButton 
+                  variant="emerald"
+                  className="min-w-[200px]"
+                >
                   Explore Courses
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-zinc-700 hover:bg-zinc-800" asChild>
-                <Link href="/contact">
+                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
+                </GlowButton>
+              </Link>
+              <Link href="/contact">
+                <GlowButton 
+                  variant="secondary"
+                  className="min-w-[200px]"
+                >
                   Talk to Advisor
-                </Link>
-              </Button>
+                </GlowButton>
+              </Link>
             </div>
           </AnimatedContent>
         </div>
@@ -131,15 +148,17 @@ export default function CoursesPage() {
               </h2>
               <div className="space-y-6">
                 {outcomes.map((item, index) => (
-                  <div key={index} className="flex gap-4 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/30 transition-colors">
-                    <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-6 h-6 text-emerald-400" />
+                  <HoverScale key={index} scale={1.02}>
+                    <div className="flex gap-4 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/30 transition-colors">
+                      <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-6 h-6 text-emerald-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">{item.title}</h3>
+                        <p className="text-sm text-zinc-400">{item.description}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold mb-1">{item.title}</h3>
-                      <p className="text-sm text-zinc-400">{item.description}</p>
-                    </div>
-                  </div>
+                  </HoverScale>
                 ))}
               </div>
             </AnimatedContent>
@@ -227,66 +246,68 @@ export default function CoursesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCourses.map((course, index) => (
               <AnimatedContent key={course.id} delay={index * 0.1}>
-                <Card className="bg-zinc-900/50 border-zinc-800 hover:border-violet-500/50 transition-all group overflow-hidden">
-                  <div className="h-2 bg-gradient-to-r from-violet-600 to-emerald-600" />
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-3">
-                      <Badge variant="secondary" className="bg-violet-500/20 text-violet-400">
-                        {course.category}
-                      </Badge>
-                      <Badge variant="outline" className="text-zinc-400">
-                        {course.level}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-xl group-hover:text-violet-400 transition-colors line-clamp-2">
-                      {course.title}
-                    </CardTitle>
-                    <CardDescription className="text-zinc-400 mt-2 line-clamp-2">
-                      {course.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3 mb-6">
-                      <div className="flex items-center gap-2 text-sm text-zinc-500">
-                        <Clock className="w-4 h-4" />
-                        <span>{course.duration}</span>
+                <HoverScale scale={1.03} className="h-full">
+                  <Card className="bg-zinc-900/50 border-zinc-800 hover:border-violet-500/50 transition-all group overflow-hidden h-full flex flex-col">
+                    <div className="h-2 bg-gradient-to-r from-violet-600 to-emerald-600" />
+                    <CardHeader>
+                      <div className="flex items-start justify-between mb-3">
+                        <Badge variant="secondary" className="bg-violet-500/20 text-violet-400">
+                          {course.category}
+                        </Badge>
+                        <Badge variant="outline" className="text-zinc-400">
+                          {course.level}
+                        </Badge>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-zinc-500">
-                        <Users className="w-4 h-4" />
-                        <span>{course.students} students</span>
+                      <CardTitle className="text-xl group-hover:text-violet-400 transition-colors line-clamp-2">
+                        {course.title}
+                      </CardTitle>
+                      <CardDescription className="text-zinc-400 mt-2 line-clamp-2">
+                        {course.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                      <div className="space-y-3 mb-6">
+                        <div className="flex items-center gap-2 text-sm text-zinc-500">
+                          <Clock className="w-4 h-4" />
+                          <span>{course.duration}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-zinc-500">
+                          <Users className="w-4 h-4" />
+                          <span>{course.students} students</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-zinc-500">
+                          <Star className="w-4 h-4 text-amber-400 fill-current" />
+                          <span>{course.rating} rating</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-zinc-500">
-                        <Star className="w-4 h-4 text-amber-400 fill-current" />
-                        <span>{course.rating} rating</span>
-                      </div>
-                    </div>
 
-                    <div className="mb-4">
-                      <div className="text-sm text-zinc-500 mb-1">Learning Outcomes:</div>
-                      <ul className="space-y-1">
-                        {course.outcomes.slice(0, 2).map((outcome, i) => (
-                          <li key={i} className="flex items-center gap-2 text-sm text-zinc-400">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                            {outcome}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <Separator className="my-4 bg-zinc-800" />
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-2xl font-bold">Rs{(course.price / 100).toLocaleString()}</span>
+                      <div className="mb-4">
+                        <div className="text-sm text-zinc-500 mb-1">Learning Outcomes:</div>
+                        <ul className="space-y-1">
+                          {course.outcomes.slice(0, 2).map((outcome, i) => (
+                            <li key={i} className="flex items-center gap-2 text-sm text-zinc-400">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                              {outcome}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                      <Button className="bg-gradient-to-r from-violet-600 to-emerald-600 hover:from-violet-500 hover:to-emerald-500" asChild>
-                        <Link href={`/enroll/${course.id}`}>
-                          Enroll Now
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+
+                      <Separator className="my-4 bg-zinc-800" />
+
+                      <div className="flex items-center justify-between mt-auto">
+                        <div>
+                          <span className="text-2xl font-bold">Rs{(course.price / 100).toLocaleString()}</span>
+                        </div>
+                        <Button className="bg-gradient-to-r from-violet-600 to-emerald-600 hover:from-violet-500 hover:to-emerald-500" asChild>
+                          <Link href={`/enroll/${course.id}`}>
+                            Enroll Now
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </HoverScale>
               </AnimatedContent>
             ))}
           </div>
@@ -370,17 +391,23 @@ export default function CoursesPage() {
               Seats are limited for the next cohort. Secure your spot in the studio today.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-emerald-600 hover:from-violet-500 hover:to-emerald-500" asChild>
-                <Link href="/enroll">
+              <Link href="/enroll">
+                <GlowButton 
+                  variant="emerald"
+                  className="min-w-[200px]"
+                >
                   Enroll Now
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-zinc-700 hover:bg-zinc-800" asChild>
-                <Link href="/contact">
+                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
+                </GlowButton>
+              </Link>
+              <Link href="/contact">
+                <GlowButton 
+                  variant="secondary"
+                  className="min-w-[200px]"
+                >
                   Talk to Advisor
-                </Link>
-              </Button>
+                </GlowButton>
+              </Link>
             </div>
           </AnimatedContent>
         </div>

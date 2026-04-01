@@ -15,6 +15,7 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { 
@@ -210,6 +211,9 @@ export default function AdminCoursesPage() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-800">
             <DialogHeader>
               <DialogTitle>{editingCourse ? 'Edit Course' : 'Add New Course'}</DialogTitle>
+              <DialogDescription>
+                Fill in the course details below. All fields marked with * are required.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

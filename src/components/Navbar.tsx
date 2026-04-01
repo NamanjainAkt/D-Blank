@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GlowButton } from '@/components/ui/GlowButton';
 import {
   Sheet,
   SheetContent,
@@ -38,14 +39,14 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 h-20',
         isScrolled
-          ? 'bg-black/80 backdrop-blur-xl border-b border-white/10'
-          : 'bg-transparent'
+          ? 'bg-black/90 backdrop-blur-xl border-b border-white/10'
+          : 'bg-black/50'
       )}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
             <div className="relative w-10 h-10">
@@ -85,7 +86,7 @@ export function Navbar() {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <Link 
               href="/admin/login" 
               className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
@@ -93,20 +94,20 @@ export function Navbar() {
               Sign In
             </Link>
             <div className="w-px h-4 bg-zinc-700" />
-            <Button
-              className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white border-0 shadow-lg shadow-violet-500/25"
-              asChild
-            >
-              <Link href="/courses">
+            <Link href="/courses">
+              <GlowButton
+                variant="primary"
+                className="px-5 py-2 text-xs"
+              >
                 Get Started
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Link>
-            </Button>
+                <ChevronRight className="w-3 h-3 ml-1" />
+              </GlowButton>
+            </Link>
           </div>
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
+            <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon" className="text-white">
                 <Menu className="w-6 h-6" />
               </Button>
@@ -117,15 +118,7 @@ export function Navbar() {
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-4 border-b border-white/10">
-                  <span className="text-lg font-bold">Menu</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsOpen(false)}
-                    className="text-zinc-400 hover:text-white"
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
+                  <span className="text-lg font-bold text-white">Menu</span>
                 </div>
                 <div className="flex flex-col p-4 gap-2">
                   {navItems.map((item, index) => (
@@ -151,16 +144,15 @@ export function Navbar() {
                   ))}
                 </div>
                 <div className="mt-auto p-4 border-t border-white/10">
-                  <Button
-                    className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white"
-                    asChild
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Link href="/courses">
+                  <Link href="/courses" onClick={() => setIsOpen(false)}>
+                    <GlowButton
+                      variant="primary"
+                      className="w-full"
+                    >
                       Get Started
                       <ChevronRight className="w-4 h-4 ml-2" />
-                    </Link>
-                  </Button>
+                    </GlowButton>
+                  </Link>
                 </div>
               </div>
             </SheetContent>

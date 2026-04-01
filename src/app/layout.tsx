@@ -4,6 +4,8 @@ import { SessionProvider } from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { Navbar } from "@/components/Navbar";
+import { MagneticCursor } from "@/components/ui/MagneticCursor";
+import { MorphingBlobs } from "@/components/ui/MorphingBlobs";
 import "./globals.css";
 
 const orbitron = Orbitron({ 
@@ -87,6 +89,13 @@ export default function RootLayout({
         <SessionProvider>
           <ThemeProvider>
             <LenisProvider>
+              <MagneticCursor />
+              <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+                <MorphingBlobs 
+                  className="opacity-20" 
+                  colors={['rgba(176,38,255,0.1)', 'rgba(0,240,255,0.05)']} 
+                />
+              </div>
               <Navbar />
               {children}
             </LenisProvider>

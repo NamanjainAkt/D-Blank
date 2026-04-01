@@ -5,18 +5,20 @@ import { motion } from 'framer-motion';
 interface GlitchTextProps {
   children: string;
   className?: string;
+  textClassName?: string;
   glitchIntensity?: number;
 }
 
 export function GlitchText({
   children,
   className = '',
+  textClassName = '',
   glitchIntensity = 0.5
 }: GlitchTextProps) {
   return (
     <div className={`relative inline-block ${className}`}>
       {/* Main text */}
-      <span className="relative z-10">{children}</span>
+      <span className={`relative z-10 ${textClassName}`}>{children}</span>
 
       {/* Glitch layers - only show occasionally */}
       <motion.span

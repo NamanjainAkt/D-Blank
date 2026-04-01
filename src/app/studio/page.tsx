@@ -16,6 +16,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ParticleField } from '@/components/ui/ParticleField';
+import { GlitchText } from '@/components/ui/GlitchText';
+import { GlowButton } from '@/components/ui/GlowButton';
+import { HoverScale } from '@/components/ui/HoverScale';
 import AnimatedContent from '@/components/AnimatedContent';
 import GlareHover from '@/components/GlareHover';
 import { achievements, teamMembers, founders } from '@/lib/placeholder-data';
@@ -32,6 +36,13 @@ export default function StudioPage() {
     <main className="min-h-screen bg-black text-white">
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden min-h-[70vh] flex items-center">
+        {/* Particle Field Background */}
+        <ParticleField 
+          particleCount={40} 
+          color="rgba(176, 38, 255, 0.2)" 
+          className="z-0" 
+        />
+        
         <div className="absolute inset-0 bg-gradient-to-b from-violet-950/30 via-black to-black" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[128px]" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[128px]" />
@@ -44,7 +55,7 @@ export default function StudioPage() {
             </Badge>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8">
               <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-                We Build Worlds
+                <GlitchText>We Build Worlds</GlitchText>
               </span>
             </h1>
             <p className="text-zinc-400 text-lg max-w-3xl mx-auto leading-relaxed">
@@ -60,30 +71,32 @@ export default function StudioPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <AnimatedContent key={stat.label} delay={index * 0.1}>
-                <div className="text-center">
-                  <div className={`w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center ${
-                    stat.color === 'violet' ? 'bg-violet-500/20' :
-                    stat.color === 'emerald' ? 'bg-emerald-500/20' :
-                    stat.color === 'amber' ? 'bg-amber-500/20' :
-                    'bg-fuchsia-500/20'
-                  }`}>
-                    <stat.icon className={`w-7 h-7 ${
+                <HoverScale scale={1.1}>
+                  <div className="text-center">
+                    <div className={`w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center ${
+                      stat.color === 'violet' ? 'bg-violet-500/20' :
+                      stat.color === 'emerald' ? 'bg-emerald-500/20' :
+                      stat.color === 'amber' ? 'bg-amber-500/20' :
+                      'bg-fuchsia-500/20'
+                    }`}>
+                      <stat.icon className={`w-7 h-7 ${
+                        stat.color === 'violet' ? 'text-violet-400' :
+                        stat.color === 'emerald' ? 'text-emerald-400' :
+                        stat.color === 'amber' ? 'text-amber-400' :
+                        'text-fuchsia-400'
+                      }`} />
+                    </div>
+                    <div className={`text-3xl md:text-4xl font-bold mb-1 ${
                       stat.color === 'violet' ? 'text-violet-400' :
                       stat.color === 'emerald' ? 'text-emerald-400' :
                       stat.color === 'amber' ? 'text-amber-400' :
                       'text-fuchsia-400'
-                    }`} />
+                    }`}>
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-zinc-500">{stat.label}</div>
                   </div>
-                  <div className={`text-3xl md:text-4xl font-bold mb-1 ${
-                    stat.color === 'violet' ? 'text-violet-400' :
-                    stat.color === 'emerald' ? 'text-emerald-400' :
-                    stat.color === 'amber' ? 'text-amber-400' :
-                    'text-fuchsia-400'
-                  }`}>
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-zinc-500">{stat.label}</div>
-                </div>
+                </HoverScale>
               </AnimatedContent>
             ))}
           </div>
@@ -207,17 +220,23 @@ export default function StudioPage() {
               Whether you are a player or a future developer, there is a place for you at D-Blanks.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500" asChild>
-                <Link href="/games">
+              <Link href="/games">
+                <GlowButton 
+                  variant="primary"
+                  className="min-w-[200px]"
+                >
                   Play Our Games
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-zinc-700 hover:bg-zinc-800" asChild>
-                <Link href="/courses">
+                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
+                </GlowButton>
+              </Link>
+              <Link href="/courses">
+                <GlowButton 
+                  variant="secondary"
+                  className="min-w-[200px]"
+                >
                   Join the Studio
-                </Link>
-              </Button>
+                </GlowButton>
+              </Link>
             </div>
           </AnimatedContent>
         </div>

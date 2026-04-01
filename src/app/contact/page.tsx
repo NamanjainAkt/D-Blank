@@ -17,6 +17,10 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ParticleField } from '@/components/ui/ParticleField';
+import { GlitchText } from '@/components/ui/GlitchText';
+import { GlowButton } from '@/components/ui/GlowButton';
+import { HoverScale } from '@/components/ui/HoverScale';
 import AnimatedContent from '@/components/AnimatedContent';
 import GlareHover from '@/components/GlareHover';
 
@@ -58,6 +62,13 @@ export default function ContactPage() {
     <main className="min-h-screen bg-black text-white">
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden">
+        {/* Particle Field Background */}
+        <ParticleField 
+          particleCount={30} 
+          color="rgba(176, 38, 255, 0.2)" 
+          className="z-0" 
+        />
+        
         <div className="absolute inset-0 bg-gradient-to-b from-violet-950/30 via-black to-black" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[128px]" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[128px]" />
@@ -69,7 +80,7 @@ export default function ContactPage() {
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-                Get in Touch
+                <GlitchText>Get in Touch</GlitchText>
               </span>
             </h1>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-10">
@@ -85,26 +96,28 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {contactMethods.map((method, index) => (
               <AnimatedContent key={method.title} delay={index * 0.1}>
-                <GlareHover
-                  background="linear-gradient(135deg, rgba(88, 28, 135, 0.2) 0%, rgba(30, 10, 60, 0.4) 100%)"
-                  borderColor="rgba(139, 92, 246, 0.2)"
-                  className="w-full !rounded-xl border p-6"
-                >
-                  <Card className="bg-transparent border-0 shadow-none w-full">
-                    <CardHeader className="p-0 mb-4">
-                      <div className="w-12 h-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4">
-                        <method.icon className="w-6 h-6 text-violet-400" />
-                      </div>
-                      <CardTitle className="text-lg">{method.title}</CardTitle>
-                      <CardDescription className="text-zinc-400">
-                        {method.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <p className="text-violet-400 font-medium">{method.value}</p>
-                    </CardContent>
-                  </Card>
-                </GlareHover>
+                <HoverScale scale={1.05} className="h-full">
+                  <GlareHover
+                    background="linear-gradient(135deg, rgba(88, 28, 135, 0.2) 0%, rgba(30, 10, 60, 0.4) 100%)"
+                    borderColor="rgba(139, 92, 246, 0.2)"
+                    className="w-full h-full !rounded-xl border p-6"
+                  >
+                    <Card className="bg-transparent border-0 shadow-none w-full">
+                      <CardHeader className="p-0 mb-4">
+                        <div className="w-12 h-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4">
+                          <method.icon className="w-6 h-6 text-violet-400" />
+                        </div>
+                        <CardTitle className="text-lg">{method.title}</CardTitle>
+                        <CardDescription className="text-zinc-400">
+                          {method.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <p className="text-violet-400 font-medium">{method.value}</p>
+                      </CardContent>
+                    </Card>
+                  </GlareHover>
+                </HoverScale>
               </AnimatedContent>
             ))}
           </div>
@@ -168,10 +181,10 @@ export default function ContactPage() {
                       className="bg-zinc-800 border-zinc-700 resize-none"
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500">
+                  <GlowButton type="submit" variant="primary" className="w-full">
                     <Send className="w-4 h-4 mr-2" />
                     Send Message
-                  </Button>
+                  </GlowButton>
                 </form>
               </CardContent>
             </Card>

@@ -2,545 +2,616 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  ChevronRight, 
-  Users, 
-  Trophy, 
+import {
+  ChevronRight,
+  Users,
+  Trophy,
   Star,
   ArrowRight,
   Sparkles,
-  Monitor,
-  Code2,
   Layers,
-  Youtube,
-  Twitter,
-  Instagram,
-  Github,
-  Linkedin
+  Linkedin,
+  Gamepad2,
+  Zap,
+  BookOpen,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { ParticleField } from '@/components/ui/ParticleField';
+import { GlitchText } from '@/components/ui/GlitchText';
+import { TypingText } from '@/components/ui/TypingText';
+import { GlowButton } from '@/components/ui/GlowButton';
+import { HoverScale } from '@/components/ui/HoverScale';
 import AnimatedContent from '@/components/AnimatedContent';
-import GlareHover from '@/components/GlareHover';
-import { games, courses, stats, testimonials, founders } from '@/lib/placeholder-data';
+import { games, testimonials, founders } from '@/lib/placeholder-data';
 
-// Tool logos as SVG components
-const UnityLogo = () => (
-  <svg viewBox="0 0 124 124" className="w-8 h-8" fill="white">
-    <path d="M85.537 20.024L38.458 0.047C36.542 -0.492 34.534 0.506 33.997 2.436L0.487 92.777c-0.535 1.93 0.467 3.938 2.386 4.424l47.08 19.978c1.916 0.812 4.153 -0.14 4.723 -2.01l5.342 -30.63 21.826 -3.858 10.769 11.155c1.124 1.165 3.005 1.165 4.128 0l11.154 -11.562 9.736 -2.113c1.93 -0.54 2.948 -2.547 2.406 -4.477l-5.342 -30.558z"/>
-  </svg>
-);
-
-const UnrealLogo = () => (
-  <svg viewBox="0 0 124 124" className="w-8 h-8" fill="white">
-    <path d="M0 62.5L62 0l62 62-62 62L0 62.5zm33.3 33.3l28.7-28.7 28.7 28.7-28.7 28.7-28.7-28.7z"/>
-  </svg>
-);
-
-const BlenderLogo = () => (
-  <svg viewBox="0 0 124 124" className="w-8 h-8" fill="white">
-    <path d="M62 0C28.3 0 0 28.3 0 62s28.3 62 62 62 62-28.3 62-62S95.7 0 62 0zm0 103.3c-22.8 0-41.3-18.5-41.3-41.3S39.2 20.7 62 20.7s41.3 18.5 41.3 41.3-18.5 41.3-41.3 41.3z"/>
-  </svg>
-);
-
-const GodotLogo = () => (
-  <svg viewBox="0 0 124 124" className="w-8 h-8" fill="white">
-    <circle cx="62" cy="62" r="50"/>
-  </svg>
-);
-
-// Avatar colors for testimonials
 const avatarColors = [
-  'from-violet-600 to-purple-600',
-  'from-cyan-600 to-blue-600',
-  'from-amber-600 to-orange-600',
-  'from-emerald-600 to-green-600',
-  'from-pink-600 to-rose-600',
-  'from-indigo-600 to-blue-600',
+  'from-violet-600 to-purple-700',
+  'from-cyan-600 to-blue-700',
+  'from-amber-600 to-orange-700',
+  'from-emerald-600 to-green-700',
+  'from-pink-600 to-rose-700',
+  'from-indigo-600 to-blue-700',
 ];
+
+const genreStyles: Record<string, { gradient: string; border: string; badge: string }> = {
+  RPG:      { gradient: 'from-purple-900/70 to-violet-950/80',  border: 'hover:border-violet-500/60', badge: 'bg-violet-600/90' },
+  Racing:   { gradient: 'from-cyan-900/70 to-blue-950/80',      border: 'hover:border-cyan-500/60',   badge: 'bg-cyan-600/90' },
+  Strategy: { gradient: 'from-blue-900/70 to-indigo-950/80',    border: 'hover:border-blue-500/60',   badge: 'bg-blue-600/90' },
+  Action:   { gradient: 'from-red-900/70 to-rose-950/80',       border: 'hover:border-red-500/60',    badge: 'bg-red-600/90' },
+  Roguelike:{ gradient: 'from-amber-900/70 to-orange-950/80',   border: 'hover:border-amber-500/60',  badge: 'bg-amber-600/90' },
+};
+
+const heroStats = [
+  { value: '500+', label: 'Students' },
+  { value: '10+',  label: 'Games Published' },
+  { value: '4.8★', label: 'Avg. Rating' },
+  { value: 'AICTE', label: 'Recognized' },
+];
+
+const features = [
+  {
+    num: '01',
+    icon: BookOpen,
+    title: 'Industry-Standard Tools',
+    desc: 'Master professional workflows used by AAA studios worldwide.',
+    tags: ['Unity', 'Unreal', 'Blender', 'Godot'],
+    color: 'violet',
+    barGradient: 'from-violet-500 to-fuchsia-500',
+    hoverBorder: 'hover:border-violet-500/40',
+    blob: 'bg-violet-600/10 group-hover:bg-violet-600/20',
+    numColor: 'text-violet-500/20',
+    iconColor: 'text-violet-400',
+    tagHover: 'hover:border-violet-500/50 hover:text-violet-300',
+    wide: true,
+  },
+  {
+    num: '02',
+    icon: Layers,
+    title: 'Hands-on Projects',
+    desc: 'Build real games from day one with guided mentorship.',
+    color: 'emerald',
+    barGradient: 'from-emerald-500 to-teal-500',
+    hoverBorder: 'hover:border-emerald-500/40',
+    blob: 'bg-emerald-600/10 group-hover:bg-emerald-600/20',
+    numColor: 'text-emerald-500/20',
+    iconColor: 'text-emerald-400',
+  },
+  {
+    num: '03',
+    icon: Users,
+    title: 'Expert Mentors',
+    desc: 'Learn from industry professionals with real-world experience.',
+    color: 'blue',
+    barGradient: 'from-blue-500 to-cyan-500',
+    hoverBorder: 'hover:border-blue-500/40',
+    blob: 'bg-blue-600/10 group-hover:bg-blue-600/20',
+    numColor: 'text-blue-500/20',
+    iconColor: 'text-blue-400',
+  },
+  {
+    num: '04',
+    icon: Trophy,
+    title: 'Career Support',
+    desc: 'Portfolio reviews, job referrals & placement assistance.',
+    color: 'amber',
+    barGradient: 'from-amber-500 to-orange-500',
+    hoverBorder: 'hover:border-amber-500/40',
+    blob: 'bg-amber-600/10 group-hover:bg-amber-600/20',
+    numColor: 'text-amber-500/20',
+    iconColor: 'text-amber-400',
+  },
+];
+
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <div className="flex items-center justify-center gap-3 mb-4">
+      <div className="w-8 h-px bg-gradient-to-r from-transparent to-violet-500" />
+      <span className="text-violet-400 text-[10px] font-display tracking-[0.35em] uppercase">{children}</span>
+      <div className="w-8 h-px bg-gradient-to-l from-transparent to-violet-500" />
+    </div>
+  );
+}
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-black text-white">
-      {/* ===== HERO SECTION ===== */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-b from-violet-950/20 via-black to-black" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[128px]" />
-        
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]" />
-        
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+      {/* ===== HERO ===== */}
+      <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden px-4 py-12">
+        <ParticleField particleCount={80} color="rgba(176, 38, 255, 0.2)" className="z-0" />
+
+        {/* Layered background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-violet-950/25 via-black/60 to-black" />
+        <div className="absolute top-1/3 left-[15%] w-[520px] h-[520px] bg-violet-600/15 rounded-full blur-[140px]" />
+        <div className="absolute bottom-1/4 right-[15%] w-[460px] h-[460px] bg-fuchsia-600/12 rounded-full blur-[140px]" />
+        {/* Top edge glow */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/60 to-transparent" />
+
+        {/* Grid — violet tinted */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.045)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]" />
+
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Badge */}
           <AnimatedContent>
-            <Badge 
-              variant="outline" 
-              className="mb-8 px-4 py-1.5 text-xs font-medium border-violet-500/50 bg-violet-500/10 text-violet-400"
-            >
+            <Badge variant="outline" className="mb-8 px-4 py-1.5 text-xs font-medium border-violet-500/50 bg-violet-500/10 text-violet-400 hover:border-violet-400/60 transition-colors cursor-default">
               <Sparkles className="w-3 h-3 mr-2" />
               AICTE Approved Vocational Partner
             </Badge>
           </AnimatedContent>
 
-          {/* Headline with clamp for responsive font sizes */}
+          {/* Headline — large, display font */}
           <AnimatedContent delay={0.1}>
-            <h1 className="text-[clamp(2rem,6vw,4rem)] font-bold tracking-tight mb-6 leading-[1.1]">
+            <h1 className="text-[clamp(3rem,9vw,6rem)] font-black leading-[0.95] mb-7 tracking-tight">
               <span className="block">
-                <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+                <GlitchText glitchIntensity={1} textClassName="bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent">
                   Build. Play.
-                </span>
+                </GlitchText>
               </span>
-              <span className="block">
-                <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-400 bg-clip-text text-transparent">
+              <span className="block mt-2">
+                <GlitchText glitchIntensity={1.5} textClassName="bg-gradient-to-r from-violet-400 via-fuchsia-300 to-violet-400 bg-clip-text text-transparent">
                   Create.
-                </span>
+                </GlitchText>
               </span>
             </h1>
           </AnimatedContent>
 
           {/* Subheadline */}
           <AnimatedContent delay={0.2}>
-            <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-              We craft immersive gaming experiences and train the next generation of game developers through industry-leading programs.
-            </p>
+            <div className="text-base sm:text-lg text-zinc-400 max-w-xl mx-auto mb-10 leading-relaxed min-h-[3rem]">
+              <TypingText
+                text="We craft immersive gaming experiences and train the next generation of game developers through industry-leading programs."
+                speed={0.03}
+                delay={0.5}
+              />
+            </div>
           </AnimatedContent>
 
-          {/* CTAs - Primary and Secondary */}
+          {/* CTAs */}
           <AnimatedContent delay={0.3}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white border-0 h-12 px-8 text-base font-semibold shadow-lg shadow-violet-500/25"
-                asChild
-              >
-                <Link href="/courses">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-14">
+              <Link href="/courses">
+                <GlowButton variant="primary" className="w-full sm:w-auto min-w-[180px]">
                   Start Learning
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="h-12 px-8 text-base font-semibold border-zinc-700 hover:bg-zinc-800 hover:border-zinc-600"
-                asChild
-              >
-                <Link href="/games">
+                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
+                </GlowButton>
+              </Link>
+              <Link href="/games">
+                <GlowButton variant="secondary" className="w-full sm:w-auto min-w-[180px]">
                   Explore Games
-                </Link>
-              </Button>
+                </GlowButton>
+              </Link>
+            </div>
+          </AnimatedContent>
+
+          {/* Stats bar */}
+          <AnimatedContent delay={0.45}>
+            <div className="flex flex-wrap items-center justify-center gap-px rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-sm divide-x divide-zinc-800">
+              {heroStats.map(({ value, label }) => (
+                <div key={label} className="flex flex-col items-center px-6 py-3 flex-1 min-w-[80px] hover:bg-zinc-800/40 transition-colors">
+                  <span className="text-lg sm:text-xl font-black text-white tracking-wide">{value}</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-0.5">{label}</span>
+                </div>
+              ))}
             </div>
           </AnimatedContent>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 rounded-full border-2 border-zinc-600 flex items-start justify-center p-1.5">
-            <div className="w-1 h-2 bg-zinc-400 rounded-full" />
+        {/* Scroll indicator */}
+        <div className="absolute bottom-7 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 rounded-full border-2 border-violet-500/40 flex items-start justify-center p-1.5">
+            <div className="w-1 h-2 bg-violet-400/80 rounded-full" />
           </div>
         </div>
       </section>
+
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
 
       {/* ===== FEATURED GAMES ===== */}
-      <section className="py-24 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="min-h-[100dvh] py-20 px-4 bg-black flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
           <AnimatedContent>
-            <div className="flex items-end justify-between mb-12">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
               <div>
-                <Badge variant="outline" className="mb-4 text-violet-400 border-violet-500/50">
-                  Our Games
-                </Badge>
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  Featured Titles
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-px bg-violet-500" />
+                  <span className="text-violet-400 text-[10px] font-display tracking-[0.35em] uppercase">Our Games</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
+                  Featured <span className="text-violet-400">Titles</span>
                 </h2>
               </div>
-              <Button variant="ghost" className="text-zinc-400 hover:text-white hidden sm:flex" asChild>
+              <Button variant="ghost" className="text-zinc-500 hover:text-violet-400 hidden sm:flex items-center gap-1 transition-colors group text-sm" asChild>
                 <Link href="/games">
-                  View All
-                  <ChevronRight className="w-4 h-4 ml-1" />
+                  View All Games
+                  <ChevronRight className="w-4 h-4 ml-0.5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </Button>
             </div>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {games.slice(0, 3).map((game, index) => (
-              <AnimatedContent key={game.id} delay={index * 0.1}>
-                <GlareHover
-                  background="linear-gradient(135deg, rgba(88, 28, 135, 0.2) 0%, rgba(30, 10, 60, 0.4) 100%)"
-                  borderColor="rgba(255, 255, 255, 0.1)"
-                  glareColor="#8b5cf6"
-                  className="w-full !rounded-xl border"
-                >
-                  <Card className="bg-transparent border-0 shadow-none w-full">
-                    <div className="relative aspect-video bg-gradient-to-br from-violet-900/50 to-fuchsia-900/50 rounded-xl overflow-hidden mb-4">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Image src="/favicon.jpeg" alt={game.title} width={64} height={64} className="opacity-20" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+            {games.slice(0, 3).map((game, index) => {
+              const style = genreStyles[game.genre] ?? { gradient: 'from-violet-900/70 to-fuchsia-950/80', border: 'hover:border-violet-500/60', badge: 'bg-violet-600/90' };
+              return (
+                <AnimatedContent key={game.id} delay={index * 0.1}>
+                  <HoverScale scale={1.02} className="h-full">
+                    <div className={`group h-full rounded-xl overflow-hidden border border-zinc-800 ${style.border} transition-all duration-400 bg-zinc-900/50 hover:shadow-xl hover:shadow-violet-500/10`}>
+                      {/* Genre-colored top area */}
+                      <div className={`relative aspect-video bg-gradient-to-br ${style.gradient} overflow-hidden`}>
+                        {/* Subtle grid inside */}
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px]" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Gamepad2 className="w-14 h-14 text-white/10 group-hover:text-white/20 group-hover:scale-110 transition-all duration-500" />
+                        </div>
+                        {/* Bottom-left: rating */}
+                        <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/70 backdrop-blur-sm rounded-md px-2.5 py-1">
+                          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                          <span className="text-xs font-bold text-amber-400">{game.rating}</span>
+                        </div>
+                        {/* Top-right: genre */}
+                        <div className={`absolute top-3 right-3 text-white text-[10px] font-bold px-2.5 py-1 rounded-md ${style.badge}`}>
+                          {game.genre}
+                        </div>
+                        {game.featured && (
+                          <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-2 py-0.5 rounded tracking-widest">
+                            FEATURED
+                          </div>
+                        )}
                       </div>
-                      {/* Genre badge with accent color */}
-                      <Badge 
-                        className={`absolute top-3 left-3 text-xs font-medium px-2.5 py-0.5 ${
-                          game.genre === 'RPG' ? 'bg-purple-600/80' :
-                          game.genre === 'Racing' ? 'bg-cyan-600/80' :
-                          game.genre === 'Strategy' ? 'bg-blue-600/80' :
-                          game.genre === 'Action' ? 'bg-red-600/80' :
-                          game.genre === 'Roguelike' ? 'bg-green-600/80' :
-                          game.genre === 'Battle Royale' ? 'bg-orange-600/80' :
-                          'bg-zinc-600/80'
-                        }`}
-                      >
-                        {game.genre}
-                      </Badge>
-                      {game.featured && (
-                        <Badge className="absolute top-3 right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-medium">
-                          Featured
-                        </Badge>
-                      )}
+
+                      <div className="p-5">
+                        <h3 className="text-base font-bold mb-1.5 group-hover:text-violet-400 transition-colors tracking-wide">{game.title}</h3>
+                        <p className="text-xs text-zinc-500 mb-4 line-clamp-2 leading-relaxed">{game.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-zinc-600 bg-zinc-800/60 px-2.5 py-1 rounded-md border border-zinc-700/50">
+                            {game.platform}
+                          </span>
+                          <span className="text-xs text-zinc-700">{game.releaseDate}</span>
+                        </div>
+                      </div>
                     </div>
-                    <CardHeader className="p-0 mb-2">
-                      <CardTitle className="text-lg font-bold">{game.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <p className="text-sm text-zinc-400 mb-3 line-clamp-2">{game.description}</p>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="flex items-center gap-1 text-amber-400">
-                          <Star className="w-4 h-4 fill-current" />
-                          {game.rating}
-                        </span>
-                        {/* Platform as styled badge */}
-                        <Badge variant="outline" className="text-xs border-zinc-700 text-zinc-400">
-                          {game.platform}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </GlareHover>
-              </AnimatedContent>
-            ))}
+                  </HoverScale>
+                </AnimatedContent>
+              );
+            })}
+          </div>
+
+          {/* Mobile: View All link */}
+          <div className="mt-8 text-center sm:hidden">
+            <Link href="/games" className="text-sm text-violet-400 hover:text-violet-300 transition-colors flex items-center justify-center gap-1">
+              View All Games <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
 
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
+
       {/* ===== WHY CHOOSE US ===== */}
-      <section className="py-24 bg-zinc-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedContent className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 text-violet-400 border-violet-500/50">
-              Why D-Blanks
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-              Built for Excellence
+      <section className="min-h-[100dvh] py-20 px-4 bg-zinc-950 flex items-center relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[250px] bg-violet-600/5 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto w-full">
+          <AnimatedContent className="text-center mb-14">
+            <SectionLabel>Why D-Blanks</SectionLabel>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4">
+              Built for <span className="text-violet-400">Excellence</span>
             </h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">
-              We combine cutting-edge technology with creative mastery to deliver exceptional gaming experiences.
+            <p className="text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed">
+              Cutting-edge technology combined with creative mastery and industry-ready curriculum.
             </p>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            {/* Feature 1 - Industry-Standard Tools */}
-            <AnimatedContent className="lg:col-span-2">
-              <GlareHover
-                background="linear-gradient(135deg, rgba(88, 28, 135, 0.3) 0%, rgba(30, 10, 60, 0.5) 100%)"
-                borderColor="rgba(139, 92, 246, 0.3)"
-                className="w-full !rounded-xl border p-6 h-full"
-              >
-                <div className="flex flex-col justify-between h-full">
-                  <div>
-                    <h3 className="text-xl font-bold mb-3">Industry-Standard Tools</h3>
-                    <p className="text-zinc-400 text-sm leading-relaxed mb-4">
-                      Master professional workflows used by AAA studios worldwide.
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1.5 rounded-lg">
-                      <UnityLogo />
-                      <span className="text-xs font-medium">Unity</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1.5 rounded-lg">
-                      <UnrealLogo />
-                      <span className="text-xs font-medium">Unreal</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1.5 rounded-lg">
-                      <BlenderLogo />
-                      <span className="text-xs font-medium">Blender</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1.5 rounded-lg">
-                      <GodotLogo />
-                      <span className="text-xs font-medium">Godot</span>
-                    </div>
-                  </div>
-                </div>
-              </GlareHover>
-            </AnimatedContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {features.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <AnimatedContent key={f.num} delay={i * 0.1} className={f.wide ? 'sm:col-span-2' : ''}>
+                  <div className={`relative h-full rounded-xl border border-zinc-800/80 ${f.hoverBorder} transition-all duration-300 p-6 overflow-hidden group bg-zinc-900/30`}>
+                    {/* Left accent bar */}
+                    <div className={`absolute top-0 left-0 w-0.5 h-full bg-gradient-to-b ${f.barGradient} rounded-l-xl`} />
+                    {/* Glow blob */}
+                    <div className={`absolute -top-8 -right-8 w-36 h-36 ${f.blob} rounded-full blur-2xl transition-colors duration-500`} />
+                    {/* Big number bg */}
+                    <span className={`${f.numColor} font-black text-8xl absolute top-1 right-3 select-none leading-none`}>{f.num}</span>
 
-            {/* Feature 2 */}
-            <AnimatedContent delay={0.1}>
-              <GlareHover
-                background="linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%)"
-                borderColor="rgba(16, 185, 129, 0.3)"
-                className="w-full !rounded-xl border p-5 h-full"
-              >
-                <div className="flex flex-col justify-between h-full">
-                  <div>
-                    <Layers className="w-7 h-7 text-emerald-400 mb-3" />
-                    <h3 className="text-base font-bold mb-2">Hands-on Projects</h3>
-                    <p className="text-sm text-zinc-400">Build real games from day one.</p>
+                    <div className="relative">
+                      <Icon className={`w-7 h-7 ${f.iconColor} mb-4`} />
+                      <h3 className="text-sm font-bold mb-2 tracking-wide">{f.title}</h3>
+                      <p className="text-xs text-zinc-500 leading-relaxed mb-4">{f.desc}</p>
+                      {f.tags && (
+                        <div className="flex flex-wrap gap-2">
+                          {f.tags.map(tag => (
+                            <span key={tag} className={`px-3 py-1 text-xs rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-400 ${f.tagHover} transition-all cursor-default`}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </GlareHover>
-            </AnimatedContent>
-
-            {/* Feature 3 */}
-            <AnimatedContent delay={0.2}>
-              <GlareHover
-                background="linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%)"
-                borderColor="rgba(59, 130, 246, 0.3)"
-                className="w-full !rounded-xl border p-5 h-full"
-              >
-                <div className="flex flex-col justify-between h-full">
-                  <div>
-                    <Users className="w-7 h-7 text-blue-400 mb-3" />
-                    <h3 className="text-base font-bold mb-2">Expert Mentors</h3>
-                    <p className="text-sm text-zinc-400">Learn from industry professionals.</p>
-                  </div>
-                </div>
-              </GlareHover>
-            </AnimatedContent>
-
-            {/* Feature 4 */}
-            <AnimatedContent delay={0.3}>
-              <GlareHover
-                background="linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%)"
-                borderColor="rgba(245, 158, 11, 0.3)"
-                className="w-full !rounded-xl border p-5 h-full"
-              >
-                <div className="flex flex-col justify-between h-full">
-                  <div>
-                    <Trophy className="w-7 h-7 text-amber-400 mb-3" />
-                    <h3 className="text-base font-bold mb-2">Career Support</h3>
-                    <p className="text-sm text-zinc-400">Portfolio reviews & job referrals.</p>
-                  </div>
-                </div>
-              </GlareHover>
-            </AnimatedContent>
+                </AnimatedContent>
+              );
+            })}
           </div>
         </div>
       </section>
 
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
+
       {/* ===== TESTIMONIALS ===== */}
-      <section className="py-24 bg-zinc-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedContent className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 text-violet-400 border-violet-500/50">
-              Testimonials
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-              What Our Community Says
+      <section className="min-h-[100dvh] py-20 px-4 bg-black flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
+          <AnimatedContent className="text-center mb-14">
+            <SectionLabel>Testimonials</SectionLabel>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
+              What Our <span className="text-violet-400">Community</span> Says
             </h2>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {testimonials.slice(0, 6).map((testimonial, index) => (
-              <AnimatedContent key={testimonial.id} delay={index * 0.1}>
-                <Card className="bg-zinc-900/50 border-zinc-800 h-full">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-1 text-amber-400 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-current" />
-                      ))}
+              <AnimatedContent key={testimonial.id} delay={index * 0.08}>
+                <div className="relative h-full rounded-xl bg-zinc-900/50 border border-zinc-800/80 hover:border-violet-500/30 transition-all duration-300 p-6 group overflow-hidden">
+                  {/* Top gradient line */}
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
+                  {/* Subtle corner glow on hover */}
+                  <div className="absolute -top-8 -right-8 w-24 h-24 bg-violet-500/0 group-hover:bg-violet-500/8 rounded-full blur-2xl transition-colors duration-500" />
+
+                  {/* Large decorative quote */}
+                  <div className="text-7xl font-black text-violet-500/12 leading-none mb-1 select-none font-display">"</div>
+
+                  {/* Stars */}
+                  <div className="flex items-center gap-0.5 text-amber-400 mb-3">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    ))}
+                  </div>
+
+                  <p className="text-zinc-300 text-sm leading-relaxed mb-6">
+                    "{testimonial.content}"
+                  </p>
+
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-white font-bold text-sm shrink-0 ring-2 ring-zinc-800`}>
+                      {testimonial.name[0]}
                     </div>
-                    <p className="text-zinc-300 mb-6 leading-relaxed">
-                      "{testimonial.content}"
-                    </p>
-                    <div className="flex items-center gap-3">
-                      {/* Styled avatar with color */}
-                      <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-white font-bold text-lg`}>
-                        {testimonial.name[0]}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-white">{testimonial.name}</p>
-                        <p className="text-sm text-zinc-500">{testimonial.role}</p>
-                      </div>
+                    <div>
+                      <p className="font-semibold text-white text-sm">{testimonial.name}</p>
+                      <p className="text-xs text-zinc-600">{testimonial.role}</p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </AnimatedContent>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== TEAM PREVIEW ===== */}
-      <section className="py-24 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedContent className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 text-violet-400 border-violet-500/50">
-              Our Team
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-              Meet the Founders
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
+
+      {/* ===== TEAM ===== */}
+      <section className="min-h-[100dvh] py-20 px-4 bg-zinc-950 flex items-center">
+        <div className="max-w-7xl mx-auto w-full">
+          <AnimatedContent className="text-center mb-14">
+            <SectionLabel>Our Team</SectionLabel>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4">
+              Meet the <span className="text-violet-400">Founders</span>
             </h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">
+            <p className="text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed">
               A passionate team of game developers, artists, and educators united by a love for interactive storytelling.
             </p>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {founders.map((founder, index) => (
               <AnimatedContent key={founder.id} delay={index * 0.1}>
-                <Card className="bg-zinc-900/50 border-zinc-800 hover:border-violet-500/50 transition-all group h-full">
-                  <CardContent className="pt-6 text-center">
-                    {/* Large styled avatar */}
-                    <div className="w-28 h-28 rounded-full mx-auto mb-6 overflow-hidden bg-gradient-to-br from-violet-600/30 to-fuchsia-600/30 border-2 border-violet-500/30 group-hover:border-violet-500/60 transition-colors">
-                      <div className={`w-full h-full bg-gradient-to-br ${avatarColors[index]} flex items-center justify-center text-4xl font-bold text-white/80`}>
-                        {founder.name.split(' ').map(n => n[0]).join('')}
-                      </div>
+                <div className="relative rounded-xl overflow-hidden border border-zinc-800/80 hover:border-violet-500/40 transition-all duration-500 group bg-zinc-900/30">
+                  {/* Image */}
+                  <div className="relative h-52 sm:h-60 overflow-hidden">
+                    <Image
+                      src={`/team/founder${index + 1}.jpeg`}
+                      alt={founder.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
+                    {/* Role chip */}
+                    <div className="absolute top-3 right-3">
+                      <span className="px-2.5 py-1 text-[9px] font-display tracking-widest bg-black/60 border border-violet-500/40 text-violet-300 rounded-md backdrop-blur-sm uppercase">
+                        {founder.role.split(' ')[0]}
+                      </span>
                     </div>
-                    <h3 className="text-xl font-bold mb-1">{founder.name}</h3>
-                    <p className="text-violet-400 text-sm mb-3 font-medium">{founder.role}</p>
-                    <p className="text-zinc-400 text-sm leading-relaxed">{founder.bio}</p>
-                  </CardContent>
-                </Card>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5">
+                    <h3 className="font-bold text-white text-sm mb-0.5 tracking-wide">{founder.name}</h3>
+                    <p className="text-violet-400 text-xs mb-2 font-medium">{founder.role}</p>
+                    <p className="text-zinc-600 text-xs line-clamp-2 leading-relaxed">{founder.bio}</p>
+                  </div>
+
+                  {/* Bottom hover accent */}
+                  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                </div>
               </AnimatedContent>
             ))}
           </div>
 
           <AnimatedContent className="text-center mt-12">
-            <Button variant="outline" className="border-zinc-700 hover:bg-zinc-800" asChild>
+            <Button variant="outline" className="border-zinc-700 hover:border-violet-500/50 hover:bg-violet-500/5 hover:text-violet-400 transition-all duration-300 text-xs tracking-widest px-8 py-5" asChild>
               <Link href="/studio">
                 View Full Team
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-3.5 h-3.5 ml-2" />
               </Link>
             </Button>
           </AnimatedContent>
         </div>
       </section>
 
-      {/* ===== CTA SECTION ===== */}
-      <section className="py-24 bg-gradient-to-b from-zinc-950 to-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.1)_1px,transparent_1px)] bg-[size:64px_64px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/20 rounded-full blur-[128px]" />
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* ===== CTA ===== */}
+      <section className="py-24 px-4 bg-gradient-to-b from-zinc-950 to-black relative overflow-hidden">
+        {/* Grid bg */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        {/* Center glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-violet-600/10 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="relative max-w-3xl mx-auto w-full">
           <AnimatedContent>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
-              Ready to Build Something{' '}
-              <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Amazing?
-              </span>
-            </h2>
-            <p className="text-zinc-400 text-lg mb-10 max-w-2xl mx-auto">
-              Join thousands of aspiring game developers who have launched their careers with D-Blanks.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white border-0 h-12 px-8 text-base font-semibold shadow-lg shadow-violet-500/25"
-                asChild
-              >
+            {/* Outer glow */}
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500/15 via-fuchsia-500/8 to-violet-500/15 blur-2xl" />
+
+            {/* Card */}
+            <div className="relative rounded-2xl border border-violet-500/20 bg-zinc-950/90 backdrop-blur-sm p-10 sm:p-14 text-center">
+              {/* Corner brackets */}
+              <div className="absolute top-4 left-4 w-5 h-5 border-t-2 border-l-2 border-violet-500/50 rounded-tl-sm" />
+              <div className="absolute top-4 right-4 w-5 h-5 border-t-2 border-r-2 border-violet-500/50 rounded-tr-sm" />
+              <div className="absolute bottom-4 left-4 w-5 h-5 border-b-2 border-l-2 border-violet-500/50 rounded-bl-sm" />
+              <div className="absolute bottom-4 right-4 w-5 h-5 border-b-2 border-r-2 border-violet-500/50 rounded-br-sm" />
+
+              {/* Top line */}
+              <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
+
+              <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-6">
+                <Zap className="w-6 h-6 text-violet-400" />
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-4">
+                Ready to Build Something{' '}
+                <span className="bg-gradient-to-r from-violet-400 via-fuchsia-300 to-violet-400 bg-clip-text text-transparent">
+                  Amazing?
+                </span>
+              </h2>
+              <p className="text-zinc-400 text-sm sm:text-base mb-8 max-w-lg mx-auto leading-relaxed">
+                Join thousands of aspiring game developers who have launched their careers with D-Blanks.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
                 <Link href="/courses">
-                  Start Learning Free
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <GlowButton variant="primary" className="w-full sm:w-auto min-w-[200px]">
+                    Start Learning Free
+                    <ArrowRight className="inline-block w-4 h-4 ml-2" />
+                  </GlowButton>
                 </Link>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="h-12 px-8 text-base font-semibold border-zinc-700 hover:bg-zinc-800"
-                asChild
-              >
                 <Link href="/contact">
-                  Contact Us
+                  <GlowButton variant="secondary" className="w-full sm:w-auto min-w-[200px]">
+                    Contact Us
+                  </GlowButton>
                 </Link>
-              </Button>
+              </div>
+
+              {/* Trust chips */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-600">
+                {['No credit card needed', 'AICTE Recognized', 'Industry mentors'].map(item => (
+                  <span key={item} className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-violet-500/70" />
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
           </AnimatedContent>
         </div>
       </section>
 
-      {/* ===== EXPANDED FOOTER ===== */}
-      <footer className="py-16 border-t border-zinc-800 bg-zinc-950">
+      {/* ===== FOOTER ===== */}
+      <footer className="py-14 px-4 border-t border-zinc-800/50 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            {/* Brand Column */}
-            <div className="md:col-span-1">
-              <Link href="/" className="flex items-center gap-2 group mb-4">
-                <div className="relative w-10 h-10 rounded-xl overflow-hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+
+            {/* Brand */}
+            <div className="sm:col-span-2 md:col-span-1">
+              <Link href="/" className="flex items-center gap-2.5 group mb-5 w-fit">
+                <div className="relative w-8 h-8 rounded-lg overflow-hidden ring-1 ring-zinc-700 group-hover:ring-violet-500/50 transition-all">
                   <Image src="/favicon.jpeg" alt="D-Blanks" fill className="object-cover" />
                 </div>
-                <span className="text-xl font-bold whitespace-nowrap">
-                  D<span className="text-violet-500">Blanks</span>
+                <span className="font-black tracking-[0.15em] text-sm">
+                  D<span className="text-violet-500 group-hover:text-violet-400 transition-colors">BLANKS</span>
                 </span>
               </Link>
-              <p className="text-zinc-400 text-sm mb-6">
+              <p className="text-zinc-500 text-xs mb-6 leading-relaxed">
                 World-class gaming experiences combined with AICTE-recognized vocational training.
               </p>
-              <div className="flex items-center gap-3">
-                <a href="#" className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors">
-                  <Twitter className="w-4 h-4" />
+              <div className="flex items-center gap-2">
+                {/* X (Twitter) */}
+                <a href="#" aria-label="X" className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
-                <a href="#" className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors">
-                  <Instagram className="w-4 h-4" />
+                {/* Instagram */}
+                <a href="#" aria-label="Instagram" className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 </a>
-                <a href="#" className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors">
-                  <Github className="w-4 h-4" />
+                {/* GitHub */}
+                <a href="#" aria-label="GitHub" className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
                 </a>
-                <a href="#" className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors">
-                  <Youtube className="w-4 h-4" />
+                {/* YouTube */}
+                <a href="#" aria-label="YouTube" className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 </a>
-                <a href="#" className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors">
-                  <Linkedin className="w-4 h-4" />
+                {/* LinkedIn */}
+                <a href="#" aria-label="LinkedIn" className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300">
+                  <Linkedin className="w-3.5 h-3.5" />
                 </a>
               </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-semibold text-white mb-4">Quick Links</h4>
-              <ul className="space-y-3">
-                <li><Link href="/" className="text-zinc-400 hover:text-white text-sm transition-colors">Home</Link></li>
-                <li><Link href="/games" className="text-zinc-400 hover:text-white text-sm transition-colors">Games</Link></li>
-                <li><Link href="/studio" className="text-zinc-400 hover:text-white text-sm transition-colors">Studio</Link></li>
-                <li><Link href="/contact" className="text-zinc-400 hover:text-white text-sm transition-colors">Contact</Link></li>
+              <h4 className="text-white text-[10px] font-display tracking-[0.25em] uppercase mb-5">Quick Links</h4>
+              <ul className="space-y-2.5">
+                {[['/', 'Home'], ['/games', 'Games'], ['/studio', 'Studio'], ['/contact', 'Contact']].map(([href, label]) => (
+                  <li key={href}>
+                    <Link href={href} className="text-zinc-500 hover:text-violet-400 text-sm transition-colors flex items-center gap-1.5 group w-fit">
+                      <ChevronRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                      {label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
             {/* Courses */}
             <div>
-              <h4 className="font-semibold text-white mb-4">Courses</h4>
-              <ul className="space-y-3">
-                <li><Link href="/courses" className="text-zinc-400 hover:text-white text-sm transition-colors">Game Development</Link></li>
-                <li><Link href="/courses" className="text-zinc-400 hover:text-white text-sm transition-colors">3D Modeling</Link></li>
-                <li><Link href="/courses" className="text-zinc-400 hover:text-white text-sm transition-colors">Game Design</Link></li>
-                <li><Link href="/courses" className="text-zinc-400 hover:text-white text-sm transition-colors">All Programs</Link></li>
+              <h4 className="text-white text-[10px] font-display tracking-[0.25em] uppercase mb-5">Courses</h4>
+              <ul className="space-y-2.5">
+                {[['Game Development', '/courses'], ['3D Modeling', '/courses'], ['Game Design', '/courses'], ['All Programs', '/courses']].map(([label, href]) => (
+                  <li key={label}>
+                    <Link href={href} className="text-zinc-500 hover:text-violet-400 text-sm transition-colors flex items-center gap-1.5 group w-fit">
+                      <ChevronRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                      {label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
-            {/* Contact Info */}
+            {/* Contact */}
             <div>
-              <h4 className="font-semibold text-white mb-4">Contact</h4>
-              <ul className="space-y-3 text-sm text-zinc-400">
-                <li>hello@dblanks.com</li>
-                <li>+91 98765 43210</li>
+              <h4 className="text-white text-[10px] font-display tracking-[0.25em] uppercase mb-5">Contact</h4>
+              <ul className="space-y-2.5 text-xs text-zinc-500">
+                <li className="hover:text-violet-400 transition-colors cursor-default">hello@dblanks.com</li>
+                <li className="hover:text-violet-400 transition-colors cursor-default">+91 98765 43210</li>
                 <li>Mumbai, Maharashtra</li>
                 <li>India</li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="mt-12 pt-8 border-t border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex flex-wrap justify-center md:items-center gap-4 md:gap-6 text-sm text-zinc-500">
-              <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
-              <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
+          {/* Bottom bar */}
+          <div className="mt-12 pt-6 border-t border-zinc-800/40 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex flex-wrap justify-center gap-5 text-xs text-zinc-700">
+              <Link href="/privacy-policy" className="hover:text-zinc-400 transition-colors">Privacy Policy</Link>
+              <Link href="/terms-of-service" className="hover:text-zinc-400 transition-colors">Terms of Service</Link>
+              <Link href="/refund-policy" className="hover:text-zinc-400 transition-colors">Refund Policy</Link>
             </div>
-            <p className="text-sm text-zinc-500">
-              © 2026 D-Blanks. All rights reserved.
-            </p>
+            <p className="text-xs text-zinc-700">© 2026 D-Blanks. All rights reserved.</p>
           </div>
         </div>
       </footer>
