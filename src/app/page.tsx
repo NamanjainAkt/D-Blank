@@ -146,22 +146,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== STATS GRID ===== */}
-      <section className="py-16 border-y border-zinc-800/50 bg-zinc-950/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((stat, i) => (
-              <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 text-center hover:border-violet-500/30 transition-colors">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                  {stat.value.toLocaleString()}{stat.suffix}
-                </div>
-                <div className="text-zinc-500 text-sm mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ===== FEATURED GAMES ===== */}
       <section className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,8 +168,8 @@ export default function HomePage() {
             </div>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {games.slice(0, 6).map((game, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {games.slice(0, 3).map((game, index) => (
               <AnimatedContent key={game.id} delay={index * 0.1}>
                 <GlareHover
                   background="linear-gradient(135deg, rgba(88, 28, 135, 0.2) 0%, rgba(30, 10, 60, 0.4) 100%)"
@@ -257,172 +241,93 @@ export default function HomePage() {
             </p>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Large Feature - Full Width */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Feature 1 - Industry-Standard Tools */}
             <AnimatedContent className="lg:col-span-2">
               <GlareHover
                 background="linear-gradient(135deg, rgba(88, 28, 135, 0.3) 0%, rgba(30, 10, 60, 0.5) 100%)"
                 borderColor="rgba(139, 92, 246, 0.3)"
-                className="w-full !rounded-2xl border p-8 min-h-[280px]"
+                className="w-full !rounded-xl border p-6 h-full"
               >
                 <div className="flex flex-col justify-between h-full">
                   <div>
-                    <h3 className="text-2xl md:text-3xl font-bold mb-4">Industry-Standard Tools</h3>
-                    <p className="text-zinc-400 leading-relaxed mb-6">
-                      Master professional workflows used by AAA studios worldwide. Our curriculum is designed with input from industry veterans.
+                    <h3 className="text-xl font-bold mb-3">Industry-Standard Tools</h3>
+                    <p className="text-zinc-400 text-sm leading-relaxed mb-4">
+                      Master professional workflows used by AAA studios worldwide.
                     </p>
                   </div>
-                  {/* Real tool logos */}
-                  <div className="flex flex-wrap items-center gap-6">
-                    <div className="flex items-center gap-2 bg-zinc-800/50 px-4 py-2 rounded-lg">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1.5 rounded-lg">
                       <UnityLogo />
-                      <span className="text-sm font-medium">Unity</span>
+                      <span className="text-xs font-medium">Unity</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-zinc-800/50 px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1.5 rounded-lg">
                       <UnrealLogo />
-                      <span className="text-sm font-medium">Unreal</span>
+                      <span className="text-xs font-medium">Unreal</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-zinc-800/50 px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1.5 rounded-lg">
                       <BlenderLogo />
-                      <span className="text-sm font-medium">Blender</span>
+                      <span className="text-xs font-medium">Blender</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-zinc-800/50 px-4 py-2 rounded-lg">
+                    <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1.5 rounded-lg">
                       <GodotLogo />
-                      <span className="text-sm font-medium">Godot</span>
+                      <span className="text-xs font-medium">Godot</span>
                     </div>
                   </div>
                 </div>
               </GlareHover>
             </AnimatedContent>
 
-            {/* Small Features - 2x2 grid */}
+            {/* Feature 2 */}
             <AnimatedContent delay={0.1}>
               <GlareHover
                 background="linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%)"
                 borderColor="rgba(16, 185, 129, 0.3)"
-                className="w-full !rounded-xl border p-6"
+                className="w-full !rounded-xl border p-5 h-full"
               >
-                <Layers className="w-8 h-8 text-emerald-400 mb-4" />
-                <h3 className="text-lg font-bold mb-2">Hands-on Projects</h3>
-                <p className="text-sm text-zinc-400">Build real games from day one, not just tutorials.</p>
+                <div className="flex flex-col justify-between h-full">
+                  <div>
+                    <Layers className="w-7 h-7 text-emerald-400 mb-3" />
+                    <h3 className="text-base font-bold mb-2">Hands-on Projects</h3>
+                    <p className="text-sm text-zinc-400">Build real games from day one.</p>
+                  </div>
+                </div>
               </GlareHover>
             </AnimatedContent>
 
+            {/* Feature 3 */}
             <AnimatedContent delay={0.2}>
               <GlareHover
                 background="linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%)"
                 borderColor="rgba(59, 130, 246, 0.3)"
-                className="w-full !rounded-xl border p-6"
+                className="w-full !rounded-xl border p-5 h-full"
               >
-                <Users className="w-8 h-8 text-blue-400 mb-4" />
-                <h3 className="text-lg font-bold mb-2">Expert Mentors</h3>
-                <p className="text-sm text-zinc-400">Learn directly from active industry professionals.</p>
+                <div className="flex flex-col justify-between h-full">
+                  <div>
+                    <Users className="w-7 h-7 text-blue-400 mb-3" />
+                    <h3 className="text-base font-bold mb-2">Expert Mentors</h3>
+                    <p className="text-sm text-zinc-400">Learn from industry professionals.</p>
+                  </div>
+                </div>
               </GlareHover>
             </AnimatedContent>
 
+            {/* Feature 4 */}
             <AnimatedContent delay={0.3}>
               <GlareHover
                 background="linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%)"
                 borderColor="rgba(245, 158, 11, 0.3)"
-                className="w-full !rounded-xl border p-6"
+                className="w-full !rounded-xl border p-5 h-full"
               >
-                <Trophy className="w-8 h-8 text-amber-400 mb-4" />
-                <h3 className="text-lg font-bold mb-2">Career Support</h3>
-                <p className="text-sm text-zinc-400">Portfolio reviews and job referrals to partner studios.</p>
+                <div className="flex flex-col justify-between h-full">
+                  <div>
+                    <Trophy className="w-7 h-7 text-amber-400 mb-3" />
+                    <h3 className="text-base font-bold mb-2">Career Support</h3>
+                    <p className="text-sm text-zinc-400">Portfolio reviews & job referrals.</p>
+                  </div>
+                </div>
               </GlareHover>
             </AnimatedContent>
-
-            <AnimatedContent delay={0.4}>
-              <GlareHover
-                background="linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%)"
-                borderColor="rgba(236, 72, 153, 0.3)"
-                className="w-full !rounded-xl border p-6"
-              >
-                <Monitor className="w-8 h-8 text-pink-400 mb-4" />
-                <h3 className="text-lg font-bold mb-2">Multi-Platform</h3>
-                <p className="text-sm text-zinc-400">Deploy to PC, Console, Mobile, and Web.</p>
-              </GlareHover>
-            </AnimatedContent>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== COURSES PREVIEW ===== */}
-      <section className="py-24 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedContent>
-            <div className="flex items-end justify-between mb-12">
-              <div>
-                <Badge variant="outline" className="mb-4 text-violet-400 border-violet-500/50">
-                  Training Programs
-                </Badge>
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  Start Your Journey
-                </h2>
-              </div>
-              <Button variant="ghost" className="text-zinc-400 hover:text-white hidden sm:flex" asChild>
-                <Link href="/courses">
-                  All Courses
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Link>
-              </Button>
-            </div>
-          </AnimatedContent>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {courses.map((course, index) => (
-              <AnimatedContent key={course.id} delay={index * 0.1}>
-                <Card className="bg-zinc-900/50 border-zinc-800 hover:border-violet-500/50 transition-colors group h-full">
-                  <CardHeader>
-                    <div className="flex items-center justify-between mb-3">
-                      {/* Category badge with distinct styling */}
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-xs font-medium uppercase tracking-wider ${
-                          course.category === 'tech' ? 'bg-blue-500/20 text-blue-400' :
-                          course.category === 'design' ? 'bg-purple-500/20 text-purple-400' :
-                          course.category === 'creative' ? 'bg-pink-500/20 text-pink-400' :
-                          'bg-zinc-700 text-zinc-300'
-                        }`}
-                      >
-                        {course.category}
-                      </Badge>
-                      {/* Price with nowrap */}
-                      <span className="text-2xl font-bold text-white whitespace-nowrap">
-                        ₹{(course.price / 100).toLocaleString()}
-                      </span>
-                    </div>
-                    <CardTitle className="text-xl group-hover:text-violet-400 transition-colors">
-                      {course.title}
-                    </CardTitle>
-                    <CardDescription className="text-zinc-400 mt-2">
-                      {course.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-4 text-sm text-zinc-500 mb-4">
-                      <span className="flex items-center gap-1">
-                        <Code2 className="w-4 h-4" />
-                        {course.duration}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        {course.students}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-amber-400 fill-current" />
-                        {course.rating}
-                      </span>
-                    </div>
-                    <Button className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500" asChild>
-                      <Link href={`/courses`}>
-                        Enroll Now
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </AnimatedContent>
-            ))}
           </div>
         </div>
       </section>
