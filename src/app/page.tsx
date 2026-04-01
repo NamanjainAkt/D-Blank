@@ -1,18 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   ChevronRight, 
-  Gamepad2, 
   Users, 
   Trophy, 
-  Zap, 
   Star,
   ArrowRight,
   Sparkles,
   Monitor,
   Code2,
-  Palette,
   Layers,
   Youtube,
   Twitter,
@@ -90,7 +88,7 @@ export default function HomePage() {
 
           {/* Headline with clamp for responsive font sizes */}
           <AnimatedContent delay={0.1}>
-            <h1 className="text-[clamp(2.5rem,8vw,6rem)] font-bold tracking-tight mb-6 leading-tight">
+            <h1 className="text-[clamp(2rem,6vw,4rem)] font-bold tracking-tight mb-6 leading-[1.1]">
               <span className="block">
                 <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
                   Build. Play.
@@ -178,9 +176,9 @@ export default function HomePage() {
                   className="w-full !rounded-xl border"
                 >
                   <Card className="bg-transparent border-0 shadow-none w-full">
-                    <div className="relative aspect-video bg-gradient-to-br from-violet-900/50 to-fuchsia-900/50 rounded-lg overflow-hidden mb-4">
+                    <div className="relative aspect-video bg-gradient-to-br from-violet-900/50 to-fuchsia-900/50 rounded-xl overflow-hidden mb-4">
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Gamepad2 className="w-16 h-16 text-white/10" />
+                        <Image src="/favicon.jpeg" alt={game.title} width={64} height={64} className="opacity-20" />
                       </div>
                       {/* Genre badge with accent color */}
                       <Badge 
@@ -241,7 +239,7 @@ export default function HomePage() {
             </p>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
             {/* Feature 1 - Industry-Standard Tools */}
             <AnimatedContent className="lg:col-span-2">
               <GlareHover
@@ -344,7 +342,7 @@ export default function HomePage() {
             </h2>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.slice(0, 6).map((testimonial, index) => (
               <AnimatedContent key={testimonial.id} delay={index * 0.1}>
                 <Card className="bg-zinc-900/50 border-zinc-800 h-full">
@@ -470,8 +468,8 @@ export default function HomePage() {
             {/* Brand Column */}
             <div className="md:col-span-1">
               <Link href="/" className="flex items-center gap-2 group mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-xl flex items-center justify-center">
-                  <Gamepad2 className="w-5 h-5 text-white" />
+                <div className="relative w-10 h-10 rounded-xl overflow-hidden">
+                  <Image src="/favicon.jpeg" alt="D-Blanks" fill className="object-cover" />
                 </div>
                 <span className="text-xl font-bold whitespace-nowrap">
                   D<span className="text-violet-500">Blanks</span>
@@ -535,7 +533,7 @@ export default function HomePage() {
 
           {/* Bottom Bar */}
           <div className="mt-12 pt-8 border-t border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-6 text-sm text-zinc-500">
+            <div className="flex flex-wrap justify-center md:items-center gap-4 md:gap-6 text-sm text-zinc-500">
               <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
               <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
