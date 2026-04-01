@@ -1,0 +1,218 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ====== SHADCN THEME ====== */
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 262 83% 30%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 286 83% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 262 83% 58%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ====== D-BLANKS DESIGN SYSTEM ====== */
+
+@layer base {
+  :root {
+    --font-display: "Orbitron", system-ui, sans-serif;
+    --font-body: "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+    /* Neon Palette */
+    --neon-purple: #B026FF;
+    --cyber-pink: #FF007F;
+    --laser-cyan: #00F0FF;
+    --acid-green: #39FF14;
+    --neon-yellow: #FFF700;
+
+    /* Core Blacks */
+    --black: #000000;
+    --ink: #020202;
+    --charcoal: #050505;
+    --graphite: #080808;
+
+    /* Brand — Emerald (Keeping but making sharper) */
+    --emerald: #10b981;
+    --emerald-dim: rgba(16,185,129,0.1);
+    --emerald-glow: rgba(16,185,129,0.3);
+
+    /* Design System */
+    --color-primary: var(--neon-purple);
+    --color-secondary: var(--laser-cyan);
+    --color-background: #000000;
+    --color-text: #FFFFFF;
+
+    /* Background & Text */
+    --bg-primary: radial-gradient(circle at 50% 50%, #080808 0%, #000000 100%);
+    --bg-secondary: #050505;
+    --text-primary: #FFFFFF;
+    --text-secondary: #E0E0E0;
+    --text-muted: #A0A0A0;
+
+    /* Grid */
+    --grid-color: rgba(176,38,255,0.05);
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  background-color: #000;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ====== BUTTONS ====== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 14px 28px;
+  border-radius: 0px;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.btn-cyber {
+  background: var(--neon-purple);
+  color: #fff;
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+}
+.btn-cyber:hover {
+  background: var(--cyber-pink);
+  border-color: var(--cyber-pink);
+  box-shadow: 0 0 30px rgba(255, 0, 127, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-laser {
+  background: var(--laser-cyan);
+  color: #000;
+  border-color: var(--laser-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+.btn-laser:hover {
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #fff;
+  border: 2px solid var(--neon-purple);
+}
+.btn-outline:hover {
+  background: var(--neon-purple);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(176, 38, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Sections */
+.section-heading {
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 10px var(--neon-purple);
+}
+
+/* Cards */
+.card {
+  background: rgba(10, 10, 10, 0.8);
+  border: 2px solid var(--neon-purple);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.card::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(176,38,255,0.1), transparent);
+  transform: rotate(45deg);
+  transition: 0.5s;
+}
+.card:hover::after {
+  left: 100%;
+}
+
+.grid-bg {
+  background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
