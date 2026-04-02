@@ -194,7 +194,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               {course.tags && course.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-8">
                   {course.tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1.5 text-xs font-mono uppercase tracking-wide text-laser-cyan/70 bg-laser-cyan/5 border border-laser-cyan/10 rounded-lg hover:border-laser-cyan/20 transition-colors">
+                    <span key={tag} className="px-3 py-1.5 text-xs font-mono uppercase tracking-wide text-laser-cyan/70 bg-laser-cyan/5 border border-laser-cyan/10 rounded-lg hover:border-laser-cyan/20 transition-colors cursor-default">
                       {tag}
                     </span>
                   ))}

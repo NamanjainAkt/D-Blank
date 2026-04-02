@@ -53,6 +53,7 @@ const processSteps = [
 
 export default function CoursesPage() {
   const [activeCategory, setActiveCategory] = useState('all');
+  const currentYear = new Date().getFullYear();
 
   const filteredCourses = activeCategory === 'all'
     ? courses
@@ -139,10 +140,10 @@ export default function CoursesPage() {
       <section className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <AnimatedContent>
-              <Badge variant="outline" className="mb-4 text-emerald-400 border-emerald-500/50">
-                Outcomes
-              </Badge>
+              <AnimatedContent>
+                <Badge variant="outline" className="mb-4 text-emerald-400 border-emerald-500/50 cursor-default">
+                  Outcomes
+                </Badge>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">
                 What You Will Achieve
               </h2>
@@ -423,7 +424,7 @@ export default function CoursesPage() {
               <span className="font-bold">D<span className="text-violet-500">Blanks</span></span>
             </div>
             <p className="text-sm text-zinc-500">
-              2026 D-Blanks. All rights reserved.
+              {currentYear} D-Blanks. All rights reserved.
             </p>
           </div>
         </div>

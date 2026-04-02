@@ -31,8 +31,8 @@ export function MagicBento({ items, className = '' }: MagicBentoProps) {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
           viewport={{ once: true }}
-          whileHover={{ scale: 1.02, y: -4 }}
-          className={`group relative overflow-hidden rounded-none bg-white/[0.02] border border-white/10 hover:border-neon-purple/50 hover:bg-white/[0.04] transition-all duration-300 ${sizeClasses[item.size || 'small']}`}
+          whileHover={{ y: -4 }}
+          className={`group relative overflow-hidden rounded-none bg-white/[0.02] border border-white/10 hover:border-neon-purple/50 hover:bg-white/[0.04] transition-all duration-300 cursor-pointer ${sizeClasses[item.size || 'small']}`}
         >
           {/* Animated gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

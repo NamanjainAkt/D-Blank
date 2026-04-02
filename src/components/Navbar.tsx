@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, ChevronRight, Gamepad2, BookOpen, Users, Mail } from 'lucide-react';
+import { Menu, ChevronRight, Gamepad2, BookOpen, Users, Mail, X } from 'lucide-react';
 import { GlowButton } from '@/components/ui/GlowButton';
 import {
   Sheet,

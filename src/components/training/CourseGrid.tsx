@@ -32,7 +32,7 @@ export function CourseGrid({ courses, className = '' }: CourseGridProps) {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
           viewport={{ once: true }}
-          className="group relative overflow-hidden bg-white/[0.02] border border-white/10 hover:border-neon-purple/50 hover:bg-white/[0.04] transition-all duration-300 flex flex-col"
+          className="group relative overflow-hidden bg-white/[0.02] border border-white/10 hover:border-neon-purple/50 hover:bg-white/[0.04] transition-all duration-300 flex flex-col cursor-pointer"
         >
           {/* Gradient overlay on hover */}
           <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

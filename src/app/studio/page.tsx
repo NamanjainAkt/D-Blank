@@ -32,6 +32,8 @@ const stats = [
 ];
 
 export default function StudioPage() {
+  const currentYear = new Date().getFullYear();
+  
   return (
     <main className="min-h-screen bg-black text-white">
       {/* Hero */}
@@ -71,32 +73,30 @@ export default function StudioPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <AnimatedContent key={stat.label} delay={index * 0.1}>
-                <HoverScale scale={1.1}>
-                  <div className="text-center">
-                    <div className={`w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center ${
+                <div className="text-center cursor-pointer">
+                  <div className={`w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center transition-transform hover:scale-110 ${
                       stat.color === 'violet' ? 'bg-violet-500/20' :
                       stat.color === 'emerald' ? 'bg-emerald-500/20' :
                       stat.color === 'amber' ? 'bg-amber-500/20' :
                       'bg-fuchsia-500/20'
                     }`}>
-                      <stat.icon className={`w-7 h-7 ${
-                        stat.color === 'violet' ? 'text-violet-400' :
-                        stat.color === 'emerald' ? 'text-emerald-400' :
-                        stat.color === 'amber' ? 'text-amber-400' :
-                        'text-fuchsia-400'
-                      }`} />
-                    </div>
-                    <div className={`text-3xl md:text-4xl font-bold mb-1 ${
+                    <stat.icon className={`w-7 h-7 ${
+                      stat.color === 'violet' ? 'text-violet-400' :
+                      stat.color === 'emerald' ? 'text-emerald-400' :
+                      stat.color === 'amber' ? 'text-amber-400' :
+                      'text-fuchsia-400'
+                    }`} />
+                  </div>
+                  <div className={`text-3xl md:text-4xl font-bold mb-1 ${
                       stat.color === 'violet' ? 'text-violet-400' :
                       stat.color === 'emerald' ? 'text-emerald-400' :
                       stat.color === 'amber' ? 'text-amber-400' :
                       'text-fuchsia-400'
                     }`}>
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-zinc-500">{stat.label}</div>
+                    {stat.value}
                   </div>
-                </HoverScale>
+                  <div className="text-sm text-zinc-500">{stat.label}</div>
+                </div>
               </AnimatedContent>
             ))}
           </div>
@@ -253,7 +253,7 @@ export default function StudioPage() {
               <span className="font-bold">D<span className="text-violet-500">Blanks</span></span>
             </div>
             <p className="text-sm text-zinc-500">
-              2026 D-Blanks. All rights reserved.
+              {currentYear} D-Blanks. All rights reserved.
             </p>
           </div>
         </div>

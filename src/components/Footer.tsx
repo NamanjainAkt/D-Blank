@@ -1,6 +1,8 @@
 import Link from 'next/link';
 
 export function Footer() {
+  const currentYear = new Date().getFullYear();
+  
   return (
     <footer className="relative border-t border-white/10 py-16 bg-black overflow-hidden">
       {/* Gradient border effect */}
@@ -39,7 +41,7 @@ export function Footer() {
           
           {/* Copyright */}
           <div className="text-sm text-gray-500">
-            © 2026 D-Blanks. All rights reserved.
+            © {currentYear} D-Blanks. All rights reserved.
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { Code, Zap, Settings, Building2 } from 'lucide-react';
 import { Course } from '@/lib/utils';
 
 interface CourseCardProps {
@@ -47,11 +48,19 @@ export function CourseCard({ course }: CourseCardProps) {
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-5xl">
-              {course.category === 'IT & Software' && '💻'}
-              {course.category === 'Electronics' && '⚡'}
-              {course.category === 'Mechanical' && '⚙️'}
-              {course.category === 'Civil' && '🏗️'}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {course.category === 'IT & Software' && (
+                <Code className="w-16 h-16 text-white/20" />
+              )}
+              {course.category === 'Electronics' && (
+                <Zap className="w-16 h-16 text-white/20" />
+              )}
+              {course.category === 'Mechanical' && (
+                <Settings className="w-16 h-16 text-white/20" />
+              )}
+              {course.category === 'Civil' && (
+                <Building2 className="w-16 h-16 text-white/20" />
+              )}
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] via-transparent to-transparent opacity-60" />
@@ -135,7 +144,7 @@ export function CourseCard({ course }: CourseCardProps) {
                 <span className="text-xs font-normal text-[var(--text-muted)] ml-1">/course</span>
               </div>
             </div>
-            <button className="btn-card">
+            <button className="btn-card cursor-pointer">
               Enroll Now
             </button>
           </div>

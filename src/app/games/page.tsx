@@ -24,6 +24,8 @@ import GlareHover from '@/components/GlareHover';
 import { games } from '@/lib/placeholder-data';
 import { useState } from 'react';
 
+const currentYear = new Date().getFullYear();
+
 const genres = ['All', 'RPG', 'Racing', 'Strategy', 'Action', 'Roguelike', 'Battle Royale', 'Simulation', 'Sports'];
 const platforms = ['All', 'PC', 'Console', 'Mobile'];
 
@@ -267,7 +269,7 @@ export default function GamesPage() {
               <span className="font-bold">D<span className="text-violet-500">Blanks</span></span>
             </div>
             <p className="text-sm text-zinc-500">
-              © 2026 D-Blanks. All rights reserved.
+              © {currentYear} D-Blanks. All rights reserved.
             </p>
           </div>
         </div>

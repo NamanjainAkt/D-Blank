@@ -7,6 +7,8 @@ export const metadata = {
 };
 
 export default function PrivacyPolicyPage() {
+  const currentYear = new Date().getFullYear();
+  
   return (
     <main className="min-h-screen bg-black">
       <Navbar />
@@ -165,7 +167,7 @@ export default function PrivacyPolicyPage() {
               <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
             </div>
             <div className="text-sm text-gray-600">
-              © 2026 D-Blanks. All rights reserved.
+              © {currentYear} D-Blanks. All rights reserved.
             </div>
           </div>
         </div>

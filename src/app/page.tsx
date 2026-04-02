@@ -26,6 +26,8 @@ import { HoverScale } from '@/components/ui/HoverScale';
 import AnimatedContent from '@/components/AnimatedContent';
 import { games, testimonials, founders } from '@/lib/placeholder-data';
 
+const currentYear = new Date().getFullYear();
+
 const avatarColors = [
   'from-violet-600 to-purple-700',
   'from-cyan-600 to-blue-700',
@@ -611,7 +613,7 @@ export default function HomePage() {
               <Link href="/terms-of-service" className="hover:text-zinc-400 transition-colors">Terms of Service</Link>
               <Link href="/refund-policy" className="hover:text-zinc-400 transition-colors">Refund Policy</Link>
             </div>
-            <p className="text-xs text-zinc-700">© 2026 D-Blanks. All rights reserved.</p>
+            <p className="text-xs text-zinc-700">© {currentYear} D-Blanks. All rights reserved.</p>
           </div>
         </div>
       </footer>
