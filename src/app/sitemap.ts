@@ -3,15 +3,17 @@ import dbConnect from '@/lib/db';
 import { Course } from '@/models/Course';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://dblanks.in';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://dblanks.site';
   
   const staticPages: MetadataRoute.Sitemap = [
+    // Homepage - Highest priority
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 1,
+      changeFrequency: 'daily',
+      priority: 1.0,
     },
+    // Core pages
     {
       url: `${baseUrl}/courses`,
       lastModified: new Date(),
@@ -19,40 +21,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/about`,
+      url: `${baseUrl}/games`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/studio`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.75,
     },
     {
       url: `${baseUrl}/contact`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.7,
     },
-    {
-      url: `${baseUrl}/founders`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/games`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
+    // Legal pages
     {
       url: `${baseUrl}/privacy-policy`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
-      priority: 0.3,
+      priority: 0.4,
     },
     {
       url: `${baseUrl}/terms-of-service`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
-      priority: 0.3,
+      priority: 0.4,
     },
     {
       url: `${baseUrl}/refund-policy`,
@@ -62,13 +59,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Dynamic course pages from database
   try {
     await dbConnect();
     const courses = await Course.find({ isPublished: true }).select('slug updatedAt').lean();
     
     const coursePages: MetadataRoute.Sitemap = courses.map((course: any) => ({
       url: `${baseUrl}/courses/${course.slug}`,
-      lastModified: course.updatedAt || new Date(),
+      lastModified: course.updatedAt ? new Date(course.updatedAt) : new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }));

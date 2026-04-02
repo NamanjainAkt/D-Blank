@@ -32,7 +32,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://dblanks.in';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://dblanks.site';
 
   useEffect(() => {
     async function fetchCourse() {
