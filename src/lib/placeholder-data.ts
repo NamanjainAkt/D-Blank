@@ -229,7 +229,7 @@ export const navItems = [
 export const founders = [
   {
     id: 1,
-    name: "Yogendra Kumar",
+    name: "Arsh Kumar Gupta",
     role: "CEO & Gameplay Lead",
     image: "/team/founder1.jpeg",
     bio: "Visionary game developer and marketing strategist with 5+ years of experience in the indie gaming scene.",
@@ -238,7 +238,7 @@ export const founders = [
   },
   {
     id: 2,
-    name: "Deepak Vishwakarma",
+    name: "Jatin Kunjam",
     role: "CTO & Technical Architect",
     image: "/team/founder2.jpeg",
     bio: "Expert in game engine architecture and low-level optimization. Passionate about pushing the boundaries of real-time graphics.",
@@ -247,7 +247,7 @@ export const founders = [
   },
   {
     id: 3,
-    name: "Pratik Kothari",
+    name: "Aditya Soni",
     role: "Creative Director",
     image: "/team/founder3.jpeg",
     bio: "Award-winning 3D artist specializing in immersive environment design and cinematic visual storytelling.",
