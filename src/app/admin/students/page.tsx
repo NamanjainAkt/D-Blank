@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Download, Search, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { Download, Search, ChevronLeft, ChevronRight, Eye, AlertCircle, Loader2 } from 'lucide-react';
 
 interface Student {
   _id: string;
@@ -36,9 +36,9 @@ interface Student {
   semester: string;
   rollNumber: string;
   city: string;
-  courseId: { title: string };
+  courseId?: { title: string };
   courseName: string;
-  paymentStatus: string;
+  paymentStatus: 'paid' | 'pending' | 'failed';
   paymentAmount: number;
   enrollmentStatus: string;
   createdAt: string;
@@ -58,53 +58,82 @@ export default function AdminStudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, pages: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
+  const [statusFilter, setStatusFilter] = useState(() => {
+    const status = searchParams.get('status');
+    return status === '' || status === null ? 'all' : status;
+  });
+  
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchStudents = useCallback(async () => {
-    setLoading(true);
+  // Check if "all" is selected (either explicitly or when value is empty)
+  const isAllStatus = statusFilter === 'all' || statusFilter === '';
+
+  const fetchStudents = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams();
       params.set('page', searchParams.get('page') || '1');
       params.set('limit', '20');
       if (search) params.set('search', search);
-      if (statusFilter) params.set('paymentStatus', statusFilter);
+      if (statusFilter && statusFilter !== 'all') params.set('paymentStatus', statusFilter);
 
       const res = await fetch(`/api/admin/students?${params}`);
+      if (!res.ok) throw new Error('Failed to fetch students');
       const data = await res.json();
       setStudents(data.students || []);
       setPagination(data.pagination || { page: 1, limit: 20, total: 0, pages: 0 });
-    } catch (error) {
-      console.error('Error fetching students:', error);
+    } catch (err) {
+      console.error('Error fetching students:', err);
+      setError('Failed to load students. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [searchParams, search, statusFilter]);
+  }, [search, statusFilter, searchParams]);
 
+  // Debounced search effect
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchStudents(false);
+    }, 300);
+    
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [search, statusFilter]);
+
+  // Initial fetch
   useEffect(() => {
     fetchStudents();
   }, [fetchStudents]);
 
+  const showSuccess = (message: string) => {
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
+
   const handleSearch = (value: string) => {
     setSearch(value);
-    const params = new URLSearchParams(searchParams);
-    if (value) {
-      params.set('search', value);
-    } else {
-      params.delete('search');
-    }
+    const params = new URLSearchParams();
+    if (value) params.set('search', value);
+    if (statusFilter && statusFilter !== 'all') params.set('paymentStatus', statusFilter);
     params.set('page', '1');
     router.push(`/admin/students?${params.toString()}`);
   };
 
   const handleStatusFilter = (value: string) => {
     setStatusFilter(value);
-    const params = new URLSearchParams(searchParams);
-    if (value) {
-      params.set('paymentStatus', value);
-    } else {
-      params.delete('paymentStatus');
-    }
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (value && value !== 'all') params.set('paymentStatus', value);
     params.set('page', '1');
     router.push(`/admin/students?${params.toString()}`);
   };
@@ -113,202 +142,210 @@ export default function AdminStudentsPage() {
     try {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
-      if (statusFilter) params.set('paymentStatus', statusFilter);
+      if (statusFilter && statusFilter !== 'all') params.set('paymentStatus', statusFilter);
 
       const res = await fetch(`/api/admin/export?${params}`);
+      if (!res.ok) throw new Error('Export failed');
+      
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `enrollments-${Date.now()}.csv`;
       a.click();
-    } catch (error) {
-      console.error('Error exporting:', error);
+      window.URL.revokeObjectURL(url);
+      showSuccess('Export completed successfully');
+    } catch (err) {
+      console.error('Error exporting:', err);
+      setError('Failed to export data. Please try again.');
     }
   };
 
   const updateEnrollmentStatus = async (studentId: string, status: string) => {
     try {
-      await fetch(`/api/admin/students/${studentId}`, {
+      const res = await fetch(`/api/admin/students/${studentId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enrollmentStatus: status }),
       });
-      fetchStudents();
-    } catch (error) {
-      console.error('Error updating status:', error);
+      if (!res.ok) throw new Error('Failed to update status');
+      fetchStudents(false);
+      showSuccess('Enrollment status updated');
+    } catch (err) {
+      console.error('Error updating status:', err);
+      setError('Failed to update enrollment status');
     }
   };
 
+  const navigateToPage = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', String(page));
+    router.push(`/admin/students?${params.toString()}`);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-10 animate-fade-up">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Students</h1>
-          <p className="text-sm text-zinc-500">{pagination.total} total enrollments</p>
+          <h1 className="text-4xl font-display font-black text-white tracking-tighter uppercase">
+            Personnel <span className="text-laser-cyan shadow-laser-cyan">Database</span>
+          </h1>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF]" />
+            Records: {pagination.total} // Authorized Access Only
+          </p>
         </div>
-        <Button onClick={handleExport} variant="outline" className="border-emerald-500/50 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10">
-          <Download className="w-4 h-4 mr-2" />
-          Export CSV
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            onClick={handleExport}
+            size="sm"
+            className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest h-9"
+          >
+            <Download className="w-3.5 h-3.5 mr-2" />
+            Export Archive
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-ink/40 p-4 border border-white/5 backdrop-blur-sm rounded-sm">
+        <div className="md:col-span-2 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <Input
-            type="text"
+            placeholder="Search by name, email, or enrollment ID..."
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search by name, email, phone, college..."
-            className="pl-10 bg-zinc-800 border-zinc-700"
+            className="pl-10 bg-black/40 border-white/5 focus:border-laser-cyan/50 text-sm font-mono placeholder:text-zinc-600 h-10"
           />
         </div>
-        <Select value={statusFilter} onValueChange={handleStatusFilter}>
-          <SelectTrigger className="w-[180px] bg-zinc-800 border-zinc-700">
-            <SelectValue placeholder="All Status" />
-          </SelectTrigger>
-          <SelectContent className="bg-zinc-800 border-zinc-700">
-            <SelectItem value="">All Status</SelectItem>
-            <SelectItem value="paid">Paid</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="failed">Failed</SelectItem>
-          </SelectContent>
-        </Select>
+        <div>
+          <Select value={statusFilter} onValueChange={handleStatusFilter}>
+            <SelectTrigger className="bg-black/40 border-white/5 focus:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest h-10">
+              <SelectValue placeholder="Status Filter" />
+            </SelectTrigger>
+            <SelectContent className="bg-ink border-white/5">
+              <SelectItem value="all" className="text-[10px] font-mono uppercase tracking-widest">All Status</SelectItem>
+              <SelectItem value="paid" className="text-[10px] font-mono uppercase tracking-widest">Paid</SelectItem>
+              <SelectItem value="pending" className="text-[10px] font-mono uppercase tracking-widest">Pending</SelectItem>
+              <SelectItem value="failed" className="text-[10px] font-mono uppercase tracking-widest">Failed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Table */}
-      <Card className="bg-zinc-900/50 border-zinc-800">
+      {/* Main Content */}
+      <Card className="bg-ink/40 border-white/5 backdrop-blur-sm relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-laser-cyan/50 to-transparent" />
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-zinc-800">
-                <TableHead className="text-zinc-500">Student</TableHead>
-                <TableHead className="text-zinc-500">College</TableHead>
-                <TableHead className="text-zinc-500">Course</TableHead>
-                <TableHead className="text-zinc-500">Amount</TableHead>
-                <TableHead className="text-zinc-500">Status</TableHead>
-                <TableHead className="text-zinc-500">Date</TableHead>
-                <TableHead className="text-zinc-500">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12 text-zinc-500">
-                    Loading...
-                  </TableCell>
+          <div className="overflow-x-auto custom-scrollbar">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-white/5 hover:bg-transparent">
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Operator</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">ID / Origin</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Module</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Status</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4 text-right">Action</TableHead>
                 </TableRow>
-              ) : students.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12 text-zinc-500">
-                    No students found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                students.map((student) => (
-                  <TableRow 
-                    key={student._id} 
-                    className="border-zinc-800/50 cursor-pointer hover:bg-zinc-800/30"
-                    onClick={() => router.push(`/admin/students/${student._id}`)}
-                  >
-                    <TableCell>
-                      <div className="font-medium">{student.studentName}</div>
-                      <div className="text-xs text-zinc-500 font-mono">{student.phone}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">{student.collegeName}</div>
-                      <div className="text-xs text-zinc-500">{student.branch} - {student.semester}</div>
-                    </TableCell>
-                    <TableCell className="text-zinc-400">
-                      {student.courseId?.title || student.courseName}
-                    </TableCell>
-                    <TableCell className="font-mono">
-                      {student.paymentAmount ? formatCurrency(student.paymentAmount) : '-'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={student.paymentStatus === 'paid' ? 'default' : student.paymentStatus === 'pending' ? 'secondary' : 'destructive'}
-                        className={
-                          student.paymentStatus === 'paid' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
-                          student.paymentStatus === 'pending' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
-                          'bg-red-500/20 text-red-400 border-red-500/30'
-                        }
-                      >
-                        {student.paymentStatus}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-zinc-500 text-sm font-mono">
-                      {format(new Date(student.createdAt), 'MMM d, yyyy')}
-                    </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => router.push(`/admin/students/${student._id}`)}
-                          className="text-zinc-400 hover:text-white"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Select value={student.enrollmentStatus} onValueChange={(v) => updateEnrollmentStatus(student._id, v)}>
-                          <SelectTrigger className="w-[130px] h-8 text-xs bg-zinc-800 border-zinc-700">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-zinc-800 border-zinc-700">
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="confirmed">Confirmed</SelectItem>
-                            <SelectItem value="in_progress">In Progress</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                          </SelectContent>
-                        </Select>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="w-6 h-6 animate-spin text-laser-cyan" />
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500">Retrieving Records...</span>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : students.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <AlertCircle className="w-6 h-6 text-zinc-700" />
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600">No Records Found</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  students.map((student) => (
+                    <TableRow key={student._id} className="border-white/5 hover:bg-white/[0.02] transition-colors group/row">
+                      <TableCell className="py-5">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-zinc-200 group-hover/row:text-white transition-colors">{student.studentName}</span>
+                          <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-tight">{student.email}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-5">
+                        <div className="flex flex-col">
+                          <span className="text-[11px] font-mono text-zinc-400">{student.enrollmentId}</span>
+                          <span className="text-[9px] font-mono text-zinc-600 uppercase">{student.collegeName}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-5">
+                        <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-tighter">
+                          {student.courseId?.title || student.courseName}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-5">
+                        <Badge 
+                          variant="outline"
+                          className={`text-[9px] font-mono uppercase tracking-widest border px-2 py-0.5 ${
+                            student.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                            student.paymentStatus === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                            'bg-red-500/10 text-red-400 border-red-500/20'
+                          }`}
+                        >
+                          {student.paymentStatus}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right py-5">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 text-laser-cyan transition-all"
+                          onClick={() => router.push(`/admin/students/${student._id}`)}
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
       {/* Pagination */}
       {pagination.pages > 1 && (
-        <div className="flex justify-center items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              const params = new URLSearchParams(searchParams);
-              params.set('page', String(pagination.page - 1));
-              router.push(`/admin/students?${params.toString()}`);
-            }}
-            disabled={pagination.page === 1}
-            className="border-zinc-700"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Previous
-          </Button>
-          <span className="text-sm text-zinc-500 px-4">
+        <div className="flex items-center justify-between pt-6">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-600">
             Page {pagination.page} of {pagination.pages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              const params = new URLSearchParams(searchParams);
-              params.set('page', String(pagination.page + 1));
-              router.push(`/admin/students?${params.toString()}`);
-            }}
-            disabled={pagination.page === pagination.pages}
-            className="border-zinc-700"
-          >
-            Next
-            <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pagination.page <= 1}
+              onClick={() => navigateToPage(pagination.page - 1)}
+              className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 disabled:opacity-30"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={pagination.page >= pagination.pages}
+              onClick={() => navigateToPage(pagination.page + 1)}
+              className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 disabled:opacity-30"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       )}
     </div>

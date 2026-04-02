@@ -17,6 +17,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate MongoDB ObjectId format
+    if (!enrollmentId.match(/^[0-9a-fA-F]{24}$/)) {
+      return NextResponse.json(
+        { error: 'Invalid enrollment ID format' },
+        { status: 400 }
+      );
+    }
+
+    // Validate amount
+    if (typeof amount !== 'number' || amount <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid amount' },
+        { status: 400 }
+      );
+    }
+
     const enrollment = await Enrollment.findById(enrollmentId);
     if (!enrollment) {
       return NextResponse.json(
@@ -49,10 +65,17 @@ export async function POST(request: Request) {
     }
 
     // PRODUCTION MODE: Real PhonePe payment
-    const merchantId = process.env.PHONEPE_MERCHANT_ID!;
-    const saltKey = process.env.PHONEPE_SALT_KEY!;
+    const merchantId = process.env.PHONEPE_MERCHANT_ID;
+    const saltKey = process.env.PHONEPE_SALT_KEY;
     const saltIndex = process.env.PHONEPE_SALT_INDEX || '1';
     const callbackUrl = `${process.env.NEXTAUTH_URL}/api/payment/verify`;
+
+    if (!merchantId || !saltKey) {
+      return NextResponse.json(
+        { error: 'Payment service not configured' },
+        { status: 500 }
+      );
+    }
 
     const merchantTransactionId = `TXN_${Date.now()}_${enrollmentId}`;
 

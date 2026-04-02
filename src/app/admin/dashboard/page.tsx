@@ -1,16 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 import { 
   Users, 
   DollarSign, 
   TrendingUp, 
   CreditCard,
-  Activity,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -23,6 +26,18 @@ import {
 } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+
+interface Enrollment {
+  _id: string;
+  studentName: string;
+  phone: string;
+  email: string;
+  courseId?: { title: string };
+  courseName: string;
+  paymentStatus: 'paid' | 'pending' | 'failed';
+  createdAt: string;
+}
 
 interface DashboardStats {
   today: {
@@ -40,63 +55,114 @@ interface DashboardStats {
     pending?: number;
     failed?: number;
   };
-  recentEnrollments: any[];
+  recentEnrollments: Enrollment[];
   enrollmentTrend: { _id: string; count: number }[];
   courseSaturation: { name: string; seats: number; filled: number; percentage: number }[];
+}
+
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  colorClass: string;
+  bgColorClass: string;
+  trend: string;
+  trendUp: boolean;
+}
+
+function StatCard({ title, value, icon: Icon, colorClass, bgColorClass, trend, trendUp }: StatCardProps) {
+  return (
+    <Card className="bg-black border-white/5 hover:border-white/10 transition-all duration-300 group overflow-hidden relative rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,255,255,0.05)] hover:-translate-y-0.5">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10 px-6 pt-6">
+        <CardTitle className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-[#A0A0A0]">{title}</CardTitle>
+        <div className={cn(bgColorClass, "p-2 rounded-lg border border-white/5 group-hover:scale-105 transition-transform duration-300")}>
+          <Icon className={cn(colorClass, "w-4 h-4")} aria-hidden="true" />
+        </div>
+      </CardHeader>
+      <CardContent className="relative z-10 px-6 pb-6 pt-2">
+        <div className="text-4xl font-display font-light text-[#E5E7EB] tracking-tight mb-2">{value}</div>
+        <div className="flex items-center gap-2 mt-1">
+          <div className={cn("flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-medium tracking-wider", 
+            trendUp ? "text-[#00FFFF] bg-[#00FFFF]/10 border border-[#00FFFF]/20 shadow-[0_0_10px_rgba(0,255,255,0.1)]" : "text-[#FF007F] bg-[#FF007F]/10 border border-[#FF007F]/20 shadow-[0_0_10px_rgba(255,0,127,0.1)]")}>
+            {trendUp ? '▲' : '▼'} {trend}
+          </div>
+          <span className="text-[10px] font-mono uppercase tracking-[0.1em] text-[#555555]">vs period</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      setError(null);
+      const res = await fetch('/api/admin/stats');
+      if (!res.ok) throw new Error('Failed to fetch stats');
+      const data = await res.json();
+      setStats(data);
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+      setError('Failed to load dashboard statistics. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function fetchStats() {
-      try {
-        const res = await fetch('/api/admin/stats');
-        const data = await res.json();
-        setStats(data);
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" aria-busy="true" aria-label="Loading dashboard">
         <div className="flex items-center justify-between">
           <div>
-            <Skeleton className="h-8 w-32 bg-zinc-800" />
-            <Skeleton className="h-4 w-48 mt-2 bg-zinc-800" />
+            <Skeleton className="h-8 w-40 bg-carbon" />
+            <Skeleton className="h-4 w-56 mt-2 bg-carbon" />
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 bg-zinc-800" />
+            <Skeleton key={i} className="h-36 bg-carbon" />
           ))}
         </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Skeleton className="lg:col-span-2 h-80 bg-carbon" />
+          <Skeleton className="h-80 bg-carbon" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 space-y-4">
+        <AlertCircle className="w-12 h-12 text-red-400" aria-hidden="true" />
+        <p className="text-zinc-400 font-mono text-sm">{error}</p>
+        <Button onClick={fetchStats} variant="outline" size="sm">
+          Retry
+        </Button>
       </div>
     );
   }
 
   if (!stats) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-zinc-500">Failed to load stats</p>
-      </div>
-    );
+    return null;
   }
 
-  const statCards = [
+  const statCards: StatCardProps[] = [
     {
       title: "Today's Enrollments",
       value: stats.today.enrollments,
       icon: Users,
-      color: "text-violet-400",
-      bgColor: "bg-violet-500/10",
+      colorClass: "text-[#00FFFF]",
+      bgColorClass: "bg-[#00FFFF]/10 shadow-[0_0_15px_rgba(0,255,255,0.15)]",
       trend: "+12%",
       trendUp: true
     },
@@ -104,8 +170,8 @@ export default function AdminDashboardPage() {
       title: "Today's Revenue",
       value: `₹${stats.today.revenue.toLocaleString()}`,
       icon: DollarSign,
-      color: "text-emerald-400",
-      bgColor: "bg-emerald-500/10",
+      colorClass: "text-[#8B5CF6]",
+      bgColorClass: "bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.15)]",
       trend: "+8%",
       trendUp: true
     },
@@ -113,8 +179,8 @@ export default function AdminDashboardPage() {
       title: "Total Students",
       value: stats.overall.totalStudents,
       icon: TrendingUp,
-      color: "text-blue-400",
-      bgColor: "bg-blue-500/10",
+      colorClass: "text-[#00FFFF]",
+      bgColorClass: "bg-[#00FFFF]/10 shadow-[0_0_15px_rgba(0,255,255,0.15)]",
       trend: "+23",
       trendUp: true
     },
@@ -122,153 +188,132 @@ export default function AdminDashboardPage() {
       title: "Total Revenue",
       value: `₹${(stats.overall.totalRevenue / 100000).toFixed(1)}L`,
       icon: CreditCard,
-      color: "text-amber-400",
-      bgColor: "bg-amber-500/10",
+      colorClass: "text-[#8B5CF6]",
+      bgColorClass: "bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.15)]",
       trend: "+15%",
       trendUp: true
     }
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 animate-fade-up">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-sm text-zinc-500 mt-1">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/[0.08] relative">
+        <div className="absolute bottom-0 left-0 w-1/3 h-[1px] bg-gradient-to-r from-[#00FFFF] to-transparent shadow-[0_0_10px_#00FFFF]" />
+        <div>
+          <h1 className="text-[28px] md:text-[32px] font-display font-light text-[#E5E7EB] tracking-widest uppercase">
+            Operational <span className="font-bold text-[#FF10F0] drop-shadow-[0_0_10px_rgba(0,255,255,0.4)]">Hub</span>
+          </h1>
+          <p className="text-[11px] font-mono text-[#71717a] uppercase tracking-[0.2em] mt-3 flex items-center gap-3">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FFFF] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00FFFF] shadow-[0_0_8px_#00FFFF]"></span>
+            </span>
+            System Status: Nominal <span className="text-white/20">|</span> {format(new Date(), 'yyyy.MM.dd HH:mm')}
+          </p>
+        </div>
+        <Button 
+          variant="outline" 
+          onClick={fetchStats}
+          size="sm"
+          className="border-white/10 bg-black hover:bg-white/[0.02] hover:border-[#00FFFF]/50 hover:shadow-[0_0_15px_rgba(0,255,255,0.15)] text-[11px] font-mono text-[#E5E7EB] uppercase tracking-widest h-10 px-6 transition-all duration-300"
+          aria-label="Refresh dashboard"
+        >
+          <RefreshCw className="w-3.5 h-3.5 mr-2 text-[#00FFFF]" />
+          Sync Data
+        </Button>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Key statistics">
         {statCards.map((stat, index) => (
-          <Card key={index} className="bg-zinc-900/50 border-zinc-800 hover:border-violet-500/50 transition-colors">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-zinc-400">{stat.title}</CardTitle>
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`w-4 h-4 ${stat.color}`} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <div className="flex items-center gap-1 mt-1">
-                {stat.trendUp ? (
-                  <ArrowUpRight className="w-3 h-3 text-emerald-400" />
-                ) : (
-                  <ArrowDownRight className="w-3 h-3 text-red-400" />
-                )}
-                <span className={`text-xs ${stat.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {stat.trend}
-                </span>
-                <span className="text-xs text-zinc-500">from last week</span>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard key={index} {...stat} />
         ))}
       </div>
 
       {/* Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Recent Enrollments */}
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Recent Uplinks */}
         <div className="lg:col-span-2">
-          <Card className="bg-zinc-900/50 border-zinc-800">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base">Recent Enrollments</CardTitle>
-              <a href="/admin/students" className="text-xs text-zinc-500 hover:text-white transition-colors">
-                View all →
-              </a>
+          <Card className="bg-black border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] rounded-xl relative overflow-hidden group hover:border-white/10 transition-colors duration-300">
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00FFFF]/30 to-transparent" />
+            <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.05] py-5 px-6">
+              <CardTitle className="text-xs font-display font-medium uppercase tracking-[0.2em] text-[#E5E7EB]">Recent Uplinks</CardTitle>
+              <Link 
+                href="/admin/students" 
+                className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#8B5CF6]/70 hover:text-[#8B5CF6] hover:drop-shadow-[0_0_5px_#8B5CF6] transition-all flex items-center gap-1.5 group/link"
+                aria-label="View all students"
+              >
+                Access Archives <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+              </Link>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-zinc-800">
-                    <TableHead className="text-zinc-500">Name</TableHead>
-                    <TableHead className="text-zinc-500">Course</TableHead>
-                    <TableHead className="text-zinc-500">Status</TableHead>
-                    <TableHead className="text-zinc-500">Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {stats.recentEnrollments.slice(0, 8).map((enrollment: any) => (
-                    <TableRow key={enrollment._id} className="border-zinc-800/50">
-                      <TableCell>
-                        <div className="font-medium">{enrollment.studentName}</div>
-                        <div className="text-xs text-zinc-500">{enrollment.phone}</div>
-                      </TableCell>
-                      <TableCell className="text-zinc-400">
-                        {enrollment.courseId?.title || enrollment.courseName}
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant={enrollment.paymentStatus === 'paid' ? 'default' : enrollment.paymentStatus === 'pending' ? 'secondary' : 'destructive'}
-                          className={enrollment.paymentStatus === 'paid' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 
-                            enrollment.paymentStatus === 'pending' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 
-                            'bg-red-500/20 text-red-400 border-red-500/30'}
-                        >
-                          {enrollment.paymentStatus}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-zinc-500 text-sm">
-                        {format(new Date(enrollment.createdAt), 'MMM d')}
-                      </TableCell>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto custom-scrollbar">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-white/[0.05] hover:bg-transparent">
+                      <TableHead className="text-[10px] font-mono uppercase tracking-widest text-[#71717a] py-4 pl-6">Operator</TableHead>
+                      <TableHead className="text-[10px] font-mono uppercase tracking-widest text-[#71717a] py-4">Module</TableHead>
+                      <TableHead className="text-[10px] font-mono uppercase tracking-widest text-[#71717a] py-4 text-right pr-6">Status</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {stats.recentEnrollments.map((enrollment) => (
+                      <TableRow key={enrollment._id} className="border-white/[0.05] hover:bg-white/[0.02] transition-colors group/row">
+                        <TableCell className="py-4 pl-6">
+                          <div className="flex flex-col">
+                            <span className="text-[13px] font-medium text-[#E5E7EB] group-hover/row:text-white transition-colors">{enrollment.studentName}</span>
+                            <span className="text-[10px] font-mono text-[#71717a] uppercase tracking-tight mt-1">{enrollment.email}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <span className="text-[11px] font-mono text-[#A0A0A0] uppercase tracking-tighter">
+                            {enrollment.courseId?.title || enrollment.courseName}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right py-4 pr-6">
+                          <Badge 
+                            variant="outline"
+                            className={cn(
+                              "text-[9px] font-mono uppercase tracking-widest border px-2.5 py-1 rounded",
+                              enrollment.paymentStatus === 'paid' ? 'bg-[#00FFFF]/10 text-[#00FFFF] border-[#00FFFF]/20 shadow-[0_0_10px_rgba(0,255,255,0.1)]' :
+                              enrollment.paymentStatus === 'pending' ? 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]' :
+                              'bg-[#FF007F]/10 text-[#FF007F] border-[#FF007F]/20 shadow-[0_0_10px_rgba(255,0,127,0.1)]'
+                            )}
+                          >
+                            {enrollment.paymentStatus}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-6">
-          {/* Course Saturation */}
-          <Card className="bg-zinc-900/50 border-zinc-800">
-            <CardHeader>
-              <CardTitle className="text-base">Course Saturation</CardTitle>
+        {/* System Saturation */}
+        <div className="space-y-8">
+          <Card className="bg-black border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] rounded-xl hover:border-white/10 transition-colors duration-300">
+            <CardHeader className="border-b border-white/[0.05] py-5 px-6">
+              <CardTitle className="text-xs font-display font-medium uppercase tracking-[0.2em] text-[#E5E7EB]">Module Saturation</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {stats.courseSaturation.map((course, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium truncate pr-2">{course.name}</span>
-                    <span className="text-zinc-500">{course.filled}/{course.seats}</span>
+            <CardContent className="p-6 space-y-7">
+              {stats.courseSaturation.map((course, index) => (
+                <div key={index} className="space-y-3 group/sat">
+                  <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest">
+                    <span className="text-[#A0A0A0] group-hover/sat:text-[#00FFFF] transition-colors">{course.name}</span>
+                    <span className="text-[#71717a] font-medium">{course.percentage}%</span>
                   </div>
-                  <Progress 
-                    value={course.percentage} 
-                    className={`h-2 ${
-                      course.percentage >= 90 ? '[&>div]:bg-red-500' :
-                      course.percentage >= 60 ? '[&>div]:bg-amber-500' : '[&>div]:bg-emerald-500'
-                    }`}
-                  />
+                  <div className="relative h-1.5 w-full bg-white/[0.03] overflow-hidden rounded-full border border-white/[0.05]">
+                    <div 
+                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#00FFFF] to-[#8B5CF6] transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(0,255,255,0.4)]"
+                      style={{ width: `${course.percentage}%` }}
+                    />
+                  </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-
-          {/* Payment Breakdown */}
-          <Card className="bg-zinc-900/50 border-zinc-800">
-            <CardHeader>
-              <CardTitle className="text-base">Payment Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-around text-center">
-                <div>
-                  <div className="text-2xl font-bold text-emerald-400">
-                    {stats.paymentBreakdown.paid || 0}
-                  </div>
-                  <div className="text-xs text-zinc-500 mt-1">Paid</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-amber-400">
-                    {stats.paymentBreakdown.pending || 0}
-                  </div>
-                  <div className="text-xs text-zinc-500 mt-1">Pending</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-red-400">
-                    {stats.paymentBreakdown.failed || 0}
-                  </div>
-                  <div className="text-xs text-zinc-500 mt-1">Failed</div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>

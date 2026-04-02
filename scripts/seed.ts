@@ -157,9 +157,10 @@ async function seed() {
     console.log(`Created ${sampleCourses.length} courses`);
 
     // Create admin user
-    const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123', 12);
+    const adminPassword = 'Dblanks@2024';
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
     await Admin.create({
-      email: process.env.ADMIN_EMAIL || 'admin@dblanks.in',
+      email: 'admin@dblanks.in',
       passwordHash,
       name: 'Admin',
     });
@@ -207,8 +208,8 @@ async function seed() {
     console.log('\n✅ Seed completed successfully!');
     console.log(`   - Courses: ${sampleCourses.length}`);
     console.log(`   - Enrollments: ${distributedEnrollments.length}`);
-    console.log(`   - Admin: ${process.env.ADMIN_EMAIL || 'admin@dblanks.in'}`);
-    console.log(`   - Password: ${process.env.ADMIN_PASSWORD || 'admin123'}`);
+    console.log(`   - Admin: admin@dblanks.in`);
+    console.log(`   - Password: ${adminPassword}`);
 
     process.exit(0);
   } catch (error) {

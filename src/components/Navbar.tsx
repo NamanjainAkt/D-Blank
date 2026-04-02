@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, ChevronRight, Gamepad2, BookOpen, Users, Mail, X } from 'lucide-react';
 import { GlowButton } from '@/components/ui/GlowButton';
 import {
@@ -25,12 +25,25 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   React.useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        router.push('/admin/login');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [router]);
 
   return (
     <header
@@ -104,13 +117,6 @@ export function Navbar() {
 
           {/* ── Desktop CTA ── */}
           <div className="hidden lg:flex items-center gap-5">
-            <Link
-              href="/admin/login"
-              className="text-[10px] font-display tracking-[0.2em] text-zinc-600 hover:text-zinc-300 transition-colors duration-200"
-            >
-              SIGN IN
-            </Link>
-            <div className="w-px h-3.5 bg-zinc-800" />
             <Link href="/courses">
               <GlowButton variant="primary" className="px-5 py-2 text-[10px]">
                 Get Started
@@ -174,11 +180,6 @@ export function Navbar() {
 
                 {/* Bottom CTA */}
                 <div className="mt-auto px-4 pb-6 pt-4 border-t border-zinc-800/60 flex flex-col gap-3">
-                  <Link href="/admin/login" onClick={() => setIsOpen(false)}>
-                    <button className="w-full text-[10px] font-display tracking-[0.2em] text-zinc-600 hover:text-zinc-400 transition-colors py-2">
-                      SIGN IN
-                    </button>
-                  </Link>
                   <Link href="/courses" onClick={() => setIsOpen(false)}>
                     <GlowButton variant="primary" className="w-full text-[10px]">
                       Get Started

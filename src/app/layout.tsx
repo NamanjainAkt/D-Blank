@@ -3,9 +3,7 @@ import { Orbitron, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LenisProvider } from "@/components/providers/LenisProvider";
-import { Navbar } from "@/components/Navbar";
 import { MagneticCursor } from "@/components/ui/MagneticCursor";
-import { MorphingBlobs } from "@/components/ui/MorphingBlobs";
 import "./globals.css";
 
 const orbitron = Orbitron({ 
@@ -30,8 +28,8 @@ export const metadata: Metadata = {
     default: "D-Blanks - Gaming & Vocational Training Platform",
     template: "%s | D-Blanks",
   },
-  description: "World-class gaming experiences combined with AICTE-recognized vocational training for BTech students. Build your dream career.",
-  keywords: ["D-Blanks", "gaming", "vocational training", "BTech", "AICTE", "online courses", "game development"],
+  description: "World-class gaming experiences combined with vocational training for BTech students. Build your dream career.",
+  keywords: ["D-Blanks", "gaming", "vocational training", "BTech", "online courses", "game development"],
   authors: [{ name: "D-Blanks" }],
   creator: "D-Blanks",
   openGraph: {
@@ -40,32 +38,7 @@ export const metadata: Metadata = {
     url: "https://dblanks.in",
     siteName: "D-Blanks",
     title: "D-Blanks - Gaming & Vocational Training Platform",
-    description: "World-class gaming experiences combined with AICTE-recognized vocational training for BTech students.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "D-Blanks",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "D-Blanks - Gaming & Vocational Training Platform",
-    description: "World-class gaming experiences combined with AICTE-recognized vocational training for BTech students.",
-    images: ["/og-image.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+    description: "World-class gaming experiences combined with vocational training for BTech students.",
   },
 };
 
@@ -90,13 +63,6 @@ export default function RootLayout({
           <ThemeProvider>
             <LenisProvider>
               <MagneticCursor />
-              <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-                <MorphingBlobs 
-                  className="opacity-20" 
-                  colors={['rgba(176,38,255,0.1)', 'rgba(0,240,255,0.05)']} 
-                />
-              </div>
-              <Navbar />
               {children}
             </LenisProvider>
           </ThemeProvider>

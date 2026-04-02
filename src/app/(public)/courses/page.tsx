@@ -77,7 +77,7 @@ export default function CoursesPage() {
           <AnimatedContent>
             <Badge variant="outline" className="mb-6 px-4 py-1.5 text-sm font-medium border-emerald-500/50 bg-emerald-500/10 text-emerald-400">
               <Sparkles className="w-4 h-4 mr-2" />
-              AICTE Approved Training
+              Certified Training
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">

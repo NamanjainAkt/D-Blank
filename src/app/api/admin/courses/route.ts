@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import dbConnect from '@/lib/db';
 import { Course } from '@/models/Course';
 import { authOptions } from '@/lib/auth';
+import { courseSchema } from '@/lib/validations';
 
 export async function GET(request: Request) {
   try {
@@ -43,6 +44,15 @@ export async function POST(request: Request) {
     await dbConnect();
 
     const body = await request.json();
+
+    // Validate input
+    const validation = courseSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.errors[0].message },
+        { status: 400 }
+      );
+    }
 
     const course = await Course.create({
       ...body,

@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
 
         await dbConnect();
 
-        const admin = await Admin.findOne({ email: credentials.email });
+        const admin = await Admin.findOne({ email: credentials.email.toLowerCase() });
 
         if (!admin) {
           throw new Error('Invalid credentials');

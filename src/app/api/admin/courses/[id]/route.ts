@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import dbConnect from '@/lib/db';
 import { Course } from '@/models/Course';
 import { authOptions } from '@/lib/auth';
+import { courseSchema } from '@/lib/validations';
+import { z } from 'zod';
 
 export async function PATCH(
   request: Request,
@@ -21,6 +23,23 @@ export async function PATCH(
     await dbConnect();
     const { id } = await params;
     const body = await request.json();
+
+    // Validate input - use partial validation for updates
+    const validation = courseSchema.partial().safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.errors[0].message },
+        { status: 400 }
+      );
+    }
+
+    // Validate MongoDB ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return NextResponse.json(
+        { error: 'Invalid course ID format' },
+        { status: 400 }
+      );
+    }
 
     const course = await Course.findByIdAndUpdate(
       id,

@@ -3,6 +3,16 @@ import { getServerSession } from 'next-auth';
 import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
 import { authOptions } from '@/lib/auth';
+import { z } from 'zod';
+
+// Validation schema for enrollment updates
+const updateEnrollmentSchema = z.object({
+  paymentStatus: z.enum(['pending', 'paid', 'failed', 'refunded']).optional(),
+  enrollmentStatus: z.enum(['pending', 'confirmed', 'in_progress', 'completed', 'cancelled']).optional(),
+  paymentId: z.string().optional(),
+  paymentAmount: z.number().optional(),
+  paymentDate: z.string().optional(),
+});
 
 export async function PATCH(
   request: Request,
@@ -21,6 +31,23 @@ export async function PATCH(
     await dbConnect();
     const { id } = await params;
     const body = await request.json();
+
+    // Validate input
+    const validation = updateEnrollmentSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.errors[0].message },
+        { status: 400 }
+      );
+    }
+
+    // Validate MongoDB ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return NextResponse.json(
+        { error: 'Invalid enrollment ID format' },
+        { status: 400 }
+      );
+    }
 
     const enrollment = await Enrollment.findByIdAndUpdate(
       id,
@@ -64,6 +91,15 @@ export async function GET(
 
     await dbConnect();
     const { id } = await params;
+
+    // Validate MongoDB ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return NextResponse.json(
+        { error: 'Invalid enrollment ID format' },
+        { status: 400 }
+      );
+    }
+
     const enrollment = await Enrollment.findById(id).populate('courseId', 'title duration schedule meetLink');
 
     if (!enrollment) {

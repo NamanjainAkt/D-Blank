@@ -6,7 +6,7 @@ async function seedAdmin() {
   await dbConnect();
 
   const email = process.env.ADMIN_EMAIL || 'admin@dblanks.in';
-  const password = process.env.ADMIN_PASSWORD || 'admin123';
+  const password = process.env.ADMIN_PASSWORD || 'Dblanks@2024';
 
   const existingAdmin = await Admin.findOne({ email });
 

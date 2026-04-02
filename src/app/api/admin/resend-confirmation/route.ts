@@ -29,6 +29,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate MongoDB ObjectId format
+    if (!enrollmentId.match(/^[0-9a-fA-F]{24}$/)) {
+      return NextResponse.json(
+        { error: 'Invalid enrollment ID format' },
+        { status: 400 }
+      );
+    }
+
     const enrollment = await Enrollment.findById(enrollmentId).populate('courseId');
 
     if (!enrollment) {

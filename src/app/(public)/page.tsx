@@ -49,7 +49,7 @@ const heroStats = [
   { value: '500+', label: 'Students' },
   { value: '10+',  label: 'Games Published' },
   { value: '4.8★', label: 'Avg. Rating' },
-  { value: 'AICTE', label: 'Recognized' },
+  { value: 'Cert.', label: 'Verified' },
 ];
 
 const features = [
@@ -139,7 +139,7 @@ export default function HomePage() {
           <AnimatedContent>
             <Badge variant="outline" className="mb-8 px-4 py-1.5 text-xs font-medium border-violet-500/50 bg-violet-500/10 text-violet-400 hover:border-violet-400/60 transition-colors cursor-default">
               <Sparkles className="w-3 h-3 mr-2" />
-              AICTE Approved Vocational Partner
+              Certified Vocational Partner
             </Badge>
           </AnimatedContent>
 
@@ -510,7 +510,7 @@ export default function HomePage() {
 
               {/* Trust chips */}
               <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-600">
-                {['No credit card needed', 'AICTE Recognized', 'Industry mentors'].map(item => (
+                {['No credit card needed', 'Industry Certified', 'Industry mentors'].map(item => (
                   <span key={item} className="flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5 text-violet-500/70" />
                     {item}
@@ -538,7 +538,7 @@ export default function HomePage() {
                 </span>
               </Link>
               <p className="text-zinc-500 text-xs mb-6 leading-relaxed">
-                World-class gaming experiences combined with AICTE-recognized vocational training.
+                World-class gaming experiences combined with certified vocational training.
               </p>
               <div className="flex items-center gap-2">
                 {/* X (Twitter) */}

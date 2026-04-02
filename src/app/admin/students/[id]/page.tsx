@@ -4,7 +4,31 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { 
+  MessageCircle, 
+  Copy, 
+  Check, 
+  Mail, 
+  Loader2,
+  AlertCircle,
+  ExternalLink,
+  Calendar,
+  CreditCard,
+  User,
+  GraduationCap,
+  BookOpen,
+  Clock
+} from 'lucide-react';
 
 interface Student {
   _id: string;
@@ -18,14 +42,14 @@ interface Student {
   semester: string;
   rollNumber: string;
   city: string;
-  courseId: {
+  courseId?: {
     title: string;
     duration: string;
     schedule: string;
     meetLink: string;
   };
   courseName: string;
-  paymentStatus: string;
+  paymentStatus: 'paid' | 'pending' | 'failed';
   paymentAmount: number;
   paymentId: string;
   paymentDate: string;
@@ -34,14 +58,55 @@ interface Student {
   createdAt: string;
 }
 
+interface InfoFieldProps {
+  label: string;
+  value?: string | React.ReactNode;
+  mono?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+function InfoField({ label, value, mono = false, className = '', children }: InfoFieldProps) {
+  return (
+    <div className={className}>
+      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-1.5">{label}</div>
+      <div className={cn(
+        "text-sm",
+        mono ? 'font-mono text-zinc-300 bg-white/5 px-2 py-1 rounded-sm border border-white/5 inline-block' : 'text-zinc-200'
+      )}>
+        {children || value}
+      </div>
+    </div>
+  );
+}
+
+function SectionCard({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
+  return (
+    <div className="bg-ink/40 border border-white/5 p-6 backdrop-blur-sm relative overflow-hidden group">
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-laser-cyan/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5 relative z-10">
+        <div className="p-2 bg-laser-cyan/10 rounded-sm border border-laser-cyan/20">
+          <Icon className="w-4 h-4 text-laser-cyan" aria-hidden="true" />
+        </div>
+        <h2 className="font-display font-bold text-xs uppercase tracking-[0.2em] text-white">{title}</h2>
+      </div>
+      <div className="relative z-10">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export default function StudentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchStudent() {
@@ -49,25 +114,32 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         const res = await fetch(`/api/admin/students/${resolvedParams.id}`);
         const data = await res.json();
         
-        if (data.error) {
-          router.push('/admin/students');
+        if (!res.ok || data.error) {
+          setError(data.error || 'Student not found');
           return;
         }
         
         setStudent(data.student);
-      } catch (error) {
-        console.error('Error fetching student:', error);
+      } catch (err) {
+        console.error('Error fetching student:', err);
+        setError('Failed to load student details');
       } finally {
         setLoading(false);
       }
     }
 
     fetchStudent();
-  }, [resolvedParams.id, router]);
+  }, [resolvedParams.id]);
+
+  const showSuccess = (message: string) => {
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
 
   const updateEnrollmentStatus = async (status: string) => {
     if (!student) return;
     setUpdating(true);
+    setError(null);
 
     try {
       const res = await fetch(`/api/admin/students/${student._id}`, {
@@ -76,11 +148,13 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         body: JSON.stringify({ enrollmentStatus: status }),
       });
 
-      if (res.ok) {
-        setStudent({ ...student, enrollmentStatus: status });
-      }
-    } catch (error) {
-      console.error('Error updating status:', error);
+      if (!res.ok) throw new Error('Failed to update status');
+      
+      setStudent({ ...student, enrollmentStatus: status });
+      showSuccess('Enrollment status updated');
+    } catch (err) {
+      console.error('Error updating status:', err);
+      setError('Failed to update enrollment status');
     } finally {
       setUpdating(false);
     }
@@ -89,6 +163,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
   const resendConfirmationEmail = async () => {
     if (!student) return;
     setEmailSending(true);
+    setError(null);
 
     try {
       const res = await fetch('/api/admin/resend-confirmation', {
@@ -101,281 +176,299 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       
       if (data.success) {
         setStudent({ ...student, confirmationEmailSent: true });
-        alert('Confirmation email sent successfully!');
+        showSuccess('Confirmation email sent successfully');
       } else {
-        alert('Failed to send email: ' + data.error);
+        setError(data.error || 'Failed to send email');
       }
-    } catch (error) {
-      console.error('Error sending email:', error);
-      alert('Failed to send email');
+    } catch (err) {
+      console.error('Error sending email:', err);
+      setError('Failed to send confirmation email');
     } finally {
       setEmailSending(false);
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   };
 
   const openWhatsApp = (phone: string) => {
     const formatted = phone.replace(/\D/g, '');
-    window.open(`https://wa.me/91${formatted}`, '_blank');
+    window.open(`https://wa.me/91${formatted}`, '_blank', 'noopener,noreferrer');
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
+      <div className="flex items-center justify-center h-96" role="status" aria-label="Loading student details">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-laser-cyan" aria-hidden="true" />
+          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em]">Retrieving Personnel File...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 space-y-6">
+        <AlertCircle className="w-12 h-12 text-red-500 opacity-50" aria-hidden="true" />
+        <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest">{error}</p>
+        <Button 
+          variant="outline" 
+          onClick={() => router.push('/admin/students')}
+          className="border-white/5 bg-white/5 hover:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest"
+        >
+          Return to Registry
+        </Button>
       </div>
     );
   }
 
   if (!student) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <div className="text-4xl mb-4">❌</div>
-        <h2 className="text-xl font-bold mb-2">Student not found</h2>
-        <Link href="/admin/students" className="btn btn-ghost mt-4">
-          Back to Students
-        </Link>
-      </div>
-    );
+    return null;
   }
 
+  const whatsappPhone = student.whatsappNumber || student.phone;
+
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <Link href="/admin/students" className="text-sm text-gray-500 hover:text-white mb-2 inline-flex items-center gap-1">
-            ← Back to Students
-          </Link>
-          <h1 className="text-3xl font-bold tracking-[-1px] mb-2">
-            {student.studentName}
-          </h1>
-          <p className="text-sm text-gray-500 font-mono">
-            Enrollment: {student.enrollmentId}
-          </p>
+    <div className="space-y-10 animate-fade-up">
+      {/* Success/Error Messages */}
+      {successMessage && (
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[11px] uppercase tracking-widest backdrop-blur-md animate-scale-in" role="status" aria-live="polite">
+          <Check className="w-4 h-4" aria-hidden="true" />
+          {successMessage}
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => openWhatsApp(student.phone)}
-            className="btn btn-green"
+      )}
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/5">
+        <div className="space-y-4">
+          <Link 
+            href="/admin/students" 
+            className="text-[10px] font-mono text-zinc-600 hover:text-laser-cyan uppercase tracking-[0.2em] transition-colors flex items-center gap-2"
           >
-            💬 WhatsApp
-          </button>
-          <button
+            <span aria-hidden="true">←</span> Back to Registry
+          </Link>
+          <div>
+            <h1 className="text-4xl font-display font-black text-white tracking-tighter uppercase">
+              {student.studentName}
+            </h1>
+            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF]" />
+              Personnel ID: {student.enrollmentId} // Archive Entry
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => openWhatsApp(whatsappPhone)}
+            className="bg-emerald-500 text-black hover:bg-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-10 px-6 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+          >
+            <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
+            Open Uplink
+          </Button>
+          <Button
+            variant="outline"
             onClick={() => copyToClipboard(student.phone)}
-            className="btn btn-ghost"
+            className="border-white/5 bg-white/5 hover:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest h-10 px-6"
           >
-            {copied ? '✓ Copied' : '📋 Copy Phone'}
-          </button>
+            {copied ? (
+              <>
+                <Check className="w-4 h-4 mr-2 text-emerald-400" aria-hidden="true" />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4 mr-2" aria-hidden="true" />
+                Copy Comm
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-8">
           {/* Personal Information */}
-          <div className="bg-charcoal border border-carbon rounded-xl p-6">
-            <h2 className="font-bold mb-4">Personal Information</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Full Name</div>
-                <div className="text-white">{student.studentName}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Email</div>
-                <a href={`mailto:${student.email}`} className="text-emerald-400 hover:underline">
+          <SectionCard title="Personal Dossier" icon={User}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <InfoField label="Legal Identity" value={student.studentName} />
+              <InfoField label="Comm Link (Email)" value={
+                <a href={`mailto:${student.email}`} className="text-laser-cyan hover:underline transition-colors">
                   {student.email}
                 </a>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Phone</div>
-                <div className="text-white font-mono">{student.phone}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">WhatsApp</div>
-                <div className="text-white font-mono">
-                  {student.whatsappNumber || student.phone}
-                </div>
-              </div>
-              <div className="col-span-2">
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">City</div>
-                <div className="text-white">{student.city}</div>
-              </div>
+              } />
+              <InfoField label="Primary Comm" value={student.phone} mono />
+              <InfoField label="WhatsApp Comm" value={whatsappPhone} mono />
+              <InfoField label="Origin (City)" value={student.city} className="sm:col-span-2" />
             </div>
-          </div>
+          </SectionCard>
 
           {/* Academic Information */}
-          <div className="bg-charcoal border border-carbon rounded-xl p-6">
-            <h2 className="font-bold mb-4">Academic Information</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">College</div>
-                <div className="text-white">{student.collegeName}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Branch</div>
-                <div className="text-white">{student.branch}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Semester</div>
-                <div className="text-white">{student.semester}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Roll Number</div>
-                <div className="text-white font-mono">{student.rollNumber}</div>
-              </div>
+          <SectionCard title="Academic Profile" icon={GraduationCap}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <InfoField label="Educational Institution" value={student.collegeName} />
+              <InfoField label="Specialization (Branch)" value={student.branch} />
+              <InfoField label="Current Semester" value={student.semester} />
+              <InfoField label="System Roll ID" value={student.rollNumber} mono />
             </div>
-          </div>
+          </SectionCard>
 
           {/* Course Information */}
-          <div className="bg-charcoal border border-carbon rounded-xl p-6">
-            <h2 className="font-bold mb-4">Course Information</h2>
-            <div className="space-y-4">
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Course</div>
-                <div className="text-white">{student.courseId?.title || student.courseName}</div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Duration</div>
-                  <div className="text-white">{student.courseId?.duration || 'N/A'}</div>
-                </div>
-                <div>
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Schedule</div>
-                  <div className="text-white">{student.courseId?.schedule || 'N/A'}</div>
-                </div>
+          <SectionCard title="Module Assignment" icon={BookOpen}>
+            <div className="space-y-8">
+              <InfoField label="Assigned Module" value={student.courseId?.title || student.courseName || 'Unknown'} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <InfoField label="Expected Runtime" value={student.courseId?.duration || 'N/A'} />
+                <InfoField label="Operational Cycle" value={student.courseId?.schedule || 'N/A'} />
               </div>
               {student.courseId?.meetLink && (
-                <div>
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Google Meet</div>
-                  <a 
-                    href={student.courseId.meetLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-teal-400 hover:underline"
-                  >
-                    {student.courseId.meetLink}
-                  </a>
-                </div>
+              <InfoField label="Direct Uplink (Meet)" value={
+                <a 
+                  href={student.courseId.meetLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-laser-cyan hover:underline inline-flex items-center gap-1.5 transition-colors group"
+                >
+                  {student.courseId.meetLink}
+                  <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
+                </a>
+              } />
               )}
             </div>
-          </div>
+          </SectionCard>
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Status Card */}
-          <div className="bg-charcoal border border-carbon rounded-xl p-6">
-            <h2 className="font-bold mb-4">Status</h2>
-            <div className="space-y-4">
+          <SectionCard title="System Status" icon={Clock}>
+            <div className="space-y-6">
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-2">Payment Status</div>
-                <span className={`status-chip ${student.paymentStatus}`}>
-                  {student.paymentStatus}
-                </span>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-2">Enrollment Status</div>
-                <select
-                  value={student.enrollmentStatus}
-                  onChange={(e) => updateEnrollmentStatus(e.target.value)}
-                  disabled={updating}
-                  className="f-input w-full"
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-3">Credits Status</div>
+                <Badge 
+                  variant="outline"
+                  className={cn(
+                    "text-[10px] font-mono uppercase tracking-widest border px-3 py-1",
+                    student.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]' :
+                    student.paymentStatus === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.1)]' :
+                    'bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]'
+                  )}
                 >
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
+                  {student.paymentStatus}
+                </Badge>
+              </div>
+              <div className="space-y-3">
+                <label htmlFor="enrollment-status" className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 block">
+                  Assignment Status
+                </label>
+                <Select value={student?.enrollmentStatus || 'pending'} onValueChange={updateEnrollmentStatus} disabled={updating}>
+                  <SelectTrigger id="enrollment-status" className="w-full bg-black/40 border-white/5 text-[10px] font-mono uppercase tracking-widest h-10">
+                    {updating ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-laser-cyan" aria-hidden="true" />
+                    ) : (
+                      <SelectValue />
+                    )}
+                  </SelectTrigger>
+                  <SelectContent className="bg-ink border-white/5">
+                    <SelectItem value="pending" className="text-[10px] font-mono uppercase tracking-widest">Pending</SelectItem>
+                    <SelectItem value="confirmed" className="text-[10px] font-mono uppercase tracking-widest">Confirmed</SelectItem>
+                    <SelectItem value="in_progress" className="text-[10px] font-mono uppercase tracking-widest">In Progress</SelectItem>
+                    <SelectItem value="completed" className="text-[10px] font-mono uppercase tracking-widest">Completed</SelectItem>
+                    <SelectItem value="cancelled" className="text-[10px] font-mono uppercase tracking-widest">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          </div>
+          </SectionCard>
 
           {/* Payment Details */}
-          <div className="bg-charcoal border border-carbon rounded-xl p-6">
-            <h2 className="font-bold mb-4">Payment Details</h2>
-            <div className="space-y-4">
+          <SectionCard title="Credits Ledger" icon={CreditCard}>
+            <div className="space-y-6">
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Amount</div>
-                <div className="text-2xl font-mono font-medium text-white">
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2">Total Transfer</div>
+                <div className="text-3xl font-display font-black text-white tracking-tighter">
                   {student.paymentAmount ? formatCurrency(student.paymentAmount) : '-'}
                 </div>
               </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Transaction ID</div>
-                <div className="text-sm text-white font-mono break-all">
-                  {student.paymentId || '-'}
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Payment Date</div>
-                <div className="text-sm text-white">
-                  {student.paymentDate 
-                    ? format(new Date(student.paymentDate), 'MMM d, yyyy h:mm a')
-                    : '-'
-                  }
-                </div>
-              </div>
+              <InfoField label="Transaction Hash" value={student.paymentId || '-'} mono />
+              <InfoField label="Timestamp" value={
+                student.paymentDate 
+                  ? format(new Date(student.paymentDate), 'yyyy.MM.dd // HH:mm')
+                  : '-'
+              } />
             </div>
-          </div>
+          </SectionCard>
 
           {/* Quick Actions */}
-          <div className="bg-charcoal border border-carbon rounded-xl p-6">
-            <h2 className="font-bold mb-4">Quick Actions</h2>
-            <div className="space-y-2">
-              <button
-                onClick={() => openWhatsApp(student.phone)}
-                className="btn btn-green w-full justify-center"
+          <SectionCard title="Control Panel" icon={ExternalLink}>
+            <div className="space-y-3">
+              <Button
+                onClick={() => openWhatsApp(whatsappPhone)}
+                className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-10 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
               >
-                💬 Open WhatsApp
-              </button>
-              <button
+                <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
+                Initiate Comm
+              </Button>
+              <Button
+                variant="outline"
                 onClick={resendConfirmationEmail}
                 disabled={emailSending}
-                className="btn btn-ghost w-full justify-center"
+                className="w-full border-white/5 bg-white/5 hover:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest h-10"
               >
-                {emailSending ? 'Sending...' : '📧 Resend Confirmation Email'}
-              </button>
+                {emailSending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin text-laser-cyan" aria-hidden="true" />
+                    Transmitting...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="w-4 h-4 mr-2" aria-hidden="true" />
+                    Resend Briefing
+                  </>
+                )}
+              </Button>
               {student.confirmationEmailSent && (
-                <div className="text-xs text-emerald-400 text-center mt-2">
-                  ✓ Confirmation email sent
+                <div className="flex items-center gap-2 text-[9px] font-mono uppercase tracking-widest text-emerald-400 mt-2 bg-emerald-500/5 p-2 border border-emerald-500/10">
+                  <Check className="w-3 h-3" aria-hidden="true" />
+                  Briefing Transmitted Successfully
                 </div>
               )}
             </div>
-          </div>
+          </SectionCard>
 
           {/* Timeline */}
-          <div className="bg-charcoal border border-carbon rounded-xl p-6">
-            <h2 className="font-bold mb-4">Timeline</h2>
-            <div className="space-y-3">
-              <div className="flex gap-3">
-                <div className="w-2 h-2 mt-2 rounded-full bg-teal-500 flex-shrink-0" />
+          <SectionCard title="Event Log" icon={Calendar}>
+            <div className="space-y-6">
+              <div className="flex gap-4 group/log">
+                <div className="w-1.5 h-1.5 mt-2 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF] flex-shrink-0 group-hover/log:scale-125 transition-transform" />
                 <div>
-                  <div className="text-sm text-white">Enrolled</div>
-                  <div className="text-xs text-gray-500">
-                    {format(new Date(student.createdAt), 'MMM d, yyyy h:mm a')}
+                  <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-300">File Created</div>
+                  <div className="text-[10px] font-mono text-zinc-600 mt-1">
+                    {format(new Date(student.createdAt), 'yyyy.MM.dd // HH:mm')}
                   </div>
                 </div>
               </div>
               {student.paymentDate && (
-                <div className="flex gap-3">
-                  <div className="w-2 h-2 mt-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                <div className="flex gap-4 group/log">
+                  <div className="w-1.5 h-1.5 mt-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] flex-shrink-0 group-hover/log:scale-125 transition-transform" />
                   <div>
-                    <div className="text-sm text-white">Payment Received</div>
-                    <div className="text-xs text-gray-500">
-                      {format(new Date(student.paymentDate), 'MMM d, yyyy h:mm a')}
+                    <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-300">Credits Received</div>
+                    <div className="text-[10px] font-mono text-zinc-600 mt-1">
+                      {format(new Date(student.paymentDate), 'yyyy.MM.dd // HH:mm')}
                     </div>
                   </div>
                 </div>
               )}
             </div>
-          </div>
+          </SectionCard>
         </div>
       </div>
     </div>

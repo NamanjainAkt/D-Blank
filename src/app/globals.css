@@ -50,6 +50,33 @@
     --acid-green: #39FF14;
     --neon-yellow: #FFF700;
 
+    /* Admin Dimensions */
+    --admin-sidebar-width: 260px;
+    --admin-sidebar-collapsed: 72px;
+    --admin-header-height: 64px;
+
+    /* Admin Colors */
+    --admin-bg: #000000;
+    --admin-surface: rgba(255,255,255,0.03);
+    --admin-border: rgba(255,255,255,0.08);
+    --admin-text: #ffffff;
+    --admin-text-muted: #71717a;
+    --admin-hover: rgba(255,255,255,0.05);
+    --admin-active: rgba(176,38,255,0.15);
+
+    /* Sidebar States */
+    --sidebar-bg: var(--admin-bg);
+    --sidebar-bg-active: var(--admin-active);
+    --sidebar-text: var(--admin-text);
+    --sidebar-text-muted: var(--admin-text-muted);
+    --sidebar-text-active: var(--admin-text);
+    --sidebar-border: var(--admin-border);
+    --sidebar-hover: var(--admin-hover);
+
+    /* Fade-in transition */
+    --fade-in-duration: 0.3s;
+    --fade-in-easing: ease;
+
     /* Core Blacks */
     --black: #000000;
     --ink: #020202;
@@ -198,10 +225,95 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(176, 38, 255, 0.2);
+}
+
+/* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.05) transparent;
+}
+
+/* Admin-specific styles */
+.admin-sidebar-mobile .radix-dialog-content {
+  background: var(--admin-bg);
+  border: none;
+}
+
+.admin-sidebar-mobile .radix-dialog-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Spring physics animation for sidebar */
+@media (prefers-reduced-motion: no-preference) {
+  .admin-sidebar {
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+/* Fade-in transitions for admin content */
+.fade-in {
+  opacity: 0;
+  transition: opacity var(--fade-in-duration) var(--fade-in-easing);
+}
+
+.fade-in.visible {
+  opacity: 1;
+}
+
+/* Admin table hover states */
+.admin-table tbody tr:hover {
+  background: var(--admin-hover);
+}
+
+.admin-table tbody tr.active {
+  background: var(--admin-active);
+}
+
+/* Admin button hover states */
+.admin-btn:hover {
+  background: var(--admin-hover);
+}
+
+/* Admin card hover states */
+.admin-card:hover {
+  border-color: var(--admin-active);
+}
+
+/* Custom scrollbar for admin */
+.admin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.admin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
 ::-webkit-scrollbar-track {
@@ -215,6 +327,23 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Form Input Styles */

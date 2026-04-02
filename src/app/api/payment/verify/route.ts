@@ -32,12 +32,28 @@ export async function POST(request: Request) {
     const saltKey = process.env.PHONEPE_SALT_KEY!;
     const saltIndex = process.env.PHONEPE_SALT_INDEX || '1';
 
+    if (!saltKey) {
+      return NextResponse.json(
+        { error: 'Payment service not configured' },
+        { status: 500 }
+      );
+    }
+
     // Decode and verify checksum
     const decodedResponse = JSON.parse(Buffer.from(response, 'base64').toString('utf-8'));
     const { merchantTransactionId, state, code } = decodedResponse;
 
-    // Verify checksum
-    const checksum = CryptoJS.SHA256(response + '/pg/v1/status/' + merchantTransactionId + '/' + saltKey) + '###' + saltIndex;
+    // Verify checksum from PhonePe response header
+    const receivedChecksum = request.headers.get('X-VERIFY');
+    const expectedChecksum = CryptoJS.SHA256(response + '/pg/v1/status/' + merchantTransactionId + '/' + saltKey) + '###' + saltIndex;
+    
+    if (receivedChecksum !== expectedChecksum) {
+      console.error('Checksum verification failed', { received: receivedChecksum, expected: expectedChecksum });
+      return NextResponse.json(
+        { error: 'Invalid payment response - checksum mismatch' },
+        { status: 400 }
+      );
+    }
 
     // Find enrollment by paymentId
     const enrollment = await Enrollment.findOne({ paymentId: merchantTransactionId });

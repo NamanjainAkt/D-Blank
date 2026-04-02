@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, cn } from '@/lib/utils';
 import { ImageUploader } from '@/components/ImageUploader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,7 +34,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Plus, Edit, BookOpen } from 'lucide-react';
+import { Plus, Edit, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
 interface Course {
   _id: string;
@@ -53,42 +53,68 @@ interface Course {
   syllabusUrl?: string;
 }
 
-const categories = ['IT & Software', 'Electronics', 'Mechanical', 'Civil', 'tech', 'design', 'creative'];
+const categories = ['IT & Software', 'Electronics', 'Mechanical', 'Civil', 'Tech', 'Design', 'Creative'];
+
+interface FormState {
+  title: string;
+  slug: string;
+  shortDescription: string;
+  fullDescription: string;
+  duration: string;
+  schedule: string;
+  price: number;
+  originalPrice: number;
+  category: string;
+  tags: string;
+  totalSeats: number;
+  instructorName: string;
+  meetLink: string;
+  isPublished: boolean;
+  thumbnailUrl: string;
+  syllabusUrl: string;
+}
+
+const initialFormState: FormState = {
+  title: '',
+  slug: '',
+  shortDescription: '',
+  fullDescription: '',
+  duration: '',
+  schedule: '',
+  price: 0,
+  originalPrice: 0,
+  category: 'IT & Software',
+  tags: '',
+  totalSeats: 50,
+  instructorName: '',
+  meetLink: '',
+  isPublished: true,
+  thumbnailUrl: '',
+  syllabusUrl: '',
+};
 
 export default function AdminCoursesPage() {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const [formData, setFormData] = useState({
-    title: '',
-    slug: '',
-    shortDescription: '',
-    fullDescription: '',
-    duration: '',
-    schedule: '',
-    price: 0,
-    originalPrice: 0,
-    category: 'IT & Software',
-    tags: '',
-    totalSeats: 50,
-    instructorName: '',
-    meetLink: '',
-    isPublished: true,
-    thumbnailUrl: '',
-    syllabusUrl: '',
-  });
+  const [formData, setFormData] = useState<FormState>(initialFormState);
 
   const fetchCourses = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch('/api/admin/courses');
+      if (!res.ok) throw new Error('Failed to fetch courses');
       const data = await res.json();
       setCourses(data.courses || []);
-    } catch (error) {
-      console.error('Error fetching courses:', error);
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+      setError('Failed to load courses. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -98,9 +124,15 @@ export default function AdminCoursesPage() {
     fetchCourses();
   }, [fetchCourses]);
 
+  const showSuccess = (message: string) => {
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError(null);
 
     try {
       const payload = {
@@ -119,14 +151,19 @@ export default function AdminCoursesPage() {
         body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
-        setIsModalOpen(false);
-        setEditingCourse(null);
-        resetForm();
-        fetchCourses();
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save course');
       }
-    } catch (error) {
-      console.error('Error saving course:', error);
+
+      setIsModalOpen(false);
+      setEditingCourse(null);
+      setFormData(initialFormState);
+      fetchCourses();
+      showSuccess(editingCourse ? 'Course updated successfully' : 'Course created successfully');
+    } catch (err) {
+      console.error('Error saving course:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save course');
     } finally {
       setSaving(false);
     }
@@ -157,36 +194,24 @@ export default function AdminCoursesPage() {
 
   const handleTogglePublish = async (course: Course) => {
     try {
-      await fetch(`/api/admin/courses/${course._id}`, {
+      const res = await fetch(`/api/admin/courses/${course._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isPublished: !course.isPublished }),
       });
+      
+      if (!res.ok) throw new Error('Failed to update status');
       fetchCourses();
-    } catch (error) {
-      console.error('Error toggling publish:', error);
+      showSuccess(`Course ${course.isPublished ? 'unpublished' : 'published'} successfully`);
+    } catch (err) {
+      console.error('Error toggling publish:', err);
+      setError('Failed to update course status');
     }
   };
 
   const resetForm = () => {
-    setFormData({
-      title: '',
-      slug: '',
-      shortDescription: '',
-      fullDescription: '',
-      duration: '',
-      schedule: '',
-      price: 0,
-      originalPrice: 0,
-      category: 'IT & Software',
-      tags: '',
-      totalSeats: 50,
-      instructorName: '',
-      meetLink: '',
-      isPublished: true,
-      thumbnailUrl: '',
-      syllabusUrl: '',
-    });
+    setFormData(initialFormState);
+    setEditingCourse(null);
   };
 
   const generateSlug = (title: string) => {
@@ -194,329 +219,350 @@ export default function AdminCoursesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10 animate-fade-up">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Courses</h1>
-          <p className="text-sm text-zinc-500">{courses.length} courses</p>
+          <h1 className="text-4xl font-display font-black text-white tracking-tighter uppercase">
+            Module <span className="text-acid-green shadow-acid-green">Control</span>
+          </h1>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-acid-green shadow-[0_0_8px_#39FF14]" />
+            Active Modules: {courses.length} // Deployment Status
+          </p>
         </div>
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => { setEditingCourse(null); resetForm(); }}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Course
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-800">
-            <DialogHeader>
-              <DialogTitle>{editingCourse ? 'Edit Course' : 'Add New Course'}</DialogTitle>
-              <DialogDescription>
-                Fill in the course details below. All fields marked with * are required.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+        <div className="flex items-center gap-3">
+          <Dialog open={isModalOpen} onOpenChange={(open) => {
+            if (!open) resetForm();
+            setIsModalOpen(open);
+          }}>
+            <DialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-acid-green/50 text-acid-green text-[10px] font-mono uppercase tracking-widest h-9 shadow-[0_0_15px_rgba(57,255,20,0.1)]"
+                onClick={() => { resetForm(); }}
+              >
+                <Plus className="w-3.5 h-3.5 mr-2" />
+                Initialize Module
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-ink border-white/5 max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+              <DialogHeader className="border-b border-white/5 pb-4 mb-6">
+                <DialogTitle className="text-xl font-display font-black text-white uppercase tracking-tighter">
+                  {editingCourse ? 'Configure Module' : 'Initialize New Module'}
+                </DialogTitle>
+                <DialogDescription className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-2">
+                  System Protocol // Course Definition Parameters
+                </DialogDescription>
+              </DialogHeader>
+              
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-mono uppercase tracking-widest mb-6" role="alert">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                  {error}
+                </div>
+              )}
+              
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="title" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Module Designation *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        title: e.target.value,
+                        slug: generateSlug(e.target.value)
+                      })}
+                      required
+                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="slug" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Access Key (Slug) *</Label>
+                    <Input
+                      id="slug"
+                      value={formData.slug}
+                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                      required
+                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Category *</Label>
+                    <Select value={formData.category} onValueChange={(v: string) => setFormData({ ...formData, category: v })}>
+                      <SelectTrigger className="bg-black/40 border-white/5 text-[10px] font-mono uppercase tracking-widest h-10">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-ink border-white/5">
+                        {categories.map((cat) => (
+                          <SelectItem key={cat} value={cat} className="text-[10px] font-mono uppercase tracking-widest">{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="totalSeats" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Capacity *</Label>
+                    <Input
+                      id="totalSeats"
+                      type="number"
+                      value={formData.totalSeats}
+                      onChange={(e) => setFormData({ ...formData, totalSeats: parseInt(e.target.value) || 0 })}
+                      min="1"
+                      required
+                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="price" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Credits (Price) *</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
+                      min="0"
+                      required
+                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="originalPrice" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Base Credits</Label>
+                    <Input
+                      id="originalPrice"
+                      type="number"
+                      value={formData.originalPrice}
+                      onChange={(e) => setFormData({ ...formData, originalPrice: parseInt(e.target.value) || 0 })}
+                      min="0"
+                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="duration" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Runtime (Duration) *</Label>
+                    <Input
+                      id="duration"
+                      value={formData.duration}
+                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                      placeholder="e.g. 45 Hours | 6 Weeks"
+                      required
+                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="schedule" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Operational Cycle *</Label>
+                    <Input
+                      id="schedule"
+                      value={formData.schedule}
+                      onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
+                      placeholder="e.g. Weekdays 7PM-9PM"
+                      required
+                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="shortDescription" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Quick Summary</Label>
                   <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      title: e.target.value,
-                      slug: generateSlug(e.target.value)
-                    })}
+                    id="shortDescription"
+                    value={formData.shortDescription}
+                    onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                    className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
+                    maxLength={120}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fullDescription" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Technical Briefing *</Label>
+                  <Textarea
+                    id="fullDescription"
+                    value={formData.fullDescription}
+                    onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
                     required
-                    className="bg-zinc-800 border-zinc-700"
+                    className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono min-h-[100px]"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="slug">Slug *</Label>
-                  <Input
-                    id="slug"
-                    value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    required
-                    className="bg-zinc-800 border-zinc-700 font-mono"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Category *</Label>
-                  <Select value={formData.category} onValueChange={(v: string) => setFormData({ ...formData, category: v })}>
-                    <SelectTrigger className="bg-zinc-800 border-zinc-700">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700">
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Module Visual</Label>
+                    <ImageUploader
+                      value={formData.thumbnailUrl}
+                      onChange={(url) => setFormData({ ...formData, thumbnailUrl: url })}
+                      type="image"
+                      label="Upload Visual"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Syllabus Matrix</Label>
+                    <ImageUploader
+                      value={formData.syllabusUrl}
+                      onChange={(url) => setFormData({ ...formData, syllabusUrl: url })}
+                      type="pdf"
+                      label="Upload Matrix"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="totalSeats">Total Seats *</Label>
-                  <Input
-                    id="totalSeats"
-                    type="number"
-                    value={formData.totalSeats}
-                    onChange={(e) => setFormData({ ...formData, totalSeats: parseInt(e.target.value) })}
-                    min="1"
-                    required
-                    className="bg-zinc-800 border-zinc-700"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="price">Price (Rs) *</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) })}
-                    min="0"
-                    required
-                    className="bg-zinc-800 border-zinc-700"
+                <div className="flex items-center space-x-3 bg-black/40 p-4 border border-white/5 rounded-sm">
+                  <Checkbox 
+                    id="isPublished" 
+                    checked={formData.isPublished}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isPublished: checked as boolean })}
+                    className="border-white/20 data-[state=checked]:bg-acid-green data-[state=checked]:border-acid-green"
                   />
+                  <Label htmlFor="isPublished" className="text-[10px] font-mono uppercase tracking-widest text-zinc-300 cursor-pointer">
+                    Deploy to Public Uplink
+                  </Label>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="originalPrice">Original Price (Rs)</Label>
-                  <Input
-                    id="originalPrice"
-                    type="number"
-                    value={formData.originalPrice}
-                    onChange={(e) => setFormData({ ...formData, originalPrice: parseInt(e.target.value) })}
-                    min="0"
-                    className="bg-zinc-800 border-zinc-700"
-                  />
+
+                <div className="flex justify-end gap-3 pt-6 border-t border-white/5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsModalOpen(false)}
+                    className="border-white/5 hover:bg-white/5 text-[10px] font-mono uppercase tracking-widest"
+                    disabled={saving}
+                  >
+                    Abort
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={saving}
+                    className="bg-acid-green text-black hover:bg-acid-green/90 text-[10px] font-mono font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(57,255,20,0.3)]"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" aria-hidden="true" />
+                        Processing...
+                      </>
+                    ) : (
+                      editingCourse ? 'Update Module' : 'Confirm Initialization'
+                    )}
+                  </Button>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="duration">Duration *</Label>
-                  <Input
-                    id="duration"
-                    value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    placeholder="e.g. 45 Hours | 6 Weeks"
-                    required
-                    className="bg-zinc-800 border-zinc-700"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="schedule">Schedule *</Label>
-                  <Input
-                    id="schedule"
-                    value={formData.schedule}
-                    onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
-                    placeholder="e.g. Weekdays 7PM-9PM"
-                    required
-                    className="bg-zinc-800 border-zinc-700"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="shortDescription">Short Description</Label>
-                <Input
-                  id="shortDescription"
-                  value={formData.shortDescription}
-                  onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                  placeholder="One-liner for course cards (max 120 chars)"
-                  maxLength={120}
-                  className="bg-zinc-800 border-zinc-700"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="fullDescription">Full Description *</Label>
-                <Textarea
-                  id="fullDescription"
-                  value={formData.fullDescription}
-                  onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
-                  placeholder="Detailed course description"
-                  required
-                  className="bg-zinc-800 border-zinc-700 min-h-[100px]"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tags">Tags (comma separated)</Label>
-                <Input
-                  id="tags"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                  placeholder="e.g. Python, IoT, Automation"
-                  className="bg-zinc-800 border-zinc-700"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Course Thumbnail</Label>
-                  <ImageUploader
-                    value={formData.thumbnailUrl}
-                    onChange={(url) => setFormData({ ...formData, thumbnailUrl: url })}
-                    type="image"
-                    label="Upload Thumbnail"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Syllabus PDF</Label>
-                  <ImageUploader
-                    value={formData.syllabusUrl}
-                    onChange={(url) => setFormData({ ...formData, syllabusUrl: url })}
-                    type="pdf"
-                    label="Upload Syllabus"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="instructorName">Instructor Name</Label>
-                  <Input
-                    id="instructorName"
-                    value={formData.instructorName}
-                    onChange={(e) => setFormData({ ...formData, instructorName: e.target.value })}
-                    className="bg-zinc-800 border-zinc-700"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="meetLink">Google Meet Link</Label>
-                  <Input
-                    id="meetLink"
-                    type="url"
-                    value={formData.meetLink}
-                    onChange={(e) => setFormData({ ...formData, meetLink: e.target.value })}
-                    placeholder="https://meet.google.com/..."
-                    className="bg-zinc-800 border-zinc-700"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="isPublished" 
-                  checked={formData.isPublished}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isPublished: checked as boolean })}
-                />
-                <Label htmlFor="isPublished" className="text-sm font-normal">
-                  Publish immediately
-                </Label>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 border-zinc-700"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1"
-                >
-                  {saving ? 'Saving...' : (editingCourse ? 'Update Course' : 'Create Course')}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      {/* Table */}
-      <Card className="bg-zinc-900/50 border-zinc-800">
+      {/* Success/Error Messages */}
+      {successMessage && (
+        <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] uppercase tracking-widest animate-fade-up" role="status" aria-live="polite">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+          {successMessage}
+        </div>
+      )}
+
+      {/* Main Content */}
+      <Card className="bg-ink/40 border-white/5 backdrop-blur-sm relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-acid-green/50 to-transparent" />
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-zinc-800">
-                <TableHead className="text-zinc-500">Course</TableHead>
-                <TableHead className="text-zinc-500">Category</TableHead>
-                <TableHead className="text-zinc-500">Price</TableHead>
-                <TableHead className="text-zinc-500">Seats</TableHead>
-                <TableHead className="text-zinc-500">Status</TableHead>
-                <TableHead className="text-zinc-500">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-zinc-500">
-                    Loading...
-                  </TableCell>
+          <div className="overflow-x-auto custom-scrollbar">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-white/5 hover:bg-transparent">
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4 px-6">Module Designation</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Classification</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Saturation</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Credits</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Status</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4 text-right px-6">Configure</TableHead>
                 </TableRow>
-              ) : courses.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-zinc-500">
-                    No courses yet. Add your first course!
-                  </TableCell>
-                </TableRow>
-              ) : (
-                courses.map((course) => (
-                  <TableRow key={course._id} className="border-zinc-800/50">
-                    <TableCell>
-                      <div className="font-medium">{course.title}</div>
-                      <div className="text-xs text-zinc-500 font-mono">/{course.slug}</div>
-                    </TableCell>
-                    <TableCell className="text-zinc-400">
-                      {course.category}
-                    </TableCell>
-                    <TableCell className="font-mono">
-                      {formatCurrency(course.price)}
-                      {course.originalPrice && (
-                        <span className="text-zinc-500 line-through ml-2">
-                          {formatCurrency(course.originalPrice)}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <span className={`text-sm ${
-                        (course.enrolledCount / course.totalSeats) >= 0.9 ? 'text-red-400' :
-                        (course.enrolledCount / course.totalSeats) >= 0.6 ? 'text-amber-400' : 'text-zinc-400'
-                      }`}>
-                        {course.enrolledCount}/{course.totalSeats}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleTogglePublish(course)}
-                        className={course.isPublished ? 'text-emerald-400' : 'text-zinc-500'}
-                      >
-                        <Badge 
-                          variant={course.isPublished ? 'default' : 'secondary'}
-                          className={course.isPublished ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-zinc-800'}
-                        >
-                          {course.isPublished ? 'Published' : 'Draft'}
-                        </Badge>
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(course)}
-                        className="text-zinc-400 hover:text-white"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
+              </TableHeader>
+              <TableBody>
+                {loading && courses.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="w-6 h-6 animate-spin text-acid-green" />
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500">Scanning Modules...</span>
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : courses.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <AlertCircle className="w-6 h-6 text-zinc-700" />
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600">No Modules Detected</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  courses.map((course) => (
+                    <TableRow key={course._id} className="border-white/5 hover:bg-white/[0.02] transition-colors group/row">
+                      <TableCell className="py-5 px-6">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-zinc-200 group-hover/row:text-white transition-colors">{course.title}</span>
+                          <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-tight">/{course.slug}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-5">
+                        <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest bg-white/5 px-2 py-1 rounded-sm border border-white/5">
+                          {course.category}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-5">
+                        <div className="flex flex-col gap-1.5 w-32">
+                          <div className="flex justify-between text-[9px] font-mono uppercase text-zinc-500">
+                            <span>{course.enrolledCount} / {course.totalSeats}</span>
+                            <span>{Math.round((course.enrolledCount / course.totalSeats) * 100)}%</span>
+                          </div>
+                          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-acid-green shadow-[0_0_8px_#39FF14]" 
+                              style={{ width: `${(course.enrolledCount / course.totalSeats) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-5 font-mono text-sm text-zinc-300">
+                        {formatCurrency(course.price)}
+                      </TableCell>
+                      <TableCell className="py-5">
+                        <button
+                          onClick={() => handleTogglePublish(course)}
+                          className="hover:scale-105 transition-transform"
+                        >
+                          <Badge 
+                            variant="outline"
+                            className={cn(
+                              "text-[9px] font-mono uppercase tracking-widest border px-2 py-0.5",
+                              course.isPublished ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20'
+                            )}
+                          >
+                            {course.isPublished ? 'Deployed' : 'Draft'}
+                          </Badge>
+                        </button>
+                      </TableCell>
+                      <TableCell className="text-right py-5 px-6">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green transition-all"
+                          onClick={() => handleEdit(course)}
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
