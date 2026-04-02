@@ -22,6 +22,7 @@ import { ParticleField } from '@/components/ui/ParticleField';
 import { GlitchText } from '@/components/ui/GlitchText';
 import { TypingText } from '@/components/ui/TypingText';
 import { GlowButton } from '@/components/ui/GlowButton';
+import { CrystalButton } from '@/components/ui/CrystalButton';
 import { HoverScale } from '@/components/ui/HoverScale';
 import AnimatedContent from '@/components/AnimatedContent';
 import { games, testimonials, founders } from '@/lib/placeholder-data';
@@ -44,13 +45,6 @@ const genreStyles: Record<string, { gradient: string; border: string; badge: str
   Action:   { gradient: 'from-red-900/70 to-rose-950/80',       border: 'hover:border-red-500/60',    badge: 'bg-red-600/90' },
   Roguelike:{ gradient: 'from-amber-900/70 to-orange-950/80',   border: 'hover:border-amber-500/60',  badge: 'bg-amber-600/90' },
 };
-
-const heroStats = [
-  { value: '500+', label: 'Students' },
-  { value: '10+',  label: 'Games Published' },
-  { value: '4.8★', label: 'Avg. Rating' },
-  { value: 'Cert.', label: 'Verified' },
-];
 
 const features = [
   {
@@ -161,7 +155,7 @@ export default function HomePage() {
 
           {/* Subheadline */}
           <AnimatedContent delay={0.2}>
-            <div className="text-base sm:text-lg text-zinc-400 max-w-xl mx-auto mb-10 leading-relaxed min-h-[3rem]">
+            <div className="text-base sm:text-lg text-zinc-400 max-w-xl mx-auto mb-10 leading-relaxed min-h-[3rem] HELLO_WORLD_TEST">
               <TypingText
                 text="We craft immersive gaming experiences and train the next generation of game developers through industry-leading programs."
                 speed={0.03}
@@ -172,40 +166,14 @@ export default function HomePage() {
 
           {/* CTAs */}
           <AnimatedContent delay={0.3}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-14">
-              <Link href="/courses">
-                <GlowButton variant="primary" className="w-full sm:w-auto min-w-[180px]">
-                  Start Learning
-                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
-                </GlowButton>
-              </Link>
-              <Link href="/games">
-                <GlowButton variant="secondary" className="w-full sm:w-auto min-w-[180px]">
-                  Explore Games
-                </GlowButton>
-              </Link>
-            </div>
-          </AnimatedContent>
-
-          {/* Stats bar */}
-          <AnimatedContent delay={0.45}>
-            <div className="flex flex-wrap items-center justify-center gap-px rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-sm divide-x divide-zinc-800">
-              {heroStats.map(({ value, label }) => (
-                <div key={label} className="flex flex-col items-center px-6 py-3 flex-1 min-w-[80px] hover:bg-zinc-800/40 transition-colors">
-                  <span className="text-lg sm:text-xl font-black text-white tracking-wide">{value}</span>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-0.5">{label}</span>
-                </div>
-              ))}
+            <div className="flex flex-col items-center justify-center pt-8">
+              <CrystalButton href="/games" className="group" />
             </div>
           </AnimatedContent>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-7 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 rounded-full border-2 border-violet-500/40 flex items-start justify-center p-1.5">
-            <div className="w-1 h-2 bg-violet-400/80 rounded-full" />
-          </div>
-        </div>
+        {/* Vertical Tapered Line */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-32 w-1.5 bg-gradient-to-b from-violet-500 via-fuchsia-500/50 to-transparent [clip-path:polygon(0_0,100%_0,65%_100%,35%_100%)]" />
       </section>
 
       {/* Divider */}
