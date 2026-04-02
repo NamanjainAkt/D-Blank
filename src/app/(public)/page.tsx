@@ -25,6 +25,7 @@ import { GlowButton } from '@/components/ui/GlowButton';
 import { CrystalButton } from '@/components/ui/CrystalButton';
 import { HoverScale } from '@/components/ui/HoverScale';
 import AnimatedContent from '@/components/AnimatedContent';
+import EarthModel from '@/components/hero/EarthModel';
 import { games, testimonials, founders } from '@/lib/placeholder-data';
 
 const currentYear = new Date().getFullYear();
@@ -115,65 +116,66 @@ export default function HomePage() {
     <main className="min-h-screen bg-black text-white">
 
       {/* ===== HERO ===== */}
-      <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden px-4 py-12">
-        <ParticleField particleCount={80} color="rgba(176, 38, 255, 0.2)" className="z-0" />
+      <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden px-4 py-12 pt-32 sm:pt-40">
+        <ParticleField particleCount={60} color="rgba(176, 38, 255, 0.15)" className="z-0 pointer-events-none" />
 
-        {/* Layered background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-violet-950/25 via-black/60 to-black" />
-        <div className="absolute top-1/3 left-[15%] w-[520px] h-[520px] bg-violet-600/15 rounded-full blur-[140px]" />
-        <div className="absolute bottom-1/4 right-[15%] w-[460px] h-[460px] bg-fuchsia-600/12 rounded-full blur-[140px]" />
+        {/* 3D Earth Model - Absolute positioned behind the text but interactive */}
+        <div className="absolute top-[55%] sm:top-1/2 left-1/2 sm:left-[65%] lg:left-[72%] -translate-x-1/2 sm:-translate-x-0 -translate-y-1/2 w-[200vw] sm:w-[110vw] lg:w-[95vw] h-[80vh] sm:h-[150vh] z-0 pointer-events-auto mix-blend-screen opacity-90 scale-[1.3] sm:scale-[1.2]">
+          <EarthModel />
+        </div>
+        
+        {/* Layered background / Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-violet-950/10 via-black/40 to-black pointer-events-none" />
+        <div className="absolute top-1/3 -left-[10%] w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[140px] pointer-events-none" />
+        
         {/* Top edge glow */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/60 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/60 to-transparent pointer-events-none" />
 
         {/* Grid — violet tinted */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.045)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.045)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)] pointer-events-none" />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Badge */}
-          <AnimatedContent>
-            <Badge variant="outline" className="mb-8 px-4 py-1.5 text-xs font-medium border-violet-500/50 bg-violet-500/10 text-violet-400 hover:border-violet-400/60 transition-colors cursor-default">
-              <Sparkles className="w-3 h-3 mr-2" />
-              Certified Vocational Partner
-            </Badge>
-          </AnimatedContent>
+        <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pointer-events-none mt-12 sm:mt-0">
+          <div className="max-w-2xl sm:pr-8 pointer-events-auto">
 
-          {/* Headline — large, display font */}
-          <AnimatedContent delay={0.1}>
-            <h1 className="text-[clamp(3rem,9vw,6rem)] font-black leading-[0.95] mb-7 tracking-tight">
-              <span className="block">
-                <GlitchText glitchIntensity={1} textClassName="bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent">
+            {/* Headline — Asymmetric, left-aligned, overlapping the 3D model slightly */}
+            <AnimatedContent delay={0.1}>
+              <h1 className="text-[clamp(3.5rem,8vw,7rem)] font-black leading-[0.9] mb-8 tracking-tighter">
+                <span className="block text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                   Build. Play.
-                </GlitchText>
-              </span>
-              <span className="block mt-2">
-                <GlitchText glitchIntensity={1.5} textClassName="bg-gradient-to-r from-violet-400 via-fuchsia-300 to-violet-400 bg-clip-text text-transparent">
-                  Create.
-                </GlitchText>
-              </span>
-            </h1>
-          </AnimatedContent>
+                </span>
+                <span className="block mt-2">
+                  <GlitchText glitchIntensity={1.2} textClassName="bg-gradient-to-br from-violet-400 via-fuchsia-300 to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]">
+                    Create.
+                  </GlitchText>
+                </span>
+              </h1>
+            </AnimatedContent>
 
-          {/* Subheadline */}
-          <AnimatedContent delay={0.2}>
-            <div className="text-base sm:text-lg text-zinc-400 max-w-xl mx-auto mb-10 leading-relaxed min-h-[3rem] HELLO_WORLD_TEST">
-              <TypingText
-                text="We craft immersive gaming experiences and train the next generation of game developers through industry-leading programs."
-                speed={0.03}
-                delay={0.5}
-              />
-            </div>
-          </AnimatedContent>
+            {/* Subheadline */}
+            <AnimatedContent delay={0.2}>
+              <div className="text-base sm:text-lg text-zinc-300 max-w-lg mb-12 leading-relaxed min-h-[4rem] backdrop-blur-sm bg-black/20 p-4 rounded-xl border border-white/5">
+                <TypingText
+                  text="We craft immersive gaming experiences and train the next generation of game developers through industry-leading programs."
+                  speed={0.03}
+                  delay={0.5}
+                />
+              </div>
+            </AnimatedContent>
 
-          {/* CTAs */}
-          <AnimatedContent delay={0.3}>
-            <div className="flex flex-col items-center justify-center pt-8">
-              <CrystalButton href="/games" className="group" />
-            </div>
-          </AnimatedContent>
+            {/* CTAs */}
+            <AnimatedContent delay={0.3}>
+              <div className="flex flex-col sm:flex-row items-start gap-5">
+                <CrystalButton href="/games" className="group w-full sm:w-auto" />
+              </div>
+            </AnimatedContent>
+          </div>
         </div>
 
-        {/* Vertical Tapered Line */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-32 w-1.5 bg-gradient-to-b from-violet-500 via-fuchsia-500/50 to-transparent [clip-path:polygon(0_0,100%_0,65%_100%,35%_100%)]" />
+        {/* Scroll Indicator - Bottom Left */}
+        <div className="absolute bottom-10 left-8 z-10 hidden sm:flex items-center gap-4 text-xs font-display tracking-widest text-violet-400/60 rotate-[-90deg] origin-left pointer-events-none">
+          <span className="uppercase">Scroll to explore</span>
+          <div className="w-12 h-px bg-violet-500/40" />
+        </div>
       </section>
 
       {/* Divider */}
