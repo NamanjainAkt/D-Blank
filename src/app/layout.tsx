@@ -83,7 +83,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.jpeg" sizes="any" />
         <meta name="google-site-verification" content="73MvbbYUl5QmkZTvGo6kZx4FLUE6vMAcOqjfuv1XX-U" />
       </head>
       <body className={`${orbitron.variable} ${spaceGrotesk.variable} ${jetbrains.variable} font-body bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased`}>

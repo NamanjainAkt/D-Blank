@@ -23,7 +23,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         />
       </div>
       <Navbar />
-      {children}
+      <div className="pt-20">
+        {children}
+      </div>
     </>
   );
 }
