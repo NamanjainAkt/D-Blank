@@ -27,10 +27,10 @@ export function MagneticCursor() {
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
 
-      xTo(clientX - 10);
-      yTo(clientY - 10);
-      trailXTo(clientX - 4);
-      trailYTo(clientY - 4);
+      xTo(clientX - 7);
+      yTo(clientY - 7);
+      trailXTo(clientX - 3);
+      trailYTo(clientY - 3);
 
       if (activeMagnetic) {
         const rect = activeMagnetic.getBoundingClientRect();
@@ -94,11 +94,11 @@ export function MagneticCursor() {
           position: 'fixed',
           top: 0,
           left: 0,
-          width: 20,
-          height: 20,
+          width: 14,
+          height: 14,
           borderRadius: '50%',
-          border: '1.5px solid #10b981',
-          boxShadow: '0 0 15px rgba(16,185,129,0.3)',
+          backgroundColor: '#d946ef',
+          boxShadow: '0 0 8px #d946ef, 0 0 20px #d946ef, 0 0 40px rgba(217,70,239,0.5)',
           pointerEvents: 'none',
           zIndex: 9999,
           opacity: 0,
@@ -111,10 +111,11 @@ export function MagneticCursor() {
           position: 'fixed',
           top: 0,
           left: 0,
-          width: 8,
-          height: 8,
+          width: 6,
+          height: 6,
           borderRadius: '50%',
-          backgroundColor: '#14b8a6',
+          backgroundColor: '#f0abfc',
+          boxShadow: '0 0 6px #d946ef',
           opacity: 0,
           pointerEvents: 'none',
           zIndex: 9998,
