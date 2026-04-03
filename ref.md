@@ -1,197 +1,160 @@
-# 🎮 Built for Real Game Developers — Section Breakdown
+Perfect — this is exactly how you level up your UI 🔥
+I found **clean SVG sources / direct pages** where you can copy code or download SVGs.
 
-## 🧠 Design Philosophy
-Each card should:
-- Represent a **real capability**
-- Include a **micro-experience**
-- Show **how it works**, not just say it
+👉 I’ll give you **reliable sources + direct links** (no low-quality junk)
 
 ---
 
-# 🔲 01 — WE BUILD GAMES FIRST (Primary Card)
+# 🎮 GAME DEV TOOL SVG LINKS (CLEAN & USABLE)
 
-## 🎯 Purpose:
-Establish authority → "We are not just trainers"
+## 🎮 Game Engines
 
-## 🏷 Title:
-We Build Games First
+### Unity
 
-## 📝 Description:
-We actively design and develop immersive games, ensuring everything we teach is aligned with real production environments.
-
-## 🧩 Microcomponent:
-### ▶ Interactive Game Preview Layer
-- Background: blurred gameplay / animated gradient
-- On hover:
-  - Reveal gameplay clip (fade-in)
-  - Slight zoom-in effect
-  - Overlay text: “From Idea → Playable”
-
-## ⚡ Microinteractions:
-- 3D tilt on mouse move (perspective transform)
-- Cursor glow follows inside card
-- Floating particles (very subtle)
-- Border neon pulse on hover
-
-## 💡 Extra:
-Click → expands into mini modal:
-- Shows pipeline: Concept → Design → Dev → Testing
+* [Download / Copy SVG](https://commons.wikimedia.org/wiki/File%3AUnity_logo.svg?utm_source=chatgpt.com)
+  👉 Public domain simple SVG (safe to use) ([Wikimedia Commons][1])
 
 ---
 
-# 🔲 02 — INDUSTRY TOOLS & PIPELINES
+### Unreal Engine
 
-## 🎯 Purpose:
-Show real-world relevance
-
-## 🏷 Title:
-Industry Tools & Pipelines
-
-## 📝 Description:
-Work with tools used in real studios — Unity, Unreal Engine, Blender, and modern asset pipelines.
-
-## 🧩 Microcomponent:
-### ▶ Tool Stack Marquee / Grid
-- Icons: Unity, Unreal, Blender, Git
-- Auto-scroll or hover-expand
-
-## ⚡ Microinteractions:
-- On hover:
-  - Icons lift + glow
-  - Tooltip appears (tool name + use)
-- GSAP:
-  - Horizontal scroll loop
-- Click:
-  - Expands → shows pipeline flow (Asset → Engine → Build)
+* [https://simpleicons.org/icons/unrealengine.svg](https://simpleicons.org/icons/unrealengine.svg)
+  👉 Best for dev use (clean, minimal)
 
 ---
 
-# 🔲 03 — PROJECT-BASED LEARNING
+### Godot
 
-## 🎯 Purpose:
-Show outcome (portfolio)
-
-## 🏷 Title:
-Build Real Games
-
-## 📝 Description:
-Create portfolio-ready games from day one through structured, hands-on development.
-
-## 🧩 Microcomponent:
-### ▶ Progress Timeline
-- Steps:
-  - Idea → Prototype → Playable → Polish
-
-## ⚡ Microinteractions:
-- On hover:
-  - Timeline animates forward
-- On scroll:
-  - Progress bar fills
-- Each step:
-  - Dot expands when hovered
-  - Shows mini tooltip
+* [Godot SVG File](https://commons.wikimedia.org/wiki/File%3AGodot_logo.svg?utm_source=chatgpt.com)
+  👉 Official vector logo available ([Wikimedia Commons][2])
 
 ---
 
-# 🔲 04 — STRUCTURED MENTORSHIP
+# 🎨 3D / Art Tools
 
-## 🎯 Purpose:
-Show guidance (not random learning)
+### Blender
 
-## 🏷 Title:
-Structured Mentorship
-
-## 📝 Description:
-Learn through guided workflows inspired by real development teams and production cycles.
-
-## 🧩 Microcomponent:
-### ▶ Mentor Flow Diagram
-- Visual:
-  - Mentor → Feedback → Improve → Iterate
-
-## ⚡ Microinteractions:
-- Lines animate (flow effect)
-- Nodes pulse sequentially
-- On hover:
-  - Highlight current step
-- Subtle loop animation (alive feel)
+* [https://simpleicons.org/icons/blender.svg](https://simpleicons.org/icons/blender.svg)
 
 ---
 
-# 🔲 05 — CAREER & PORTFOLIO SUPPORT
+### Autodesk Maya
 
-## 🎯 Purpose:
-Show end result (job readiness)
-
-## 🏷 Title:
-Career & Portfolio Support
-
-## 📝 Description:
-Refine your work, get feedback, and prepare for real opportunities in the gaming industry.
-
-## 🧩 Microcomponent:
-### ▶ Portfolio Preview Card
-- Fake (but generic) portfolio UI
-- Thumbnail grid (projects)
-
-## ⚡ Microinteractions:
-- On hover:
-  - Cards stack → spread out
-  - Highlight one project
-- Button:
-  - “Review Flow” → animates checklist:
-    - Feedback ✔
-    - Improve ✔
-    - Finalize ✔
+* [https://simpleicons.org/icons/autodesk.svg](https://simpleicons.org/icons/autodesk.svg)
+  👉 (Maya doesn’t have official SVG → Autodesk logo used)
 
 ---
 
-# 🌌 GLOBAL SECTION INTERACTIONS
+### Substance Painter
 
-## 🌀 Entry Animation:
-- Title: staggered text reveal (GSAP SplitText)
-- Cards: stagger (y: 40 → 0, opacity)
-
----
-
-## 🖱 Cursor System:
-- Small glowing dot follows cursor
-- On card hover:
-  - Expands + soft blur glow
+* [https://simpleicons.org/icons/adobe.svg](https://simpleicons.org/icons/adobe.svg)
+  👉 (Use Adobe logo OR custom SVG for better branding)
 
 ---
 
-## 🎇 Background:
-- Subtle grid / noise texture
-- Parallax shift on mouse move
-- Floating tiny particles
+# 🔊 Audio
+
+### FMOD
+
+* ❗ No official SVG publicly standardized
+  👉 Use:
+* [https://www.vectorlogo.zone/logos/fmod/fmod-icon.svg](https://www.vectorlogo.zone/logos/fmod/fmod-icon.svg)
 
 ---
 
-## 🔢 Number Indicators (01–05):
-- Animate in with:
-  - Scale + fade
-  - Optional glitch effect (gaming feel)
+# ⚙️ Dev / Version Control
+
+### Git
+
+* [https://simpleicons.org/icons/git.svg](https://simpleicons.org/icons/git.svg)
 
 ---
 
-## 📌 Bottom Transparency Bar:
-“Currently building our first set of games…”
+### Perforce
 
-### Interaction:
-- Fades in last
-- Slight pulse (very subtle)
-- Optional typing effect
+* ❗ No official clean SVG on SimpleIcons
+  👉 Use:
+* [https://www.vectorlogo.zone/logos/perforce/perforce-icon.svg](https://www.vectorlogo.zone/logos/perforce/perforce-icon.svg)
 
 ---
 
-# 🚀 EXPERIENCE GOAL
+### VS Code
 
-User should feel:
-- “This is a real game studio”
-- “This is interactive and premium”
-- “They know what they’re doing”
+* [https://simpleicons.org/icons/visualstudiocode.svg](https://simpleicons.org/icons/visualstudiocode.svg)
 
-NOT:
-- Static cards
-- Generic course website
+---
+
+# 🔥 BEST PRACTICE (IMPORTANT)
+
+Don’t just dump SVGs like icons.
+
+👉 Do THIS for premium feel:
+
+## 🧠 Use inline SVG (NOT <img>)
+
+Why?
+
+* You can animate paths
+* Change colors dynamically
+* Add glow effects
+
+---
+
+# ⚡ Microinteraction Ideas for SVGs
+
+## 🔹 On Hover:
+
+* Stroke animation (draw effect)
+* Fill transition (outline → solid)
+* Glow using `filter: drop-shadow()`
+
+---
+
+## 🔹 GSAP Animation (🔥 must try)
+
+```js
+gsap.from("svg path", {
+  strokeDashoffset: 100,
+  duration: 1,
+  stagger: 0.1
+});
+```
+
+👉 Looks like logo is being drawn
+
+---
+
+## 🔹 Advanced:
+
+* Rotate slightly on hover
+* Scale + bounce
+* Gradient fill animation
+
+---
+
+# 💥 Pro Tip (VERY IMPORTANT)
+
+👉 Mix icons smartly:
+
+| Type    | Style        |
+| ------- | ------------ |
+| Engines | Solid / bold |
+| Tools   | Outline      |
+| Dev     | Minimal      |
+
+👉 This creates **visual hierarchy automatically**
+
+---
+
+# 🚀 If you want next level
+
+I can:
+
+* Convert all these into **React components (SVG inline ready)**
+* Add **GSAP animations per icon**
+* Or design a **tool showcase like AAA studio pipeline UI**
+
+Just say 👍
+
+[1]: https://commons.wikimedia.org/wiki/File%3AUnity_logo.svg?utm_source=chatgpt.com "File:Unity logo.svg - Wikimedia Commons"
+[2]: https://commons.wikimedia.org/wiki/File%3AGodot_logo.svg?utm_source=chatgpt.com "File:Godot logo.svg - Wikimedia Commons"
