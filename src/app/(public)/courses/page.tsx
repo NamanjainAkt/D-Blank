@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Footer2 from "@/components/Footer2";
 import { 
   BookOpen, 
   Users, 
@@ -429,6 +430,7 @@ export default function CoursesPage() {
           </div>
         </div>
       </footer>
+      <Footer2 />
     </main>
   );
 }

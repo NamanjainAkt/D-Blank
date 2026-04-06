@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Footer2 from "@/components/Footer2";
 import { 
   Gamepad2, 
   Users, 
@@ -258,6 +259,7 @@ export default function StudioPage() {
           </div>
         </div>
       </footer>
+      <Footer2 />
     </main>
   );
 }

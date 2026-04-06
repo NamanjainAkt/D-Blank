@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Footer2 from "@/components/Footer2";
 import Image from "next/image";
 import {
   ChevronRight,
@@ -540,6 +541,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      <Footer2 />
     </main>
   );
 }

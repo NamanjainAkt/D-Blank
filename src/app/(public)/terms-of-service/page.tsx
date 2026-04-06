@@ -1,5 +1,6 @@
 import { Navbar } from '@/components/Navbar';
 import Link from 'next/link';
+import Footer2 from "@/components/Footer2";
 
 export const metadata = {
   title: 'Terms of Service | D-Blanks',
@@ -199,6 +200,7 @@ export default function TermsOfServicePage() {
           </div>
         </div>
       </footer>
+      <Footer2 />
     </main>
   );
 }

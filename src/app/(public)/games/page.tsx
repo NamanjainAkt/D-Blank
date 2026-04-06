@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Footer2 from "@/components/Footer2";
 import { 
   ChevronRight, 
   Gamepad2, 
@@ -274,6 +275,7 @@ export default function GamesPage() {
           </div>
         </div>
       </footer>
+      <Footer2 />
     </main>
   );
 }

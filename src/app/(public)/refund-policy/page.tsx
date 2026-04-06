@@ -1,5 +1,6 @@
 import { Navbar } from '@/components/Navbar';
 import Link from 'next/link';
+import Footer2 from "@/components/Footer2";
 
 export const metadata = {
   title: 'Refund Policy | D-Blanks',
@@ -167,6 +168,7 @@ export default function RefundPolicyPage() {
           </div>
         </div>
       </footer>
+      <Footer2 />
     </main>
   );
 }

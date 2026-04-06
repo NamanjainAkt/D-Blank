@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Footer2 from "@/components/Footer2";
 import { 
   Mail, 
   MessageCircle, 
@@ -267,6 +268,7 @@ export default function ContactPage() {
           </div>
         </div>
       </footer>
+      <Footer2 />
     </main>
   );
 }
