@@ -27,6 +27,7 @@ yarn-error.log*
 .env
 .env*.local
 .env.local
+.env.prod
 
 # Vercel
 .vercel
@@ -41,3 +42,5 @@ next-env.d.ts
 *.swp
 *.swo
 .agents
+
+.vercel

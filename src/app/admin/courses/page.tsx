@@ -419,7 +419,7 @@ export default function AdminCoursesPage() {
                     id="isPublished" 
                     checked={formData.isPublished}
                     onCheckedChange={(checked) => setFormData({ ...formData, isPublished: checked as boolean })}
-                    className="border-white/20 data-[state=checked]:bg-acid-green data-[state=checked]:border-acid-green"
+                    className="border-white/20"
                   />
                   <Label htmlFor="isPublished" className="text-[10px] font-mono uppercase tracking-widest text-zinc-300 cursor-pointer">
                     Deploy to Public Uplink
