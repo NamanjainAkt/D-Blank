@@ -1,5 +1,7 @@
 import { Navbar } from '@/components/Navbar';
 import Link from 'next/link';
+import { Footer } from '@/components/Footer';
+import Footer2 from "@/components/Footer2";
 
 export const metadata = {
   title: 'Privacy Policy | D-Blanks',
@@ -153,25 +155,8 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-carbon py-8 bg-black">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="font-bold">D-Blanks</span>
-            </div>
-            <div className="flex gap-6 text-sm text-gray-500">
-              <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
-              <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
-            </div>
-            <div className="text-sm text-gray-600">
-              © {currentYear} D-Blanks. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
+      <Footer2 />
     </main>
   );
 }
