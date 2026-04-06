@@ -97,7 +97,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
       ref={rootRef}
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
-      className={`relative w-full h-full flex flex-wrap justify-center items-start gap-4 sm:gap-6 ${className}`}
+      className={`relative w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 ${className}`}
       style={
         {
           '--r': `${radius}px`,
@@ -111,7 +111,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
           key={i}
           onMouseMove={handleCardMove}
           onClick={() => handleCardClick(c.url)}
-          className="group relative flex flex-col w-full sm:w-[320px] rounded-xl overflow-hidden border border-white/5 transition-all duration-300 cursor-pointer bg-zinc-900/40"
+          className="group relative flex flex-col w-full rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 cursor-pointer bg-zinc-900/40"
           style={
             {
               '--card-border': c.borderColor || 'transparent',

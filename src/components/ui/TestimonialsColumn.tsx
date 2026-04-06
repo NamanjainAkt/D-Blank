@@ -51,7 +51,7 @@ export const TestimonialsColumn = ({
         {[...testimonials, ...testimonials].map((testimonial, index) => (
           <div
             key={`${testimonial.id}-${index}`}
-            className="relative rounded-xl bg-zinc-900/50 border border-zinc-800/80 hover:border-violet-500/30 transition-all duration-300 p-6 group overflow-hidden"
+            className="relative rounded-2xl bg-white/[0.03] backdrop-blur-md border border-white/10 hover:border-violet-500/30 transition-all duration-300 p-5 group overflow-hidden"
           >
             {/* Top gradient line */}
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
