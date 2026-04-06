@@ -269,14 +269,8 @@ export default function FeatureCard({
       )}>
         {/* Left / Top content area */}
         <div className={cn(isLarge ? "flex-1" : "flex-1 flex flex-col")}>
-          {/* Header: Number + Icon */}
-          <div className="flex items-start justify-between mb-4">
-            <span
-              ref={numberRef}
-              className="font-mono text-xs tracking-wider text-white/[0.15] transition-opacity"
-            >
-              {id}
-            </span>
+          {/* Header: Icon + Number */}
+          <div className="flex items-center gap-3 mb-4">
             <div
               ref={iconRef}
               className={cn(
@@ -287,6 +281,12 @@ export default function FeatureCard({
             >
               <Icon size={isLarge ? 22 : 18} />
             </div>
+            <span
+              ref={numberRef}
+              className="font-mono text-xs tracking-wider text-white/[0.15] transition-opacity"
+            >
+              {id}
+            </span>
           </div>
 
           {/* Micro-interaction for small cards */}

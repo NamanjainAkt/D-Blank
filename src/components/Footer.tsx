@@ -104,7 +104,7 @@ export function Footer() {
               <div className="space-y-4 relative z-10 text-sm text-zinc-400">
                 <p className="flex items-start gap-3">
                   <span className="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0" />
-                  Mumbai, Maharashtra<br/>India 400001
+                  Sindhya Nagar, Durg<br/>Chhattisgarh 491001
                 </p>
                 <p className="flex items-center gap-3 hover:text-white transition-colors cursor-pointer w-fit">
                   <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0" />
