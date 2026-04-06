@@ -21,18 +21,10 @@ import { CrystalButton } from "@/components/ui/CrystalButton";
 import { HoverScale } from "@/components/ui/HoverScale";
 import AnimatedContent from "@/components/AnimatedContent";
 import WhyChooseUs from "@/components/sections/WhyChooseUs";
-import { games, testimonials, founders } from "@/lib/placeholder-data";
+import TestimonialsSection from "@/components/sections/TestimonialsSection";
+import { games, founders } from "@/lib/placeholder-data";
 
 const currentYear = new Date().getFullYear();
-
-const avatarColors = [
-  "from-violet-600 to-purple-700",
-  "from-cyan-600 to-blue-700",
-  "from-amber-600 to-orange-700",
-  "from-emerald-600 to-green-700",
-  "from-pink-600 to-rose-700",
-  "from-indigo-600 to-blue-700",
-];
 
 const genreStyles: Record<
   string,
@@ -264,61 +256,7 @@ export default function HomePage() {
       <div className="h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
 
       {/* ===== TESTIMONIALS ===== */}
-      <section className="min-h-[100dvh] py-20 px-4 bg-black flex items-center">
-        <div className="max-w-7xl mx-auto w-full">
-          <AnimatedContent className="text-center mb-14">
-            <SectionLabel>Testimonials</SectionLabel>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
-              What Our <span className="text-violet-400">Community</span> Says
-            </h2>
-          </AnimatedContent>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {testimonials.slice(0, 6).map((testimonial, index) => (
-              <AnimatedContent key={testimonial.id} delay={index * 0.08}>
-                <div className="relative h-full rounded-xl bg-zinc-900/50 border border-zinc-800/80 hover:border-violet-500/30 transition-all duration-300 p-6 group overflow-hidden">
-                  {/* Top gradient line */}
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
-                  {/* Subtle corner glow on hover */}
-                  <div className="absolute -top-8 -right-8 w-24 h-24 bg-violet-500/0 group-hover:bg-violet-500/8 rounded-full blur-2xl transition-colors duration-500" />
-
-                  {/* Large decorative quote */}
-                  <div className="text-7xl font-black text-violet-500/12 leading-none mb-1 select-none font-display">
-                    "
-                  </div>
-
-                  {/* Stars */}
-                  <div className="flex items-center gap-0.5 text-amber-400 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                    ))}
-                  </div>
-
-                  <p className="text-zinc-300 text-sm leading-relaxed mb-6">
-                    "{testimonial.content}"
-                  </p>
-
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-white font-bold text-sm shrink-0 ring-2 ring-zinc-800`}
-                    >
-                      {testimonial.name[0]}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white text-sm">
-                        {testimonial.name}
-                      </p>
-                      <p className="text-xs text-zinc-600">
-                        {testimonial.role}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </AnimatedContent>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimonialsSection />
 
       {/* Divider */}
       <div className="h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
