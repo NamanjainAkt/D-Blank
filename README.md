@@ -178,7 +178,3 @@ The app is optimized for Vercel:
 4. Deploy
 
 Vercel Hobby Plan (free) supports this app perfectly.
-
-## Support
-
-For issues or questions, contact: support@vocalearn.in
