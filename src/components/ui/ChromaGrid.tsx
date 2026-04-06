@@ -111,46 +111,48 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
           key={i}
           onMouseMove={handleCardMove}
           onClick={() => handleCardClick(c.url)}
-          className="group relative flex flex-col w-full sm:max-w-[280px] rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 cursor-pointer bg-zinc-900/40 mx-auto"
+          className="group relative flex flex-col w-full sm:max-w-[340px] rounded-[2rem] overflow-hidden border border-white/[0.03] hover:border-violet-500/20 transition-all duration-700 cursor-pointer bg-zinc-950/20 mx-auto"
           style={
             {
               '--card-border': c.borderColor || 'transparent',
-              background: c.gradient || 'linear-gradient(to bottom, #18181b, #09090b)',
-              '--spotlight-color': 'rgba(176, 38, 255, 0.15)'
+              background: c.gradient || 'linear-gradient(180deg, rgba(24,24,27,0.4) 0%, rgba(9,9,11,0.6) 100%)',
+              '--spotlight-color': 'rgba(168, 85, 247, 0.12)'
             } as React.CSSProperties
           }
         >
           {/* Spotlight effect */}
           <div
-            className="absolute inset-0 pointer-events-none transition-opacity duration-500 z-20 opacity-0 group-hover:opacity-100"
+            className="absolute inset-0 pointer-events-none transition-opacity duration-700 z-20 opacity-0 group-hover:opacity-100"
             style={{
               background:
-                'radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 70%)'
+                'radial-gradient(circle 400px at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 80%)'
             }}
           />
           
-          {/* Card Border glow */}
-          <div className="absolute inset-0 border border-violet-500/0 group-hover:border-violet-500/30 transition-colors duration-500 z-30 pointer-events-none" />
+          {/* Subtle inner glow */}
+          <div className="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/[0.02] transition-colors duration-1000 z-10 pointer-events-none" />
 
-          <div className="relative z-10 p-2 aspect-[3/4] overflow-hidden">
+          <div className="relative z-10 p-3 aspect-[3/4] overflow-hidden">
             <img 
               src={c.image} 
               alt={c.title} 
               loading="lazy" 
-              className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-700" 
+              className="w-full h-full object-cover rounded-[1.5rem] group-hover:scale-[1.03] transition-transform duration-1000 ease-out" 
             />
           </div>
           
-          <footer className="relative z-10 p-4 text-white font-sans flex flex-col gap-1 bg-gradient-to-t from-black/95 via-black/60 to-transparent mt-[-70px]">
-            <h3 className="m-0 text-lg font-black tracking-tight group-hover:text-violet-400 transition-colors">
-              {c.title}
-            </h3>
-            <div className="flex justify-between items-center w-full">
-              <p className="m-0 text-[10px] font-bold text-violet-400 uppercase tracking-[0.2em]">
-                {c.subtitle}
-              </p>
+          <footer className="relative z-20 p-6 pt-0 text-white font-sans flex flex-col gap-2 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent mt-[-80px] backdrop-blur-[2px]">
+            <div className="flex justify-between items-end w-full">
+              <div className="flex flex-col">
+                <h3 className="m-0 text-xl font-black tracking-tight group-hover:text-violet-400 transition-colors duration-500">
+                  {c.title}
+                </h3>
+                <p className="m-0 text-[10px] font-bold text-violet-500/80 uppercase tracking-[0.25em] mt-0.5">
+                  {c.subtitle}
+                </p>
+              </div>
               {c.handle && (
-                <span className="text-[10px] font-black tracking-widest bg-violet-500 text-white px-2 py-0.5 rounded-full border border-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+                <span className="text-[10px] font-black tracking-widest bg-violet-600 text-white px-3 py-1 rounded-full border border-violet-400/50 shadow-[0_0_15px_rgba(147,51,234,0.4)] transform group-hover:scale-110 transition-transform duration-500">
                   {c.handle}
                 </span>
               )}

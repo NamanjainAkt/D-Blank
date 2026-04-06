@@ -63,20 +63,20 @@ const FoundersSection = () => {
   }));
 
   return (
-    <section className="py-24 px-4 bg-zinc-950 relative overflow-hidden">
+    <section className="py-32 px-4 bg-zinc-950 relative overflow-hidden">
       {/* Background accents */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
-      <div className="absolute top-1/4 -right-[10%] w-[500px] h-[500px] bg-violet-600/5 rounded-full blur-[120px] pointer-events-none" />
-
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-violet-500/10 to-transparent" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl aspect-square bg-violet-600/[0.03] rounded-full blur-[160px] pointer-events-none" />
+      
       <div className="max-w-7xl mx-auto w-full relative z-10">
-        <div ref={headerRef} className="text-center mb-16 opacity-0">
+        <div ref={headerRef} className="text-center mb-24 opacity-0">
           <SectionLabel>Our Team</SectionLabel>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
             Meet the <span className="text-violet-400">Founders</span>
           </h2>
-          <p className="text-zinc-500 max-w-xl mx-auto text-sm leading-relaxed">
+          <p className="text-zinc-500 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
             A passionate team of game developers, artists, and educators
-            united by a love for interactive storytelling.
+            united by a love for interactive storytelling and vocational innovation.
           </p>
         </div>
 
