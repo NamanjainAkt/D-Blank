@@ -21,18 +21,11 @@ import { CrystalButton } from "@/components/ui/CrystalButton";
 import { HoverScale } from "@/components/ui/HoverScale";
 import AnimatedContent from "@/components/AnimatedContent";
 import WhyChooseUs from "@/components/sections/WhyChooseUs";
-import { games, testimonials, founders } from "@/lib/placeholder-data";
+import TestimonialsSection from "@/components/sections/TestimonialsSection";
+import FoundersSection from "@/components/sections/FoundersSection";
+import { games } from "@/lib/placeholder-data";
 
 const currentYear = new Date().getFullYear();
-
-const avatarColors = [
-  "from-violet-600 to-purple-700",
-  "from-cyan-600 to-blue-700",
-  "from-amber-600 to-orange-700",
-  "from-emerald-600 to-green-700",
-  "from-pink-600 to-rose-700",
-  "from-indigo-600 to-blue-700",
-];
 
 const genreStyles: Record<
   string,
@@ -121,7 +114,7 @@ export default function HomePage() {
             <AnimatedContent delay={0.2}>
               <div className="text-base sm:text-lg text-zinc-300 max-w-lg mb-8 leading-relaxed min-h-[4rem] backdrop-blur-sm bg-black/20 p-4 rounded-xl border border-white/5">
                 <TypingText
-                  text="Crafting immersive games. Training future game developers."
+                  text="Crafting immersive games and training future game developers with passion."
                   speed={0.03}
                   delay={0.5}
                 />
@@ -129,14 +122,12 @@ export default function HomePage() {
             </AnimatedContent>
 
             {/* CTAs */}
-            <AnimatedContent delay={0.3}>
-              <div className="flex flex-col sm:flex-row items-start gap-5">
-                <CrystalButton
-                  href="/games"
-                  className="group w-full sm:w-auto"
-                />
-              </div>
-            </AnimatedContent>
+            <div className="flex flex-col sm:flex-row items-start gap-5">
+              <CrystalButton
+                href="/games"
+                className="group w-full sm:w-auto"
+              />
+            </div>
           </div>
         </div>
 
@@ -163,7 +154,7 @@ export default function HomePage() {
                   </span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
-                  Featured <span className="text-violet-400">Titles</span>
+                  Featured <span className="bg-gradient-to-br from-violet-400 via-fuchsia-300 to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]">Titles</span>
                 </h2>
               </div>
               <Button
@@ -266,137 +257,16 @@ export default function HomePage() {
       <div className="h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
 
       {/* ===== TESTIMONIALS ===== */}
-      <section className="min-h-[100dvh] py-20 px-4 bg-black flex items-center">
-        <div className="max-w-7xl mx-auto w-full">
-          <AnimatedContent className="text-center mb-14">
-            <SectionLabel>Testimonials</SectionLabel>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
-              What Our <span className="text-violet-400">Community</span> Says
-            </h2>
-          </AnimatedContent>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {testimonials.slice(0, 6).map((testimonial, index) => (
-              <AnimatedContent key={testimonial.id} delay={index * 0.08}>
-                <div className="relative h-full rounded-xl bg-zinc-900/50 border border-zinc-800/80 hover:border-violet-500/30 transition-all duration-300 p-6 group overflow-hidden">
-                  {/* Top gradient line */}
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
-                  {/* Subtle corner glow on hover */}
-                  <div className="absolute -top-8 -right-8 w-24 h-24 bg-violet-500/0 group-hover:bg-violet-500/8 rounded-full blur-2xl transition-colors duration-500" />
-
-                  {/* Large decorative quote */}
-                  <div className="text-7xl font-black text-violet-500/12 leading-none mb-1 select-none font-display">
-                    "
-                  </div>
-
-                  {/* Stars */}
-                  <div className="flex items-center gap-0.5 text-amber-400 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                    ))}
-                  </div>
-
-                  <p className="text-zinc-300 text-sm leading-relaxed mb-6">
-                    "{testimonial.content}"
-                  </p>
-
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-white font-bold text-sm shrink-0 ring-2 ring-zinc-800`}
-                    >
-                      {testimonial.name[0]}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white text-sm">
-                        {testimonial.name}
-                      </p>
-                      <p className="text-xs text-zinc-600">
-                        {testimonial.role}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </AnimatedContent>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimonialsSection />
 
       {/* Divider */}
       <div className="h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
 
       {/* ===== TEAM ===== */}
-      <section className="min-h-[100dvh] py-20 px-4 bg-zinc-950 flex items-center">
-        <div className="max-w-7xl mx-auto w-full">
-          <AnimatedContent className="text-center mb-14">
-            <SectionLabel>Our Team</SectionLabel>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4">
-              Meet the <span className="text-violet-400">Founders</span>
-            </h2>
-            <p className="text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed">
-              A passionate team of game developers, artists, and educators
-              united by a love for interactive storytelling.
-            </p>
-          </AnimatedContent>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            {founders.map((founder, index) => (
-              <AnimatedContent key={founder.id} delay={index * 0.1}>
-                <div className="relative rounded-xl overflow-hidden border border-zinc-800/80 hover:border-violet-500/40 transition-all duration-500 group bg-zinc-900/30">
-                  {/* Image */}
-                  <div className="relative h-52 sm:h-60 overflow-hidden">
-                    <Image
-                      src={`/team/founder${index + 1}.jpeg`}
-                      alt={founder.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
-                    {/* Role chip */}
-                    <div className="absolute top-3 right-3">
-                      <span className="px-2.5 py-1 text-[9px] font-display tracking-widest bg-black/60 border border-violet-500/40 text-violet-300 rounded-md backdrop-blur-sm uppercase">
-                        {founder.role.split(" ")[0]}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5">
-                    <h3 className="font-bold text-white text-sm mb-0.5 tracking-wide">
-                      {founder.name}
-                    </h3>
-                    <p className="text-violet-400 text-xs mb-2 font-medium">
-                      {founder.role}
-                    </p>
-                    <p className="text-zinc-600 text-xs line-clamp-2 leading-relaxed">
-                      {founder.bio}
-                    </p>
-                  </div>
-
-                  {/* Bottom hover accent */}
-                  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-                </div>
-              </AnimatedContent>
-            ))}
-          </div>
-
-          <AnimatedContent className="text-center mt-12">
-            <Button
-              variant="outline"
-              className="border-zinc-700 hover:border-violet-500/50 hover:bg-violet-500/5 hover:text-violet-400 transition-all duration-300 text-xs tracking-widest px-8 py-5"
-              asChild
-            >
-              <Link href="/studio">
-                View Full Team
-                <ArrowRight className="w-3.5 h-3.5 ml-2" />
-              </Link>
-            </Button>
-          </AnimatedContent>
-        </div>
-      </section>
+      <FoundersSection />
 
       {/* ===== CTA ===== */}
-      <section className="py-24 px-4 bg-gradient-to-b from-zinc-950 to-black relative overflow-hidden">
+      <section className="py-24 px-4 bg-black relative overflow-hidden">
         {/* Grid bg */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
         {/* Center glow */}
@@ -472,7 +342,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== FOOTER ===== */}
-      <footer className="py-14 px-4 border-t border-zinc-800/50 bg-zinc-950">
+      <footer className="py-14 px-4 border-t border-zinc-800/50 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
             {/* Brand */}

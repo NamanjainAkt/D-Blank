@@ -2,19 +2,30 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { Box, Code2, Database, GitBranch, Terminal } from "lucide-react";
+import {
+  UnityIcon,
+  UnrealEngineIcon,
+  GodotIcon,
+  BlenderIcon,
+  AutodeskIcon,
+  SubstancePainterIcon,
+  FMODIcon,
+  GitIcon,
+  PerforceIcon,
+  VSCodeIcon,
+} from "@/components/icons/ToolIcons";
 
 const tools = [
-  { name: "Unity", icon: Box, color: "#FFFFFF" },
-  { name: "Unreal Engine", icon: Terminal, color: "#3B82F6" },
-  { name: "Godot", icon: Box, color: "#60A5FA" },
-  { name: "Blender", icon: Box, color: "#F59E0B" },
-  { name: "Maya", icon: Box, color: "#22C55E" },
-  { name: "Substance Painter", icon: Box, color: "#EF4444" },
-  { name: "FMOD", icon: Box, color: "#A78BFA" },
-  { name: "Git", icon: GitBranch, color: "#F43F5E" },
-  { name: "Perforce", icon: Database, color: "#6366F1" },
-  { name: "VS Code", icon: Code2, color: "#0EA5E9" },
+  { name: "Unity", icon: UnityIcon, color: "#FFFFFF" },
+  { name: "Unreal Engine", icon: UnrealEngineIcon, color: "#3B82F6" },
+  { name: "Godot", icon: GodotIcon, color: "#478CBF" },
+  { name: "Blender", icon: BlenderIcon, color: "#F59E0B" },
+  { name: "Maya", icon: AutodeskIcon, color: "#22C55E" },
+  { name: "Substance Painter", icon: SubstancePainterIcon, color: "#EF4444" },
+  { name: "FMOD", icon: FMODIcon, color: "#A78BFA" },
+  { name: "Git", icon: GitIcon, color: "#F43F5E" },
+  { name: "Perforce", icon: PerforceIcon, color: "#6366F1" },
+  { name: "VS Code", icon: VSCodeIcon, color: "#0EA5E9" },
 ];
 
 export default function ToolStack() {
@@ -60,8 +71,7 @@ export default function ToolStack() {
           >
             <tool.icon
               size={16}
-              style={{ color: tool.color }}
-              className="drop-shadow-[0_0_6px_currentColor]"
+              color={tool.color}
             />
             <span className="text-[6px] mt-1.5 text-zinc-500 font-mono uppercase tracking-wider leading-none">
               {tool.name}
