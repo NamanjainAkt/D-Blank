@@ -114,7 +114,7 @@ export default function HomePage() {
             <AnimatedContent delay={0.2}>
               <div className="text-base sm:text-lg text-zinc-300 max-w-lg mb-8 leading-relaxed min-h-[4rem] backdrop-blur-sm bg-black/20 p-4 rounded-xl border border-white/5">
                 <TypingText
-                  text="Crafting immersive games. Training future game developers"
+                  text="Crafting immersive games and training future game developers with passion."
                   speed={0.03}
                   delay={0.5}
                 />
