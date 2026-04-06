@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Footer } from '@/components/Footer';
 import Footer2 from "@/components/Footer2";
 import Image from "next/image";
 import {
@@ -267,280 +268,82 @@ export default function HomePage() {
       <FoundersSection />
 
       {/* ===== CTA ===== */}
-      <section className="py-24 px-4 bg-black relative overflow-hidden">
-        {/* Grid bg */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
-        {/* Center glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-violet-600/10 rounded-full blur-[100px] pointer-events-none" />
+      <section className="relative py-32 md:py-48 px-4 bg-black overflow-hidden flex flex-col items-center justify-center min-h-[600px] md:min-h-[800px]">
+        {/* Animated Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)] pointer-events-none" />
+        
+        {/* Core Glows */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[400px] bg-violet-600/10 blur-[120px] rounded-[100%] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] max-w-[400px] h-[200px] bg-fuchsia-600/10 blur-[80px] rounded-[100%] pointer-events-none" />
 
-        <div className="relative max-w-3xl mx-auto w-full">
+        {/* Scanline Effect */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="w-full h-full bg-gradient-to-b from-transparent via-violet-500/5 to-transparent opacity-50" 
+               style={{ animation: 'scanline 8s linear infinite' }} />
+        </div>
+
+        {/* Giant Background Text */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-center items-center pointer-events-none">
+          <h1 className="text-[clamp(6rem,20vw,20rem)] font-black tracking-tighter bg-gradient-to-b from-white/[0.03] to-transparent bg-clip-text text-transparent select-none font-display">
+            BUILD
+          </h1>
+        </div>
+
+        <div className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center">
           <AnimatedContent>
-            {/* Outer glow */}
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500/15 via-fuchsia-500/8 to-violet-500/15 blur-2xl" />
-
-            {/* Card */}
-            <div className="relative rounded-2xl border border-violet-500/20 bg-zinc-950/90 backdrop-blur-sm p-10 sm:p-14 text-center">
-              {/* Corner brackets */}
-              <div className="absolute top-4 left-4 w-5 h-5 border-t-2 border-l-2 border-violet-500/50 rounded-tl-sm" />
-              <div className="absolute top-4 right-4 w-5 h-5 border-t-2 border-r-2 border-violet-500/50 rounded-tr-sm" />
-              <div className="absolute bottom-4 left-4 w-5 h-5 border-b-2 border-l-2 border-violet-500/50 rounded-bl-sm" />
-              <div className="absolute bottom-4 right-4 w-5 h-5 border-b-2 border-r-2 border-violet-500/50 rounded-br-sm" />
-
-              {/* Top line */}
-              <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
-
-              <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-6 h-6 text-violet-400" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 p-[1px] mb-8 mx-auto shadow-[0_0_30px_rgba(217,70,239,0.3)] animate-float">
+              <div className="w-full h-full rounded-2xl bg-zinc-950 flex items-center justify-center">
+                <Zap className="w-8 h-8 text-fuchsia-400" />
               </div>
+            </div>
 
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-4">
-                Ready to Build Something{" "}
-                <span className="bg-gradient-to-r from-violet-400 via-fuchsia-300 to-violet-400 bg-clip-text text-transparent">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight mb-6">
+              Ready to Build Something{" "}
+              <span className="relative inline-block">
+                {/* Text Glow Layers */}
+                <span className="absolute inset-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 bg-clip-text text-transparent blur-xl opacity-60">Amazing?</span>
+                <span className="relative bg-gradient-to-r from-violet-400 via-fuchsia-300 to-violet-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(217,70,239,0.5)]">
                   Amazing?
                 </span>
-              </h2>
-              <p className="text-zinc-400 text-sm sm:text-base mb-8 max-w-lg mx-auto leading-relaxed">
-                Join thousands of aspiring game developers who have launched
-                their careers with D-Blanks.
-              </p>
+              </span>
+            </h2>
+            
+            <p className="text-zinc-400 text-base sm:text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
+              Join thousands of aspiring game developers who have launched their careers with D-Blanks.
+            </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
-                <Link href="/courses">
-                  <GlowButton
-                    variant="primary"
-                    className="w-full sm:w-auto min-w-[200px]"
-                  >
-                    Start Learning Free
-                    <ArrowRight className="inline-block w-4 h-4 ml-2" />
-                  </GlowButton>
-                </Link>
-                <Link href="/contact">
-                  <GlowButton
-                    variant="secondary"
-                    className="w-full sm:w-auto min-w-[200px]"
-                  >
-                    Contact Us
-                  </GlowButton>
-                </Link>
-              </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-12">
+              <Link href="/courses">
+                <GlowButton variant="primary" className="w-full sm:w-auto min-w-[220px] text-sm py-4 shadow-[0_0_20px_rgba(217,70,239,0.4)]">
+                  Start Learning
+                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
+                </GlowButton>
+              </Link>
+              <Link href="/contact">
+                <GlowButton variant="secondary" className="w-full sm:w-auto min-w-[220px] text-sm py-4 border-zinc-700 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white">
+                  Contact Us
+                </GlowButton>
+              </Link>
+            </div>
 
-              {/* Trust chips */}
-              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-600">
-                {[
-                  "No credit card needed",
-                  "Industry Certified",
-                  "Industry mentors",
-                ].map((item) => (
-                  <span key={item} className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-violet-500/70" />
-                    {item}
-                  </span>
-                ))}
-              </div>
+            {/* Trust chips */}
+            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 text-xs md:text-sm text-zinc-500 font-medium tracking-wide">
+              {[
+                "Real-World Projects",
+                "Industry Certified",
+                "Industry Mentors",
+              ].map((item) => (
+                <span key={item} className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-fuchsia-500/80 drop-shadow-[0_0_5px_rgba(217,70,239,0.5)]" />
+                  {item}
+                </span>
+              ))}
             </div>
           </AnimatedContent>
         </div>
       </section>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="py-14 px-4 border-t border-zinc-800/50 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
-            {/* Brand */}
-            <div className="sm:col-span-2 md:col-span-1">
-              <Link
-                href="/"
-                className="flex items-center gap-2.5 group mb-5 w-fit"
-              >
-                <div className="relative w-8 h-8 rounded-lg overflow-hidden ring-1 ring-zinc-700 group-hover:ring-violet-500/50 transition-all">
-                  <Image
-                    src="/favicon.jpeg"
-                    alt="D-Blanks"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <span className="font-black tracking-[0.15em] text-sm">
-                  D
-                  <span className="text-violet-500 group-hover:text-violet-400 transition-colors">
-                    BLANKS
-                  </span>
-                </span>
-              </Link>
-              <p className="text-zinc-500 text-xs mb-6 leading-relaxed">
-                World-class gaming experiences combined with certified
-                vocational training.
-              </p>
-              <div className="flex items-center gap-2">
-                {/* X (Twitter) */}
-                <a
-                  href="#"
-                  aria-label="X"
-                  className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300"
-                >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                </a>
-                {/* Instagram */}
-                <a
-                  href="#"
-                  aria-label="Instagram"
-                  className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300"
-                >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                  </svg>
-                </a>
-                {/* GitHub */}
-                <a
-                  href="#"
-                  aria-label="GitHub"
-                  className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300"
-                >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z" />
-                  </svg>
-                </a>
-                {/* YouTube */}
-                <a
-                  href="#"
-                  aria-label="YouTube"
-                  className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300"
-                >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
-                </a>
-                {/* LinkedIn */}
-                <a
-                  href="#"
-                  aria-label="LinkedIn"
-                  className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/40 flex items-center justify-center text-zinc-600 hover:text-violet-400 hover:border-violet-500/40 transition-all duration-300"
-                >
-                  <Linkedin className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-white text-[10px] font-display tracking-[0.25em] uppercase mb-5">
-                Quick Links
-              </h4>
-              <ul className="space-y-2.5">
-                {[
-                  ["/", "Home"],
-                  ["/games", "Games"],
-                  ["/studio", "Studio"],
-                  ["/contact", "Contact"],
-                ].map(([href, label]) => (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      className="text-zinc-500 hover:text-violet-400 text-sm transition-colors flex items-center gap-1.5 group w-fit"
-                    >
-                      <ChevronRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Courses */}
-            <div>
-              <h4 className="text-white text-[10px] font-display tracking-[0.25em] uppercase mb-5">
-                Courses
-              </h4>
-              <ul className="space-y-2.5">
-                {[
-                  ["Game Development", "/courses"],
-                  ["3D Modeling", "/courses"],
-                  ["Game Design", "/courses"],
-                  ["All Programs", "/courses"],
-                ].map(([label, href]) => (
-                  <li key={label}>
-                    <Link
-                      href={href}
-                      className="text-zinc-500 hover:text-violet-400 text-sm transition-colors flex items-center gap-1.5 group w-fit"
-                    >
-                      <ChevronRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h4 className="text-white text-[10px] font-display tracking-[0.25em] uppercase mb-5">
-                Contact
-              </h4>
-              <ul className="space-y-2.5 text-xs text-zinc-500">
-                <li className="hover:text-violet-400 transition-colors cursor-default">
-                  hello@dblanks.com
-                </li>
-                <li className="hover:text-violet-400 transition-colors cursor-default">
-                  +91 98765 43210
-                </li>
-                <li>Mumbai, Maharashtra</li>
-                <li>India</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom bar */}
-          <div className="mt-12 pt-6 border-t border-zinc-800/40 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex flex-wrap justify-center gap-5 text-xs text-zinc-700">
-              <Link
-                href="/privacy-policy"
-                className="hover:text-zinc-400 transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms-of-service"
-                className="hover:text-zinc-400 transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                href="/refund-policy"
-                className="hover:text-zinc-400 transition-colors"
-              >
-                Refund Policy
-              </Link>
-            </div>
-            <p className="text-xs text-zinc-700">
-              © {currentYear} D-Blanks. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
       <Footer2 />
     </main>
   );

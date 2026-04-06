@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Footer } from '@/components/Footer';
 import Footer2 from "@/components/Footer2";
 import { 
   Gamepad2, 
@@ -57,9 +58,9 @@ export default function StudioPage() {
               Inside the Studio
             </Badge>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8">
-              <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-                <GlitchText>We Build Worlds</GlitchText>
-              </span>
+              <GlitchText textClassName="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+                We Build Worlds
+              </GlitchText>
             </h1>
             <p className="text-zinc-400 text-lg max-w-3xl mx-auto leading-relaxed">
               D-Blanks is a high-performance game studio and creative collective pushing the boundaries of interactive entertainment.
@@ -243,22 +244,7 @@ export default function StudioPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 border-t border-zinc-800 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-lg flex items-center justify-center">
-                <Gamepad2 className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold">D<span className="text-violet-500">Blanks</span></span>
-            </div>
-            <p className="text-sm text-zinc-500">
-              {currentYear} D-Blanks. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
       <Footer2 />
     </main>
   );

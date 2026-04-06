@@ -18,7 +18,7 @@ export default function Footer2() {
         
         {/* GLOWING TEXT LAYER (Behind, highly blurred) */}
         <h1 className="absolute text-[clamp(4rem,15vw,14rem)] font-black tracking-tighter
-          bg-gradient-to-b from-[#d946ef] via-[#a21caf] to-[#4c1d95]
+          bg-gradient-to-b from-violet-600 via-fuchsia-600 to-violet-600
           bg-clip-text text-transparent opacity-60 whitespace-nowrap pointer-events-none font-display select-none
           blur-2xl">
           D-BLANKS
@@ -26,7 +26,7 @@ export default function Footer2() {
 
         {/* SECONDARY GLOW LAYER (Medium blur) */}
         <h1 className="absolute text-[clamp(4rem,15vw,14rem)] font-black tracking-tighter
-          bg-gradient-to-b from-[#e879f9] via-[#c026d3] to-transparent
+          bg-gradient-to-b from-violet-500 via-fuchsia-500 to-violet-500
           bg-clip-text text-transparent opacity-40 whitespace-nowrap pointer-events-none font-display select-none
           blur-md">
           D-BLANKS
@@ -34,7 +34,7 @@ export default function Footer2() {
 
         {/* MAIN TEXT LAYER (Crisp & Bright) */}
         <h1 className="relative text-[clamp(4rem,15vw,14rem)] font-black tracking-tighter
-          bg-gradient-to-b from-white via-[#fdf4ff] to-[#4c1d95]
+          bg-gradient-to-b from-violet-400 via-fuchsia-400 to-violet-400
           bg-clip-text text-transparent opacity-95 whitespace-nowrap pointer-events-none font-display select-none
           drop-shadow-[0_0_15px_rgba(217,70,239,0.5)]">
           D-BLANKS

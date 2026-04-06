@@ -7,14 +7,15 @@ import { cn } from '@/lib/utils';
 
 interface LogoProps {
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export function Logo({ className, size = 'md' }: LogoProps) {
   const sizeClasses = {
-    sm: { icon: 'w-8 h-8', text: 'text-sm' },
-    md: { icon: 'w-14 h-14', text: 'text-2xl' },
-    lg: { icon: 'w-16 h-16', text: 'text-3xl' },
+    sm: { icon: 'w-8 h-8', text: 'text-sm', sub: 'text-[8px]' },
+    md: { icon: 'w-14 h-14', text: 'text-2xl', sub: 'text-[8px]' },
+    lg: { icon: 'w-16 h-16', text: 'text-3xl', sub: 'text-[10px]' },
+    xl: { icon: 'w-40 h-40', text: 'text-4xl', sub: 'text-xs tracking-[0.4em]' },
   };
 
   const sizes = sizeClasses[size];
@@ -52,7 +53,7 @@ export function Logo({ className, size = 'md' }: LogoProps) {
         )}>
           D<span className="text-violet-500 group-hover:text-violet-400 transition-colors duration-200">-</span>BLANKS
         </span>
-        <span className="text-[8px] tracking-[0.3em] text-zinc-500 font-display uppercase mt-0.5">
+        <span className={cn('text-zinc-500 font-display uppercase mt-0.5', sizes.sub || 'text-[8px] tracking-[0.3em]')}>
           Gaming Studio
         </span>
       </div>
