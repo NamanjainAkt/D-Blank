@@ -22,7 +22,8 @@ import { HoverScale } from "@/components/ui/HoverScale";
 import AnimatedContent from "@/components/AnimatedContent";
 import WhyChooseUs from "@/components/sections/WhyChooseUs";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
-import { games, founders } from "@/lib/placeholder-data";
+import FoundersSection from "@/components/sections/FoundersSection";
+import { games } from "@/lib/placeholder-data";
 
 const currentYear = new Date().getFullYear();
 
@@ -262,74 +263,7 @@ export default function HomePage() {
       <div className="h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
 
       {/* ===== TEAM ===== */}
-      <section className="min-h-[100dvh] py-20 px-4 bg-zinc-950 flex items-center">
-        <div className="max-w-7xl mx-auto w-full">
-          <AnimatedContent className="text-center mb-14">
-            <SectionLabel>Our Team</SectionLabel>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4">
-              Meet the <span className="text-violet-400">Founders</span>
-            </h2>
-            <p className="text-zinc-400 max-w-xl mx-auto text-sm leading-relaxed">
-              A passionate team of game developers, artists, and educators
-              united by a love for interactive storytelling.
-            </p>
-          </AnimatedContent>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            {founders.map((founder, index) => (
-              <AnimatedContent key={founder.id} delay={index * 0.1}>
-                <div className="relative rounded-xl overflow-hidden border border-zinc-800/80 hover:border-violet-500/40 transition-all duration-500 group bg-zinc-900/30">
-                  {/* Image */}
-                  <div className="relative h-52 sm:h-60 overflow-hidden">
-                    <Image
-                      src={`/team/founder${index + 1}.jpeg`}
-                      alt={founder.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
-                    {/* Role chip */}
-                    <div className="absolute top-3 right-3">
-                      <span className="px-2.5 py-1 text-[9px] font-display tracking-widest bg-black/60 border border-violet-500/40 text-violet-300 rounded-md backdrop-blur-sm uppercase">
-                        {founder.role.split(" ")[0]}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5">
-                    <h3 className="font-bold text-white text-sm mb-0.5 tracking-wide">
-                      {founder.name}
-                    </h3>
-                    <p className="text-violet-400 text-xs mb-2 font-medium">
-                      {founder.role}
-                    </p>
-                    <p className="text-zinc-600 text-xs line-clamp-2 leading-relaxed">
-                      {founder.bio}
-                    </p>
-                  </div>
-
-                  {/* Bottom hover accent */}
-                  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-                </div>
-              </AnimatedContent>
-            ))}
-          </div>
-
-          <AnimatedContent className="text-center mt-12">
-            <Button
-              variant="outline"
-              className="border-zinc-700 hover:border-violet-500/50 hover:bg-violet-500/5 hover:text-violet-400 transition-all duration-300 text-xs tracking-widest px-8 py-5"
-              asChild
-            >
-              <Link href="/studio">
-                View Full Team
-                <ArrowRight className="w-3.5 h-3.5 ml-2" />
-              </Link>
-            </Button>
-          </AnimatedContent>
-        </div>
-      </section>
+      <FoundersSection />
 
       {/* ===== CTA ===== */}
       <section className="py-24 px-4 bg-gradient-to-b from-zinc-950 to-black relative overflow-hidden">
