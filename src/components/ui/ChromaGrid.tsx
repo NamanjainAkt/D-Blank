@@ -111,7 +111,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
           key={i}
           onMouseMove={handleCardMove}
           onClick={() => handleCardClick(c.url)}
-          className="group relative flex flex-col w-full sm:max-w-[340px] rounded-[2rem] overflow-hidden border border-white/[0.03] hover:border-violet-500/20 transition-all duration-700 cursor-pointer bg-zinc-950/20 mx-auto"
+          className="group relative flex flex-col w-full sm:max-w-[340px] rounded-[2.5rem] overflow-hidden border border-white/[0.03] hover:border-violet-500/20 transition-all duration-700 cursor-pointer bg-zinc-950/20 mx-auto"
           style={
             {
               '--card-border': c.borderColor || 'transparent',
@@ -120,6 +120,21 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
             } as React.CSSProperties
           }
         >
+          {/* Animated Border Glow Segment */}
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            <div 
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"
+              style={{
+                background: `conic-gradient(from ${90 + (i * 45)}deg at 50% 50%, transparent 0deg, transparent 70deg, #a855f7 90deg, transparent 110deg, transparent 360deg)`,
+                filter: 'blur(8px)',
+                padding: '1px',
+                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                WebkitMaskComposite: 'xor',
+                maskComposite: 'exclude',
+              }}
+            />
+          </div>
+
           {/* Spotlight effect */}
           <div
             className="absolute inset-0 pointer-events-none transition-opacity duration-700 z-20 opacity-0 group-hover:opacity-100"
@@ -133,21 +148,27 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
           <div className="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/[0.02] transition-colors duration-1000 z-10 pointer-events-none" />
 
           <div className="relative z-10 p-3 aspect-[3/4] overflow-hidden">
-            <img 
-              src={c.image} 
-              alt={c.title} 
-              loading="lazy" 
-              className="w-full h-full object-cover rounded-[1.5rem] group-hover:scale-[1.03] transition-transform duration-1000 ease-out" 
-            />
+            {/* Image with Vignette */}
+            <div className="relative w-full h-full rounded-[1.8rem] overflow-hidden">
+              <img 
+                src={c.image} 
+                alt={c.title} 
+                loading="lazy" 
+                className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-1000 ease-out" 
+              />
+              {/* Vignette Overlay */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.6)_100%)] pointer-events-none" />
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/10 pointer-events-none" />
+            </div>
           </div>
           
-          <footer className="relative z-20 p-6 pt-0 text-white font-sans flex flex-col gap-2 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent mt-[-80px] backdrop-blur-[2px]">
+          <footer className="relative z-20 p-7 pt-0 text-white font-sans flex flex-col gap-2 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent mt-[-90px] backdrop-blur-[2px]">
             <div className="flex justify-between items-end w-full">
               <div className="flex flex-col">
-                <h3 className="m-0 text-xl font-black tracking-tight group-hover:text-violet-400 transition-colors duration-500">
+                <h3 className="m-0 text-2xl font-black tracking-tight group-hover:text-violet-400 transition-colors duration-500">
                   {c.title}
                 </h3>
-                <p className="m-0 text-[10px] font-bold text-violet-500/80 uppercase tracking-[0.25em] mt-0.5">
+                <p className="m-0 text-[10px] font-bold text-violet-500/80 uppercase tracking-[0.25em] mt-1">
                   {c.subtitle}
                 </p>
               </div>
