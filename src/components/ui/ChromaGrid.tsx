@@ -132,7 +132,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
           {/* Card Border glow */}
           <div className="absolute inset-0 border border-violet-500/0 group-hover:border-violet-500/30 transition-colors duration-500 z-30 pointer-events-none" />
 
-          <div className="relative z-10 p-2.5 aspect-[3/4] overflow-hidden">
+          <div className="relative z-10 p-2 aspect-[16/13] overflow-hidden">
             <img 
               src={c.image} 
               alt={c.title} 
@@ -141,7 +141,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
             />
           </div>
           
-          <footer className="relative z-10 p-5 text-white font-sans flex flex-col gap-1 bg-gradient-to-t from-black/80 to-transparent mt-[-60px]">
+          <footer className="relative z-10 p-4 text-white font-sans flex flex-col gap-1 bg-gradient-to-t from-black/90 via-black/40 to-transparent mt-[-50px]">
             <h3 className="m-0 text-lg font-black tracking-tight group-hover:text-violet-400 transition-colors">
               {c.title}
             </h3>
