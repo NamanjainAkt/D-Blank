@@ -537,7 +537,7 @@ const StyledWrapper = styled.div`
     left: 50%;
     top: 56%;
     z-index: 9;
-    animation: splashFeedback2 0.7s cubic-bezier(0.18, 0.94, 1, 1) forwards;
+    opacity: 0;
     color: #9a4df1;
     pointer-events: none;
     stroke-width: 2px;
@@ -723,12 +723,10 @@ const StyledWrapper = styled.div`
   }
 
   .text p.state-1 > span {
-    opacity: 0;
-    animation: appear 1.5s ease forwards calc(var(--i) * 0.1s);
+    opacity: 1;
   }
   .text p.state-2 > span {
-    opacity: 1;
-    animation: disappear 0.6s ease forwards calc(var(--i) * 0.05s);
+    opacity: 0;
   }
 
   .liquid {

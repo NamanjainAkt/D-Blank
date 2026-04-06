@@ -129,14 +129,12 @@ export default function HomePage() {
             </AnimatedContent>
 
             {/* CTAs */}
-            <AnimatedContent delay={0.3}>
-              <div className="flex flex-col sm:flex-row items-start gap-5">
-                <CrystalButton
-                  href="/games"
-                  className="group w-full sm:w-auto"
-                />
-              </div>
-            </AnimatedContent>
+            <div className="flex flex-col sm:flex-row items-start gap-5">
+              <CrystalButton
+                href="/games"
+                className="group w-full sm:w-auto"
+              />
+            </div>
           </div>
         </div>
 
