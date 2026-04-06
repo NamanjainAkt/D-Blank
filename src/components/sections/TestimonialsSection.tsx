@@ -54,7 +54,7 @@ const TestimonialsSection = () => {
         <div ref={headerRef} className="text-center mb-14 opacity-0">
           <SectionLabel>Testimonials</SectionLabel>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
-            What Our <span className="text-violet-400">Community</span> Says
+            What Our <span className="bg-gradient-to-br from-violet-400 via-fuchsia-300 to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]">Community</span> Says
           </h2>
           <p className="text-zinc-500 mt-4 max-w-lg mx-auto text-sm leading-relaxed">
             See what our players and developers have to say about their experience with D-Blanks.

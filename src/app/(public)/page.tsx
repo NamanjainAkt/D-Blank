@@ -154,7 +154,7 @@ export default function HomePage() {
                   </span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
-                  Featured <span className="text-violet-400">Titles</span>
+                  Featured <span className="bg-gradient-to-br from-violet-400 via-fuchsia-300 to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]">Titles</span>
                 </h2>
               </div>
               <Button
@@ -266,7 +266,7 @@ export default function HomePage() {
       <FoundersSection />
 
       {/* ===== CTA ===== */}
-      <section className="py-24 px-4 bg-gradient-to-b from-zinc-950 to-black relative overflow-hidden">
+      <section className="py-24 px-4 bg-black relative overflow-hidden">
         {/* Grid bg */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
         {/* Center glow */}
@@ -342,7 +342,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== FOOTER ===== */}
-      <footer className="py-14 px-4 border-t border-zinc-800/50 bg-zinc-950">
+      <footer className="py-14 px-4 border-t border-zinc-800/50 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
             {/* Brand */}
