@@ -150,9 +150,9 @@ export async function sendEnrollmentConfirmation({
 
             <!-- Footer -->
             <div style="text-align: center; padding-top: 24px;">
-              <p style="color: #666666; font-size: 12px; margin: 0 0 8px 0;">
-                Need help? Contact us at <a href="mailto:support@dblanks.in" style="color: #3b82f6;">support@dblanks.in</a>
-              </p>
+                <p style="color: #666666; font-size: 12px; margin: 0 0 8px 0;">
+                  Need help? Contact us at <a href="mailto:arshgupta723@gmail.com" style="color: #3b82f6;">arshgupta723@gmail.com</a>
+                </p>
               <p style="color: #444444; font-size: 12px; margin: 0;">
                 © 2026 D-Blanks. All rights reserved.
               </p>
@@ -230,7 +230,7 @@ export async function sendPaymentConfirmation({
               </div>
             </div>
             <div style="text-align: center; padding-top: 24px;">
-              <p style="color: #666666; font-size: 12px; margin: 0;">Questions? Contact <a href="mailto:support@dblanks.in" style="color: #3b82f6;">support@dblanks.in</a></p>
+                <p style="color: #666666; font-size: 12px; margin: 0;">Questions? Contact <a href="mailto:arshgupta723@gmail.com" style="color: #3b82f6;">arshgupta723@gmail.com</a></p>
             </div>
           </div>
         </body>

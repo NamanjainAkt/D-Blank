@@ -2,123 +2,182 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { BrainCircuit, MessageSquare, RefreshCcw } from "lucide-react";
+import { BookOpen, Eye, RefreshCw } from "lucide-react";
 
-const nodes = [
-  { icon: BrainCircuit, label: "Learn", color: "#B026FF" },
-  { icon: MessageSquare, label: "Review", color: "#E879F9" },
-  { icon: RefreshCcw, label: "Iterate", color: "#818CF8" },
+const steps = [
+  { icon: BookOpen, label: "Learn", color: "#B026FF", description: "Guided lessons" },
+  { icon: Eye, label: "Review", color: "#E879F9", description: "Expert feedback" },
+  { icon: RefreshCw, label: "Iterate", color: "#818CF8", description: "Refine & grow" },
 ];
 
 export default function MentorshipFlow() {
-  const nodesRef = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const nodeEls = nodesRef.current.filter(Boolean) as HTMLDivElement[];
-    if (nodeEls.length === 0 || !dotRef.current) return;
+    const line = lineRef.current;
+    const progress = progressRef.current;
+    const dot = dotRef.current;
 
-    // Get positions for the traveling dot
-    const tl = gsap.timeline({ repeat: -1, defaults: { ease: "power2.inOut" } });
+    if (!line || !progress || !dot) return;
 
-    nodes.forEach((node, i) => {
-      const nodeEl = nodeEls[i];
+    const tl = gsap.timeline({ repeat: -1 });
 
-      // Highlight current node
-      tl.to(nodeEl, {
-        borderColor: node.color,
-        boxShadow: `0 0 24px ${node.color}50, inset 0 0 16px ${node.color}15`,
-        scale: 1.1,
-        duration: 0.4,
-      });
+    // Animate progress line
+    tl.fromTo(
+      progress,
+      { scaleX: 0 },
+      { scaleX: 1, duration: 1.2, ease: "power2.inOut" }
+    );
 
-      // Move dot to next position
-      if (i < nodes.length - 1) {
-        tl.to(dotRef.current, {
-          x: `+=${110}`,
-          duration: 0.5,
-          ease: "power2.inOut",
-        }, "+=0.3");
+    // Animate dot through each step
+    steps.forEach((_, i) => {
+      const node = nodeRefs.current[i];
+      const icon = iconRefs.current[i];
+
+      if (!node) return;
+
+      // Get position of node relative to container
+      const nodeLeft = (i / (steps.length - 1)) * 100;
+
+      // Move dot to node
+      tl.to(
+        dot,
+        {
+          left: `${nodeLeft}%`,
+          scale: 1.4,
+          duration: 0.6,
+          ease: "power2.out",
+        },
+        i * 0.8
+      );
+
+      // Pulse node
+      if (icon) {
+        tl.to(icon, {
+          scale: 1.2,
+          duration: 0.3,
+          ease: "back.out(2)",
+        });
+        tl.to(icon, {
+          scale: 1,
+          duration: 0.3,
+          ease: "power2.in",
+        });
       }
 
-      // Dim current node
-      tl.to(nodeEl, {
-        borderColor: `${node.color}20`,
-        boxShadow: "none",
-        scale: 1,
-        duration: 0.3,
-      }, "-=0.2");
+      // Hold at node
+      tl.to({}, { duration: 0.2 });
     });
 
-    // Return dot to start
-    tl.to(dotRef.current, {
-      x: 0,
-      duration: 0.6,
-      ease: "power2.inOut",
-    }, "+=0.3");
+    // Hold at end
+    tl.to({}, { duration: 0.8 });
 
-    // Pause before repeat
+    // Reset
+    tl.to(dot, {
+      left: "0%",
+      scale: 1,
+      duration: 0.5,
+      ease: "power2.inOut",
+    });
+
+    tl.to(progress, { scaleX: 0, duration: 0.3, ease: "power2.in" });
+
     tl.to({}, { duration: 0.5 });
 
-    return () => { tl.kill(); };
+    return () => {
+      tl.kill();
+    };
   }, []);
 
   return (
-    <div className="relative w-full flex items-center justify-center min-h-[100px] py-3">
-      <div className="relative flex items-start gap-0">
-        {nodes.map((node, i) => (
-          <div key={i} className="flex items-start">
-            {/* Node */}
-            <div className="flex flex-col items-center gap-2 w-[70px]">
-              <div
-                ref={(el) => { nodesRef.current[i] = el; }}
-                className="relative w-[46px] h-[46px] rounded-xl border-[1.5px] flex items-center justify-center bg-zinc-950/80"
-                style={{ borderColor: `${node.color}20` }}
-              >
-                <node.icon size={20} style={{ color: node.color }} className="drop-shadow-[0_0_8px_currentColor]" />
-              </div>
-              <span className="text-[7px] font-mono uppercase tracking-[0.12em] text-zinc-500">
-                {node.label}
-              </span>
-            </div>
-
-            {/* Connector */}
-            {i < nodes.length - 1 && (
-              <div className="flex items-center h-[46px] -mx-2">
-                <div className="w-[40px] flex items-center">
-                  <div className="flex-1 h-[1.5px] bg-white/[0.06] rounded-full relative overflow-hidden">
-                    <div
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: `linear-gradient(90deg, ${node.color}30, ${nodes[i + 1].color}30)`,
-                      }}
-                    />
-                  </div>
-                  <svg width="6" height="10" viewBox="0 0 6 10" className="ml-0.5 flex-shrink-0">
-                    <path d="M1 1L5 5L1 9" stroke={`${nodes[i + 1].color}40`} strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+    <div
+      ref={containerRef}
+      className="relative w-full py-4 px-2"
+    >
+      {/* Roadmap container */}
+      <div className="relative flex items-start justify-between">
+        {/* Progress line background */}
+        <div
+          ref={lineRef}
+          className="absolute top-[22px] left-[22px] right-[22px] h-[2px] bg-zinc-800 rounded-full overflow-hidden"
+        >
+          {/* Progress line */}
+          <div
+            ref={progressRef}
+            className="h-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-indigo-500 origin-left"
+            style={{ width: "100%" }}
+          />
+        </div>
 
         {/* Traveling dot */}
         <div
           ref={dotRef}
-          className="absolute top-[22px] left-[34px] w-2 h-2 rounded-full pointer-events-none"
-          style={{
-            background: "white",
-            boxShadow: "0 0 12px rgba(176, 38, 255, 0.8), 0 0 4px white",
-          }}
+          className="absolute top-[14px] w-5 h-5 rounded-full bg-white shadow-[0_0_12px_rgba(176,38,255,0.8),0_0_4px_white] z-10 pointer-events-none"
+          style={{ left: "0%", transform: "translateX(-50%)" }}
         />
 
-        {/* Loop indicator below */}
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-1 opacity-40">
-          <div className="w-8 h-[1px] bg-gradient-to-r from-transparent to-violet-500/30 rounded-full" />
-          <RefreshCcw size={8} className="text-violet-400" />
-          <div className="w-8 h-[1px] bg-gradient-to-l from-transparent to-violet-500/30 rounded-full" />
-        </div>
+        {/* Steps */}
+        {steps.map((step, i) => (
+          <div
+            key={i}
+            className="relative flex flex-col items-center z-20"
+            style={{ width: `${100 / steps.length}%` }}
+          >
+            {/* Node circle */}
+            <div
+              ref={(el) => { nodeRefs.current[i] = el; }}
+              className="relative"
+            >
+              {/* Glow effect */}
+              <div
+                className="absolute inset-0 rounded-full blur-md opacity-0"
+                style={{ backgroundColor: step.color }}
+              />
+
+              {/* Node */}
+              <div
+                ref={(el) => { iconRefs.current[i] = el; }}
+                className="relative w-11 h-11 rounded-full border-2 flex items-center justify-center bg-zinc-950 backdrop-blur-sm transition-transform duration-300"
+                style={{
+                  borderColor: `${step.color}60`,
+                  boxShadow: `0 0 16px ${step.color}30`,
+                }}
+              >
+                <step.icon
+                  size={18}
+                  style={{ color: step.color }}
+                  className="drop-shadow-[0_0_6px_currentColor]"
+                />
+              </div>
+            </div>
+
+            {/* Label */}
+            <div className="mt-3 text-center">
+              <span
+                className="block text-[10px] font-bold uppercase tracking-wider"
+                style={{ color: step.color }}
+              >
+                {step.label}
+              </span>
+              <span className="block text-[8px] text-zinc-500 mt-0.5 font-mono">
+                {step.description}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Decorative elements */}
+      <div className="absolute top-[22px] left-[22px] right-[22px] h-[2px] pointer-events-none">
+        {/* Start dot */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-violet-500 -ml-[2px]" />
+        {/* End dot */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-indigo-500 -mr-[2px]" />
       </div>
     </div>
   );

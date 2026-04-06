@@ -172,8 +172,8 @@ export default function TermsOfServicePage() {
                 <div className="text-gray-400 space-y-4">
                   <p>For questions regarding these Terms of Service, please contact:</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Email: support@dblanks.in</li>
-                    <li>WhatsApp: +91 98765 43210</li>
+                    <li>Email: arshgupta723@gmail.com</li>
+                    <li>WhatsApp: +91 9340576811</li>
                   </ul>
                 </div>
               </section>

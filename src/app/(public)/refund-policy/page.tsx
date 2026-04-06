@@ -100,7 +100,7 @@ export default function RefundPolicyPage() {
                 <div className="text-gray-400 space-y-4">
                   <p>To request a refund, please:</p>
                   <ol className="list-decimal list-inside space-y-2 ml-4">
-                    <li>Contact us via email at support@dblanks.in</li>
+                    <li>Contact us via email at arshgupta723@gmail.com</li>
                     <li>Include your enrollment ID and reason for refund</li>
                     <li>Provide supporting documentation if applicable</li>
                     <li>Allow 5-7 business days for processing</li>
@@ -140,8 +140,8 @@ export default function RefundPolicyPage() {
                 <div className="text-gray-400 space-y-4">
                   <p>For refund requests or questions about this policy:</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Email: support@dblanks.in</li>
-                    <li>WhatsApp: +91 98765 43210</li>
+                    <li>Email: arshgupta723@gmail.com</li>
+                    <li>WhatsApp: +91 9340576811</li>
                   </ul>
                 </div>
               </section>

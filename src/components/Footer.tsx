@@ -28,12 +28,12 @@ export function Footer() {
             {/* SOCIALS */}
             <div className="flex items-center gap-3">
               {/* Instagram */}
-              <a href="#" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 transition-all duration-300">
+              <a href="https://www.instagram.com/d_blanks.games" target="_blank" rel="noopener noreferrer" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 transition-all duration-300">
                 <div className="absolute inset-0 rounded-xl bg-fuchsia-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Instagram className="w-4 h-4 text-zinc-400 group-hover:text-fuchsia-400 relative z-10 transition-colors" />
               </a>
               {/* YouTube */}
-              <a href="#" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 transition-all duration-300">
+              <a href="https://youtube.com/@aashu01in?si=3YMh3iXi0uqgMiG6" target="_blank" rel="noopener noreferrer" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 transition-all duration-300">
                 <div className="absolute inset-0 rounded-xl bg-fuchsia-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Youtube className="w-4 h-4 text-zinc-400 group-hover:text-fuchsia-400 relative z-10 transition-colors" />
               </a>
@@ -104,15 +104,15 @@ export function Footer() {
               <div className="space-y-4 relative z-10 text-sm text-zinc-400">
                 <p className="flex items-start gap-3">
                   <span className="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0" />
-                  Mumbai, Maharashtra<br/>India 400001
+                  Sindhya Nagar, Durg<br/>Chhattisgarh 491001
                 </p>
                 <p className="flex items-center gap-3 hover:text-white transition-colors cursor-pointer w-fit">
                   <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0" />
-                  hello@dblanks.com
+                  arshgupta723@gmail.com
                 </p>
                 <p className="flex items-center gap-3 hover:text-white transition-colors cursor-pointer w-fit">
                   <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0" />
-                  +91 98765 43210
+                  +91 9340576811
                 </p>
               </div>
             </div>

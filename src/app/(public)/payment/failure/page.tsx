@@ -73,7 +73,7 @@ export default function PaymentFailurePage() {
           </div>
 
           <p className="text-center text-xs text-gray-600 mt-6">
-            Need help? Contact us at support@dblanks.in
+            Need help? Contact us at arshgupta723@gmail.com
           </p>
         </div>
       </div>
