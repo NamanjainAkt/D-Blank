@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { Quote } from 'lucide-react';
 
 interface Testimonial {
   id: number | string;
@@ -51,35 +52,30 @@ export const TestimonialsColumn = ({
         {[...testimonials, ...testimonials].map((testimonial, index) => (
           <div
             key={`${testimonial.id}-${index}`}
-            className="relative rounded-2xl bg-white/[0.03] backdrop-blur-md border border-white/10 hover:border-violet-500/30 transition-all duration-300 p-5 group overflow-hidden"
+            className="relative rounded-3xl bg-white/[0.04] backdrop-blur-xl border border-white/10 hover:border-violet-500/30 transition-all duration-300 p-4 group overflow-hidden"
           >
             {/* Top gradient line */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
-            {/* Subtle corner glow on hover */}
-            <div className="absolute -top-8 -right-8 w-24 h-24 bg-violet-500/0 group-hover:bg-violet-500/8 rounded-full blur-2xl transition-colors duration-500" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
+            
+            <Quote className="w-8 h-8 text-violet-500/20 mb-2 rotate-180" />
 
-            {/* Large decorative quote */}
-            <div className="text-7xl font-black text-violet-500/12 leading-none mb-1 select-none font-display">
-              "
-            </div>
-
-            <p className="text-zinc-300 text-sm leading-relaxed mb-6">
+            <p className="text-zinc-300 text-xs leading-relaxed mb-4 italic">
               "{testimonial.content}"
             </p>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div
-                className={`w-10 h-10 rounded-full bg-gradient-to-br ${
+                className={`w-8 h-8 rounded-full bg-gradient-to-br ${
                   avatarColors[index % avatarColors.length]
-                } flex items-center justify-center text-white font-bold text-sm shrink-0 ring-2 ring-zinc-800`}
+                } flex items-center justify-center text-white font-bold text-[10px] shrink-0 ring-1 ring-white/10`}
               >
                 {testimonial.name[0]}
               </div>
-              <div>
-                <p className="font-semibold text-white text-sm">
+              <div className="min-w-0">
+                <p className="font-bold text-white text-xs truncate">
                   {testimonial.name}
                 </p>
-                <p className="text-xs text-zinc-600">{testimonial.role}</p>
+                <p className="text-[10px] text-zinc-500 truncate">{testimonial.role}</p>
               </div>
             </div>
           </div>

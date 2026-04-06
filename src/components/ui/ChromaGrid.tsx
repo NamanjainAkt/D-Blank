@@ -111,7 +111,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
           key={i}
           onMouseMove={handleCardMove}
           onClick={() => handleCardClick(c.url)}
-          className="group relative flex flex-col w-full rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 cursor-pointer bg-zinc-900/40"
+          className="group relative flex flex-col w-full sm:max-w-[280px] rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 cursor-pointer bg-zinc-900/40 mx-auto"
           style={
             {
               '--card-border': c.borderColor || 'transparent',
@@ -132,7 +132,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
           {/* Card Border glow */}
           <div className="absolute inset-0 border border-violet-500/0 group-hover:border-violet-500/30 transition-colors duration-500 z-30 pointer-events-none" />
 
-          <div className="relative z-10 p-2 aspect-[16/13] overflow-hidden">
+          <div className="relative z-10 p-2 aspect-[3/4] overflow-hidden">
             <img 
               src={c.image} 
               alt={c.title} 
@@ -141,16 +141,16 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
             />
           </div>
           
-          <footer className="relative z-10 p-4 text-white font-sans flex flex-col gap-1 bg-gradient-to-t from-black/90 via-black/40 to-transparent mt-[-50px]">
+          <footer className="relative z-10 p-4 text-white font-sans flex flex-col gap-1 bg-gradient-to-t from-black/95 via-black/60 to-transparent mt-[-70px]">
             <h3 className="m-0 text-lg font-black tracking-tight group-hover:text-violet-400 transition-colors">
               {c.title}
             </h3>
             <div className="flex justify-between items-center w-full">
-              <p className="m-0 text-xs font-medium text-violet-400/90 uppercase tracking-widest">
+              <p className="m-0 text-[10px] font-bold text-violet-400 uppercase tracking-[0.2em]">
                 {c.subtitle}
               </p>
               {c.handle && (
-                <span className="text-[10px] font-display tracking-widest bg-white/5 px-2 py-0.5 rounded border border-white/10 opacity-60">
+                <span className="text-[10px] font-black tracking-widest bg-violet-500 text-white px-2 py-0.5 rounded-full border border-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.3)]">
                   {c.handle}
                 </span>
               )}
