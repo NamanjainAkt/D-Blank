@@ -43,7 +43,7 @@ export default function ContactPage() {
     {
       title: "Email Us",
       description: "Send us an email anytime",
-      value: "hello@dblanks.com",
+      value: "arshgupta723@gmail.com",
       icon: Mail
     },
     {
@@ -55,7 +55,7 @@ export default function ContactPage() {
     {
       title: "Call Us",
       description: "Mon-Fri, 9am-6pm IST",
-      value: "+91 98765 43210",
+      value: "+91 9340576811",
       icon: Smartphone
     }
   ];

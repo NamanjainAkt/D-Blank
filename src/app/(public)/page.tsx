@@ -134,7 +134,7 @@ export default function HomePage() {
         </div>
 
         {/* Scroll Indicator - Bottom Left */}
-        <div className="absolute bottom-10 left-8 z-10 hidden sm:flex items-center gap-4 text-xs font-display tracking-widest text-violet-400/60 rotate-[-90deg] origin-left pointer-events-none">
+        <div className="absolute bottom-20 left-8 z-10 hidden sm:flex items-center gap-4 text-xs font-display tracking-widest text-violet-400/60 rotate-[-90deg] origin-left pointer-events-none">
           <span className="uppercase">Scroll to explore</span>
           <div className="w-12 h-px bg-violet-500/40" />
         </div>
