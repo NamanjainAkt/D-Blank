@@ -14,7 +14,7 @@ export function SidebarNav({ className }: SidebarNavProps) {
     { href: '/admin/students', label: 'Signups', icon: Users },
     { href: '/admin/courses', label: 'Courses', icon: BookOpen },
     { href: '/admin/games', label: 'Games', icon: Gamepad2 },
-    { href: '/admin/enrollments', label: 'Enrollments', icon: GraduationCap },
+    { href: '/admin/students', label: 'Enrollments', icon: GraduationCap },
   ];
 
   return (

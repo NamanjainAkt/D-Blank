@@ -42,11 +42,14 @@ interface Enrollment {
 interface DashboardStats {
   today: {
     enrollments: number;
+    enrollers: number;
     revenue: number;
   };
   overall: {
-    totalStudents: number;
+    totalEnrollers: number;
+    totalEnrollments: number;
     totalCourses: number;
+    totalGames: number;
     totalRevenue: number;
     totalPaid: number;
   };
@@ -177,7 +180,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: "Total Students",
-      value: stats.overall.totalStudents,
+      value: stats.overall.totalEnrollers ?? 0,
       icon: TrendingUp,
       colorClass: "text-[#00FFFF]",
       bgColorClass: "bg-[#00FFFF]/10 shadow-[0_0_15px_rgba(0,255,255,0.15)]",
