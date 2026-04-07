@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Footer } from '@/components/Footer';
 import Footer2 from "@/components/Footer2";
 import { 
@@ -13,10 +15,11 @@ import {
   Award,
   Rocket,
   Globe,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ParticleField } from '@/components/ui/ParticleField';
 import { GlitchText } from '@/components/ui/GlitchText';
@@ -26,16 +29,286 @@ import AnimatedContent from '@/components/AnimatedContent';
 import GlareHover from '@/components/GlareHover';
 import { achievements, teamMembers, founders } from '@/lib/placeholder-data';
 
-const stats = [
+// Types
+interface StudioStats {
+  totalGames: number;
+  featuredGames: number;
+  totalEnrollments: number;
+  totalEnrollers: number;
+}
+
+interface FeaturedGame {
+  _id: string;
+  title: string;
+  slug: string;
+  genre: string;
+  shortDescription: string;
+  thumbnailUrl: string;
+  rating: number;
+  platforms: string[];
+}
+
+// Animated Counter Component
+function AnimatedCounter({ 
+  value, 
+  suffix = '', 
+  color 
+}: { 
+  value: number; 
+  suffix?: string;
+  color: string;
+}) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasStarted]);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+
+    const duration = 2000;
+    const steps = 60;
+    const stepValue = value / steps;
+    let current = 0;
+
+    const timer = setInterval(() => {
+      current += stepValue;
+      if (current >= value) {
+        setDisplayValue(value);
+        clearInterval(timer);
+      } else {
+        setDisplayValue(Math.floor(current));
+      }
+    }, duration / steps);
+
+    return () => clearInterval(timer);
+  }, [value, hasStarted]);
+
+  const colorClass = 
+    color === 'violet' ? 'text-violet-400' :
+    color === 'emerald' ? 'text-emerald-400' :
+    color === 'amber' ? 'text-amber-400' :
+    color === 'fuchsia' ? 'text-fuchsia-400' :
+    'text-cyan-400';
+
+  return (
+    <span ref={ref} className={colorClass}>
+      {displayValue.toLocaleString()}{suffix}
+    </span>
+  );
+}
+
+// Skeleton for Stats
+function StatsSkeleton() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="text-center">
+          <div className="w-14 h-14 rounded-xl mx-auto mb-4 bg-zinc-800 animate-pulse" />
+          <div className="h-9 w-20 mx-auto bg-zinc-800 rounded animate-pulse mb-1" />
+          <div className="h-4 w-16 mx-auto bg-zinc-800 rounded animate-pulse" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Game Card Component
+function GameCard({ game }: { game: FeaturedGame }) {
+  const platformIcons: Record<string, React.ReactNode> = {
+    PC: <Globe className="w-3 h-3" />,
+    Mobile: <Sparkles className="w-3 h-3" />,
+    Console: <Gamepad2 className="w-3 h-3" />,
+  };
+
+  return (
+    <HoverScale>
+      <Card className="bg-zinc-900/50 border-zinc-800 hover:border-violet-500/50 transition-all overflow-hidden group">
+        <div className="relative aspect-video overflow-hidden">
+          <Image
+            src={game.thumbnailUrl}
+            alt={game.title}
+            fill
+            className="object-cover transition-transform group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+          <div className="absolute top-3 right-3">
+            <Badge className="bg-violet-600/80 text-white text-xs">
+              <Star className="w-3 h-3 mr-1 fill-current" />
+              {game.rating.toFixed(1)}
+            </Badge>
+          </div>
+          <div className="absolute bottom-3 left-3 flex gap-1">
+            {game.platforms?.slice(0, 3).map((platform) => (
+              <Badge key={platform} variant="secondary" className="bg-black/60 text-zinc-300 text-xs">
+                {platformIcons[platform] || null}
+                {platform}
+              </Badge>
+            ))}
+          </div>
+        </div>
+        <CardContent className="p-4">
+          <Badge variant="outline" className="mb-2 text-xs border-violet-500/50 text-violet-400">
+            {game.genre}
+          </Badge>
+          <h3 className="font-bold text-lg mb-1 group-hover:text-violet-400 transition-colors">
+            {game.title}
+          </h3>
+          <p className="text-zinc-400 text-sm line-clamp-2">
+            {game.shortDescription}
+          </p>
+        </CardContent>
+        <CardFooter className="p-4 pt-0">
+          <Link href={`/games/${game.slug}`} className="w-full">
+            <Button variant="outline" size="sm" className="w-full border-violet-500/50 hover:bg-violet-500/20">
+              View Game
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        </CardFooter>
+      </Card>
+    </HoverScale>
+  );
+}
+
+// Skeleton for Game Cards
+function GameCardSkeleton() {
+  return (
+    <Card className="bg-zinc-900/50 border-zinc-800">
+      <div className="aspect-video bg-zinc-800 animate-pulse" />
+      <CardContent className="p-4">
+        <div className="h-4 w-16 bg-zinc-800 rounded animate-pulse mb-2" />
+        <div className="h-6 w-3/4 bg-zinc-800 rounded animate-pulse mb-2" />
+        <div className="h-4 w-full bg-zinc-800 rounded animate-pulse" />
+      </CardContent>
+      <CardFooter className="p-4 pt-0">
+        <div className="h-9 w-full bg-zinc-800 rounded animate-pulse" />
+      </CardFooter>
+    </Card>
+  );
+}
+
+// Fallback stats (used when API fails)
+const fallbackStats = [
   { icon: Gamepad2, label: 'Games', value: '120+', color: 'violet' },
   { icon: Users, label: 'Players', value: '50K+', color: 'emerald' },
   { icon: Trophy, label: 'Awards', value: '15+', color: 'amber' },
   { icon: Rocket, label: 'Founded', value: '2025', color: 'fuchsia' },
 ];
 
+// Fallback featured games (used when API fails)
+const fallbackFeaturedGames: FeaturedGame[] = [
+  {
+    _id: '1',
+    title: 'Cyber Drifter',
+    slug: 'cyber-drifter',
+    genre: 'Action RPG',
+    shortDescription: 'Explore a neon-soaked metropolis in this action-packed RPG adventure.',
+    thumbnailUrl: '/games/cyber-drifter/thumbnail.jpg',
+    rating: 4.8,
+    platforms: ['PC', 'Console'],
+  },
+  {
+    _id: '2',
+    title: 'Neon Warriors',
+    slug: 'neon-warriors',
+    genre: 'Fighting',
+    shortDescription: 'Battle your way through intense combat arenas with electrifying fighters.',
+    thumbnailUrl: '/games/neon-warriors/thumbnail.jpg',
+    rating: 4.6,
+    platforms: ['PC', 'Mobile'],
+  },
+  {
+    _id: '3',
+    title: 'Void Runner',
+    slug: 'void-runner',
+    genre: 'Endless Runner',
+    shortDescription: 'Race through the void in this high-speed endless runner with stunning visuals.',
+    thumbnailUrl: '/games/void-runner/thumbnail.jpg',
+    rating: 4.5,
+    platforms: ['Mobile', 'PC'],
+  },
+];
+
 export default function StudioPage() {
+  const [stats, setStats] = useState<StudioStats | null>(null);
+  const [featuredGames, setFeaturedGames] = useState<FeaturedGame[]>([]);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [isLoadingGames, setIsLoadingGames] = useState(true);
+  const [statsError, setStatsError] = useState(false);
+  const [gamesError, setGamesError] = useState(false);
+
   const currentYear = new Date().getFullYear();
-  
+
+  // Fetch stats on mount
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/studio/stats');
+        if (!res.ok) throw new Error('Failed to fetch stats');
+        const data = await res.json();
+        setStats(data);
+        setStatsError(false);
+      } catch (error) {
+        console.error('Error fetching studio stats:', error);
+        setStatsError(true);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
+  // Fetch featured games on mount
+  useEffect(() => {
+    async function fetchFeaturedGames() {
+      try {
+        const res = await fetch('/api/studio/games');
+        if (!res.ok) throw new Error('Failed to fetch games');
+        const data = await res.json();
+        setFeaturedGames(data);
+        setGamesError(false);
+      } catch (error) {
+        console.error('Error fetching featured games:', error);
+        setGamesError(true);
+      } finally {
+        setIsLoadingGames(false);
+      }
+    }
+    fetchFeaturedGames();
+  }, []);
+
+  // Determine which stats to display
+  const displayStats = statsError || !stats
+    ? fallbackStats
+    : [
+        { icon: Gamepad2, label: 'Games', value: stats.totalGames, color: 'violet', isAnimated: true },
+        { icon: Users, label: 'Players', value: stats.totalEnrollers, color: 'emerald', isAnimated: true, suffix: '+' },
+        { icon: Trophy, label: 'Featured', value: stats.featuredGames, color: 'amber', isAnimated: true },
+        { icon: Rocket, label: 'Founded', value: '2025', color: 'fuchsia', isAnimated: false },
+      ];
+
+  // Determine which games to display
+  const displayGames = gamesError || featuredGames.length === 0
+    ? fallbackFeaturedGames
+    : featuredGames;
+
   return (
     <main className="min-h-screen bg-black text-white">
       {/* Hero */}
@@ -72,41 +345,98 @@ export default function StudioPage() {
       {/* Stats */}
       <section className="py-16 bg-zinc-950 border-y border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <AnimatedContent key={stat.label} delay={index * 0.1}>
-                <div className="text-center cursor-pointer">
-                  <div className={`w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center transition-transform hover:scale-110 ${
-                      stat.color === 'violet' ? 'bg-violet-500/20' :
-                      stat.color === 'emerald' ? 'bg-emerald-500/20' :
-                      stat.color === 'amber' ? 'bg-amber-500/20' :
-                      'bg-fuchsia-500/20'
-                    }`}>
-                    <stat.icon className={`w-7 h-7 ${
-                      stat.color === 'violet' ? 'text-violet-400' :
-                      stat.color === 'emerald' ? 'text-emerald-400' :
-                      stat.color === 'amber' ? 'text-amber-400' :
-                      'text-fuchsia-400'
-                    }`} />
+          {isLoadingStats ? (
+            <StatsSkeleton />
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {displayStats.map((stat, index) => (
+                <AnimatedContent key={stat.label} delay={index * 0.1}>
+                  <div className="text-center cursor-pointer">
+                    <div className={`w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center transition-transform hover:scale-110 ${
+                        stat.color === 'violet' ? 'bg-violet-500/20' :
+                        stat.color === 'emerald' ? 'bg-emerald-500/20' :
+                        stat.color === 'amber' ? 'bg-amber-500/20' :
+                        'bg-fuchsia-500/20'
+                      }`}>
+                      <stat.icon className={`w-7 h-7 ${
+                        stat.color === 'violet' ? 'text-violet-400' :
+                        stat.color === 'emerald' ? 'text-emerald-400' :
+                        stat.color === 'amber' ? 'text-amber-400' :
+                        'text-fuchsia-400'
+                      }`} />
+                    </div>
+                    <div className={`text-3xl md:text-4xl font-bold mb-1 ${
+                        stat.color === 'violet' ? 'text-violet-400' :
+                        stat.color === 'emerald' ? 'text-emerald-400' :
+                        stat.color === 'amber' ? 'text-amber-400' :
+                        'text-fuchsia-400'
+                      }`}>
+                      {'isAnimated' in stat && stat.isAnimated ? (
+                        <AnimatedCounter 
+                          value={typeof stat.value === 'number' ? stat.value : 0}
+                          suffix={'suffix' in stat ? stat.suffix || '' : ''}
+                          color={stat.color}
+                        />
+                      ) : (
+                        <span>{'value' in stat ? stat.value : ''}</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-zinc-500">{stat.label}</div>
                   </div>
-                  <div className={`text-3xl md:text-4xl font-bold mb-1 ${
-                      stat.color === 'violet' ? 'text-violet-400' :
-                      stat.color === 'emerald' ? 'text-emerald-400' :
-                      stat.color === 'amber' ? 'text-amber-400' :
-                      'text-fuchsia-400'
-                    }`}>
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-zinc-500">{stat.label}</div>
-                </div>
-              </AnimatedContent>
-            ))}
-          </div>
+                </AnimatedContent>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Featured Games */}
+      <section className="py-24 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedContent className="text-center mb-16">
+            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm font-medium border-violet-500/50 bg-violet-500/10 text-violet-400">
+              <Zap className="w-4 h-4 mr-2" />
+              Featured Games
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+              Our Latest Creations
+            </h2>
+            <p className="text-zinc-400 mt-4 max-w-2xl mx-auto">
+              Discover our most popular titles, crafted with passion and precision.
+            </p>
+          </AnimatedContent>
+
+          {isLoadingGames ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <GameCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayGames.map((game, index) => (
+                <AnimatedContent key={game._id} delay={index * 0.1}>
+                  <GameCard game={game} />
+                </AnimatedContent>
+              ))}
+            </div>
+          )}
+
+          {displayGames.length > 0 && (
+            <AnimatedContent className="text-center mt-12">
+              <Link href="/games">
+                <GlowButton variant="secondary" className="min-w-[200px]">
+                  View All Games
+                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
+                </GlowButton>
+              </Link>
+            </AnimatedContent>
+          )}
         </div>
       </section>
 
       {/* Leadership */}
-      <section className="py-24 bg-black">
+      <section className="py-24 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedContent className="text-center mb-16">
             <Badge variant="outline" className="mb-4 text-violet-400 border-violet-500/50">

@@ -212,8 +212,7 @@ export default function ContactPage() {
                   </p>
                   <div className="space-y-2 text-sm">
                     <p className="text-white">D-Blanks Studio</p>
-                    <p className="text-zinc-500">123 Game Developer Lane</p>
-                    <p className="text-zinc-500">Mumbai, Maharashtra 400001</p>
+                    <p className="text-zinc-500">Sindhya nagar, Durg 491001</p>
                     <p className="text-zinc-500">India</p>
                   </div>
                 </CardContent>
