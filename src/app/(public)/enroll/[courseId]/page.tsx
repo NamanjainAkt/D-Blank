@@ -6,6 +6,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Navbar } from '@/components/Navbar';
 import { formatCurrency } from '@/lib/utils';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  CheckCircle2, 
+  AlertCircle, 
+  Loader2, 
+  ShieldCheck,
+  Cpu
+} from 'lucide-react';
 
 interface Course {
   _id: string;
@@ -17,24 +26,10 @@ interface Course {
   originalPrice?: number;
   category: string;
   thumbnailUrl?: string;
-  totalSeats: number;
-  enrolledCount: number;
-}
-
-interface FormData {
-  courseId: string;
-  studentName: string;
-  email: string;
-  phone: string;
-  whatsappNumber: string;
-  collegeName: string;
-  branch: string;
-  semester: string;
-  rollNumber: string;
-  city: string;
 }
 
 const semesters = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
+const years = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Graduated'];
 
 export default function EnrollPage({ params }: { params: Promise<{ courseId: string }> }) {
   const resolvedParams = use(params);
@@ -44,22 +39,22 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [enrollmentId, setEnrollmentId] = useState('');
 
-  const [formData, setFormData] = useState<FormData>({
-    courseId: resolvedParams.courseId,
-    studentName: '',
+  const [formData, setFormData] = useState({
+    name: '',
     email: '',
     phone: '',
     whatsappNumber: '',
     collegeName: '',
     branch: '',
+    year: '',
     semester: '',
     rollNumber: '',
     city: '',
+    referrer: '',
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [formErrors, setErrors] = useState<Partial<Record<string, string>>>({});
 
   useEffect(() => {
     async function fetchCourse() {
@@ -67,517 +62,303 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
         const res = await fetch('/api/courses');
         const data = await res.json();
         const foundCourse = data.courses?.find((c: any) => c._id === resolvedParams.courseId);
-        if (foundCourse) {
-          setCourse(foundCourse);
-        } else {
-          setError('Course not found');
-        }
+        if (foundCourse) setCourse(foundCourse);
+        else setError('Course not found');
       } catch (err) {
-        setError('Failed to load course');
+        setError('Failed to load course details.');
       } finally {
         setLoading(false);
       }
     }
-
     fetchCourse();
   }, [resolvedParams.courseId]);
 
-  const validateStep = (currentStep: number): boolean => {
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
-
+  const validateStep = (currentStep: number) => {
+    const errs: any = {};
     if (currentStep === 1) {
-      if (!formData.studentName.trim()) newErrors.studentName = 'Name is required';
-      if (!formData.email.trim()) newErrors.email = 'Email is required';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email';
-      if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
-      else if (!/^[6-9]\d{9}$/.test(formData.phone)) newErrors.phone = 'Invalid phone (10 digits)';
+      if (!formData.name) errs.name = 'REQUIRED';
+      if (!formData.email) errs.email = 'REQUIRED';
+      if (!formData.phone) errs.phone = 'REQUIRED';
     } else if (currentStep === 2) {
-      if (!formData.collegeName.trim()) newErrors.collegeName = 'College is required';
-      if (!formData.branch.trim()) newErrors.branch = 'Branch is required';
-      if (!formData.semester) newErrors.semester = 'Semester is required';
-      if (!formData.rollNumber.trim()) newErrors.rollNumber = 'Roll number is required';
-      if (!formData.city.trim()) newErrors.city = 'City is required';
+      if (!formData.collegeName) errs.collegeName = 'REQUIRED';
+      if (!formData.branch) errs.branch = 'REQUIRED';
+      if (!formData.year) errs.year = 'REQUIRED';
+      if (!formData.semester) errs.semester = 'REQUIRED';
+      if (!formData.rollNumber) errs.rollNumber = 'REQUIRED';
+      if (!formData.city) errs.city = 'REQUIRED';
     }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
-  const handleNext = () => {
-    if (validateStep(step)) {
-      setStep(step + 1);
-    }
-  };
-
-  const handleBack = () => {
-    setStep(step - 1);
-    setErrors({});
-  };
+  const handleNext = () => { if (validateStep(step)) setStep(step + 1); };
+  const handleBack = () => setStep(step - 1);
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) return;
-
     setSubmitting(true);
     setError('');
-
     try {
-      const res = await fetch('/api/enroll', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-
-      if (data.error) {
-        setError(data.error);
-        setSubmitting(false);
-        return;
-      }
-
-      setEnrollmentId(data.enrollment.id);
-
-      const paymentRes = await fetch('/api/payment/initiate', {
+      // 1. Create Enrollment & Enroller Profile
+      const enrollRes = await fetch('/api/enroll', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          enrollmentId: data.enrollment.id,
-          amount: course?.price,
+          courseId: course?._id,
+          studentData: formData,
+          paymentMethod: 'UPI'
         }),
       });
 
-      const paymentData = await paymentRes.json();
+      const enrollData = await enrollRes.json();
+      if (!enrollRes.ok) throw new Error(enrollData.error || 'Failed to authorize');
 
-      if (paymentData.bypass) {
-        router.push(`/payment/success?enrollmentId=${data.enrollment.id}&bypass=true`);
-      } else if (paymentData.paymentUrl) {
-        window.location.href = paymentData.paymentUrl;
+      const enrollmentId = enrollData.enrollmentId;
+
+      // 2. Handle Payment (Simulated if bypass is on)
+      if (process.env.NEXT_PUBLIC_BYPASS_PAYMENT === 'true') {
+        const payRes = await fetch('/api/payment/dummy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enrollmentId }),
+        });
+        const payData = await payRes.json();
+        if (payRes.ok) {
+          router.push(`/payment/success?enrollmentId=${enrollmentId}&transactionId=${payData.transactionId}`);
+        } else {
+          throw new Error(payData.error || 'Transaction failed');
+        }
       } else {
-        setError('Failed to initiate payment');
+        // Real PhonePe flow would go here
+        const initiateRes = await fetch('/api/payment/initiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enrollmentId, amount: course?.price }),
+        });
+        const initiateData = await initiateRes.json();
+        if (initiateData.paymentUrl) window.location.href = initiateData.paymentUrl;
+        else throw new Error('Payment gateway uplink failed');
       }
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'System error occurred.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const updateField = (field: keyof FormData, value: string) => {
-    setFormData({ ...formData, [field]: value });
-    if (errors[field]) {
-      setErrors({ ...errors, [field]: '' });
-    }
+  const updateField = (f: string, v: string) => {
+    setFormData({ ...formData, [f]: v });
+    if (formErrors[f]) setErrors({ ...formErrors, [f]: '' });
   };
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Navbar />
-        <div className="pt-32 flex items-center justify-center">
-          <div className="flex items-center gap-3 text-laser-cyan/50 font-mono uppercase tracking-widest animate-pulse">
-            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            Loading mission details...
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (!course) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Navbar />
-        <div className="pt-32 flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-none bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-display font-bold mb-2 uppercase tracking-tight">Mission Not Found</h2>
-          <Link href="/courses" className="mt-4 btn btn-outline">
-            Browse Missions
-          </Link>
-        </div>
-      </main>
-    );
-  }
+  if (loading) return (
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+      <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+      <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Scanning Grid...</span>
+    </div>
+  );
 
   return (
-    <main className="min-h-screen bg-black text-white font-body overflow-x-hidden">
+    <main className="min-h-screen bg-black text-white selection:bg-emerald-500 selection:text-black">
       <Navbar />
-
-      <div className="pt-24 pb-16 px-8 relative">
-        <div className="absolute top-0 left-0 w-full h-full bg-grid-bg opacity-20 pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Form */}
-            <div className="lg:col-span-3">
-              <div className="bg-charcoal/80 border border-neon-purple/20 rounded-none overflow-hidden hover:border-neon-purple/40 transition-colors backdrop-blur-xl">
-                {/* Progress Bar */}
-                <div className="px-8 py-6 border-b border-white/5 bg-white/2">
-                  <div className="flex items-center gap-2">
-                    {[
-                      { num: 1, name: 'Personal' },
-                      { num: 2, name: 'Academic' },
-                      { num: 3, name: 'Review' },
-                    ].map((s, i) => (
-                      <div key={s.num} className="flex items-center">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-7 h-7 rounded-none flex items-center justify-center text-xs font-display font-black transition-all ${
-                            step > s.num ? 'bg-neon-purple text-white' :
-                            step === s.num ? 'bg-laser-cyan text-black' :
-                            'bg-white/5 text-gray-600 border border-white/10'
-                          }`}>
-                            {step > s.num ? (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                            ) : s.num}
-                          </div>
-                          <span className={`text-[10px] font-display font-black uppercase tracking-widest ${
-                            step >= s.num ? 'text-white' : 'text-gray-600'
-                          }`}>
-                            {s.name}
-                          </span>
-                        </div>
-                        {i < 2 && <span className="mx-3 text-neon-purple/30">→</span>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Form Body */}
-                <div className="p-8">
-                  {error && (
-                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-none text-red-400 text-[11px] font-mono uppercase tracking-wider flex items-center gap-2">
-                      <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {error}
-                    </div>
-                  )}
-
-                  {step === 1 && (
-                    <div className="animate-fade-up">
-                      <h2 className="text-2xl font-display font-black mb-2 uppercase tracking-tight text-white">Personal Data</h2>
-                      <p className="text-[11px] font-mono uppercase tracking-widest text-laser-cyan mb-8">// Identification required</p>
-
-                      <div className="space-y-6">
-                        <div>
-                          <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                            Full Legal Name *
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.studentName}
-                            onChange={(e) => updateField('studentName', e.target.value)}
-                            placeholder="OPERATOR NAME"
-                            className={`f-input font-mono uppercase ${errors.studentName ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'focus:shadow-[0_0_15px_var(--laser-cyan)]'}`}
-                          />
-                          {errors.studentName && (
-                            <p className="text-red-400 text-[10px] font-mono mt-2 uppercase tracking-tighter">{errors.studentName}</p>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                              Comms Link (Email) *
-                            </label>
-                            <input
-                              type="email"
-                              value={formData.email}
-                              onChange={(e) => updateField('email', e.target.value)}
-                              placeholder="ID@NETWORK.NET"
-                              className={`f-input font-mono uppercase ${errors.email ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'focus:shadow-[0_0_15px_var(--laser-cyan)]'}`}
-                            />
-                            {errors.email && (
-                              <p className="text-red-400 text-[10px] font-mono mt-2 uppercase tracking-tighter">{errors.email}</p>
-                            )}
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                              Mobile Uplink *
-                            </label>
-                            <input
-                              type="tel"
-                              value={formData.phone}
-                              onChange={(e) => updateField('phone', e.target.value)}
-                              placeholder="+91-0000000000"
-                              className={`f-input font-mono ${errors.phone ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'focus:shadow-[0_0_15px_var(--laser-cyan)]'}`}
-                            />
-                            {errors.phone && (
-                              <p className="text-red-400 text-[10px] font-mono mt-2 uppercase tracking-tighter">{errors.phone}</p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                            Secondary Comms (Optional)
-                          </label>
-                          <input
-                            type="tel"
-                            value={formData.whatsappNumber}
-                            onChange={(e) => updateField('whatsappNumber', e.target.value)}
-                            placeholder="WHATSAPP_ID"
-                            className="f-input font-mono"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                            Base City *
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.city}
-                            onChange={(e) => updateField('city', e.target.value)}
-                            placeholder="LOCATION_ID"
-                            className={`f-input font-mono uppercase ${errors.city ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'focus:shadow-[0_0_15px_var(--laser-cyan)]'}`}
-                          />
-                          {errors.city && (
-                            <p className="text-red-400 text-[10px] font-mono mt-2 uppercase tracking-tighter">{errors.city}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {step === 2 && (
-                    <div className="animate-fade-up">
-                      <h2 className="text-2xl font-display font-black mb-2 uppercase tracking-tight text-white">Academy Specs</h2>
-                      <p className="text-[11px] font-mono uppercase tracking-widest text-laser-cyan mb-8">// Educational background</p>
-
-                      <div className="space-y-6">
-                        <div>
-                          <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                            Institute / Academy *
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.collegeName}
-                            onChange={(e) => updateField('collegeName', e.target.value)}
-                            placeholder="ACADEMY_ID"
-                            className={`f-input font-mono uppercase ${errors.collegeName ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'focus:shadow-[0_0_15px_var(--laser-cyan)]'}`}
-                          />
-                          {errors.collegeName && (
-                            <p className="text-red-400 text-[10px] font-mono mt-2 uppercase tracking-tighter">{errors.collegeName}</p>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                              Specialization *
-                            </label>
-                            <input
-                              type="text"
-                              value={formData.branch}
-                              onChange={(e) => updateField('branch', e.target.value)}
-                              placeholder="e.g. CORE_CS"
-                              className={`f-input font-mono uppercase ${errors.branch ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'focus:shadow-[0_0_15px_var(--laser-cyan)]'}`}
-                            />
-                            {errors.branch && (
-                              <p className="text-red-400 text-[10px] font-mono mt-2 uppercase tracking-tighter">{errors.branch}</p>
-                            )}
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                              Level (Semester) *
-                            </label>
-                            <select
-                              value={formData.semester}
-                              onChange={(e) => updateField('semester', e.target.value)}
-                              className={`f-input font-mono uppercase ${errors.semester ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'focus:shadow-[0_0_15px_var(--laser-cyan)]'}`}
-                            >
-                              <option value="">SELECT_LEVEL</option>
-                              {semesters.map((s) => (
-                                <option key={s} value={s}>{s} LEVEL</option>
-                              ))}
-                            </select>
-                            {errors.semester && (
-                              <p className="text-red-400 text-[10px] font-mono mt-2 uppercase tracking-tighter">{errors.semester}</p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-2">
-                            Registry Number *
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.rollNumber}
-                            onChange={(e) => updateField('rollNumber', e.target.value)}
-                            placeholder="ROLL_NUM_ID"
-                            className={`f-input font-mono uppercase ${errors.rollNumber ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'focus:shadow-[0_0_15px_var(--laser-cyan)]'}`}
-                          />
-                          {errors.rollNumber && (
-                            <p className="text-red-400 text-[10px] font-mono mt-2 uppercase tracking-tighter">{errors.rollNumber}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {step === 3 && (
-                    <div className="animate-fade-up">
-                      <h2 className="text-2xl font-display font-black mb-2 uppercase tracking-tight text-white">Review Uplink</h2>
-                      <p className="text-[11px] font-mono uppercase tracking-widest text-laser-cyan mb-8">// Confirm mission parameters</p>
-
-                      <div className="space-y-4 text-[11px] font-mono uppercase tracking-widest">
-                        <div className="grid grid-cols-2 gap-4 p-6 bg-white/2 border border-white/5">
-                          <div className="border-l border-neon-purple/50 pl-3">
-                            <div className="text-gray-500 mb-1">OPERATOR</div>
-                            <div className="font-bold text-white truncate">{formData.studentName}</div>
-                          </div>
-                          <div className="border-l border-neon-purple/50 pl-3">
-                            <div className="text-gray-500 mb-1">COMMS</div>
-                            <div className="font-bold text-white truncate">{formData.email}</div>
-                          </div>
-                          <div className="border-l border-neon-purple/50 pl-3">
-                            <div className="text-gray-500 mb-1">MOBILE</div>
-                            <div className="font-bold text-white truncate">{formData.phone}</div>
-                          </div>
-                          <div className="border-l border-neon-purple/50 pl-3">
-                            <div className="text-gray-500 mb-1">BASE_CITY</div>
-                            <div className="font-bold text-white truncate">{formData.city}</div>
-                          </div>
-                          <div className="border-l border-neon-purple/50 pl-3">
-                            <div className="text-gray-500 mb-1">INSTITUTE</div>
-                            <div className="font-bold text-white truncate">{formData.collegeName}</div>
-                          </div>
-                          <div className="border-l border-neon-purple/50 pl-3">
-                            <div className="text-gray-500 mb-1">SPECIAL</div>
-                            <div className="font-bold text-white truncate">{formData.branch}</div>
-                          </div>
-                          <div className="border-l border-neon-purple/50 pl-3">
-                            <div className="text-gray-500 mb-1">LEVEL</div>
-                            <div className="font-bold text-white truncate">{formData.semester}</div>
-                          </div>
-                          <div className="border-l border-neon-purple/50 pl-3">
-                            <div className="text-gray-500 mb-1">REG_ID</div>
-                            <div className="font-bold text-white truncate">{formData.rollNumber}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Navigation */}
-                  <div className="flex justify-between items-center mt-12 pt-8 border-t border-white/5">
-                    <div className="text-[10px] text-laser-cyan/50 font-mono uppercase tracking-widest">
-                      PHASE 0{step} / 03
-                    </div>
-                    <div className="flex gap-4">
-                      {step > 1 && (
-                        <button onClick={handleBack} className="btn btn-outline py-2.5 px-6 text-xs">
-                          Back
-                        </button>
-                      )}
-                      {step < 3 ? (
-                        <button onClick={handleNext} className="btn btn-laser py-2.5 px-8 text-xs">
-                          Continue
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handleSubmit}
-                          disabled={submitting}
-                          className="btn btn-cyber py-3 px-10 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {submitting ? (
-                            <span className="flex items-center gap-2">
-                              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                              </svg>
-                              UPLINKING...
-                            </span>
-                          ) : (
-                            process.env.NEXT_PUBLIC_BYPASS_PAYMENT === 'true' ? (
-                              <>CONFIRM_ENROLL</>
-                            ) : (
-                              <span className="flex items-center gap-2">
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
-                                </svg>
-                                PAY ₹{course.price.toLocaleString()}
-                              </span>
-                            )
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+      
+      <div className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-3 gap-12">
+          
+          {/* Main Form Area */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <Cpu className="w-6 h-6 text-emerald-500" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-black uppercase tracking-tighter italic">Mission Authorization</h1>
+                <p className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest">// Authorization Protocol Phase 0{step}</p>
               </div>
             </div>
 
-            {/* Order Summary Sidebar */}
-            <div className="lg:col-span-2">
-              <div className="sticky top-24 bg-charcoal/80 border border-laser-cyan/20 rounded-none overflow-hidden hover:border-laser-cyan/40 transition-colors backdrop-blur-xl">
-                {/* Course Preview */}
-                <div className="relative h-48 bg-zinc-900 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/20 to-laser-cyan/20 z-10" />
-                  {course.thumbnailUrl ? (
-                    <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-graphite z-10">
-                      <span className="text-4xl font-display font-black text-white/10">{course.title[0]}</span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/20 to-transparent z-20" />
-                  
-                  {/* Decorative corner */}
-                  <div className="absolute top-0 right-0 w-12 h-12 bg-laser-cyan/10 border-b border-l border-laser-cyan/20 z-30" />
+            {/* Stepper */}
+            <div className="flex items-center gap-4 border-b border-white/5 pb-8">
+              {['Identity', 'Academic', 'Verification'].map((s, i) => (
+                <div key={s} className="flex items-center gap-3">
+                  <div className={`w-8 h-8 flex items-center justify-center text-[10px] font-mono border ${
+                    step > i + 1 ? 'bg-emerald-500 border-emerald-500 text-black' :
+                    step === i + 1 ? 'border-emerald-500 text-emerald-500' : 'border-white/10 text-zinc-600'
+                  }`}>
+                    {step > i + 1 ? <CheckCircle2 className="w-4 h-4" /> : `0${i+1}`}
+                  </div>
+                  <span className={`text-[10px] font-mono uppercase tracking-widest ${step === i + 1 ? 'text-white' : 'text-zinc-600'}`}>{s}</span>
+                  {i < 2 && <div className="w-8 h-px bg-white/5" />}
                 </div>
+              ))}
+            </div>
 
-                <div className="p-8 relative">
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-laser-cyan/60 mb-3">// MISSION_SPEC</div>
-                  <h3 className="text-xl font-display font-black leading-tight mb-6 text-white uppercase tracking-tight">{course.title}</h3>
+            {error && (
+              <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-mono uppercase tracking-widest flex items-center gap-3">
+                <AlertCircle className="w-4 h-4" /> {error}
+              </div>
+            )}
 
-                  <div className="space-y-4 text-[11px] font-mono border-t border-white/5 pt-6 uppercase tracking-widest">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500">DURATION</span>
-                      <span className="text-white border-b border-laser-cyan/30">{course.duration}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500">WINDOW</span>
-                      <span className="text-white border-b border-laser-cyan/30">{course.schedule}</span>
-                    </div>
+            {/* Form Steps */}
+            <div className="space-y-8 animate-in fade-in duration-500">
+              {step === 1 && (
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Full Signature Name *</label>
+                    <input value={formData.name} onChange={e => updateField('name', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase" placeholder="OPERATOR_NAME" />
                   </div>
-
-                  <div className="mt-8 p-6 bg-white/2 border border-white/5 rounded-none">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-gray-500">TOTAL_FEE</span>
-                      <div className="text-right">
-                        {course.originalPrice && (
-                          <div className="text-xs text-gray-600 font-mono line-through mb-1">
-                            ₹{course.originalPrice.toLocaleString()}
-                          </div>
-                        )}
-                        <div className="text-3xl font-display font-black text-white">
-                          ₹{course.price.toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Comms Uplink (Email) *</label>
+                    <input value={formData.email} onChange={e => updateField('email', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase" placeholder="ID@NETWORK.NET" />
                   </div>
-
-                  <div className="mt-6 flex items-center justify-center gap-2 text-[10px] font-mono text-gray-600 uppercase tracking-widest">
-                    <div className="w-1.5 h-1.5 rounded-full bg-laser-cyan animate-pulse shadow-[0_0_8px_var(--laser-cyan)]" />
-                    {process.env.NEXT_PUBLIC_BYPASS_PAYMENT === 'true'
-                      ? 'SIMULATION_MODE_ACTIVE'
-                      : 'SECURE_UPLINK_VIA_PHONEPE'
-                    }
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Mobile Link (Phone) *</label>
+                    <input value={formData.phone} onChange={e => updateField('phone', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none" placeholder="+91-XXXXX-XXXXX" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Secondary WhatsApp (Opt)</label>
+                    <input value={formData.whatsappNumber} onChange={e => updateField('whatsappNumber', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none" placeholder="SEC_LINK" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Origin Base (City) *</label>
+                    <input value={formData.city} onChange={e => updateField('city', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase" placeholder="LOCATION_ID" />
                   </div>
                 </div>
+              )}
+
+              {step === 2 && (
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Institute / Academy *</label>
+                    <input value={formData.collegeName} onChange={e => updateField('collegeName', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase" placeholder="ACADEMY_ID" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Stream / Specialization *</label>
+                    <input value={formData.branch} onChange={e => updateField('branch', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase" placeholder="e.g. CS_ENGINEERING" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Year *</label>
+                    <select value={formData.year} onChange={e => updateField('year', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase appearance-none">
+                      <option value="">SELECT_YEAR</option>
+                      {years.map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Level (Semester) *</label>
+                    <select value={formData.semester} onChange={e => updateField('semester', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase appearance-none">
+                      <option value="">SELECT_LEVEL</option>
+                      {semesters.map(s => <option key={s} value={s}>{s} LEVEL</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Registration ID (Roll Num) *</label>
+                    <input value={formData.rollNumber} onChange={e => updateField('rollNumber', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase" placeholder="ROLL_ID" />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Acquisition Channel (Referrer)</label>
+                    <input value={formData.referrer} onChange={e => updateField('referrer', e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 font-mono text-sm focus:border-emerald-500/50 outline-none uppercase" placeholder="HOW DID YOU FIND US?" />
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="p-8 bg-white/[0.02] border border-white/5 space-y-6">
+                  <div className="grid md:grid-cols-2 gap-8 text-[11px] font-mono uppercase tracking-widest">
+                    <div className="space-y-1">
+                      <span className="text-zinc-600 text-[9px]">Identity</span>
+                      <div className="text-zinc-200">{formData.name}</div>
+                      <div className="text-zinc-400 lowercase">{formData.email}</div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-zinc-600 text-[9px]">Base</span>
+                      <div className="text-zinc-200">{formData.city}</div>
+                      <div className="text-zinc-400">{formData.phone}</div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-zinc-600 text-[9px]">Academy</span>
+                      <div className="text-zinc-200 line-clamp-1">{formData.collegeName}</div>
+                      <div className="text-zinc-400">{formData.branch} // {formData.semester}</div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-zinc-600 text-[9px]">Mission</span>
+                      <div className="text-emerald-500 font-black">{course?.title}</div>
+                      <div className="text-zinc-400">{formatCurrency(course?.price || 0)}</div>
+                    </div>
+                  </div>
+                  <div className="pt-6 border-t border-white/5 flex items-center gap-3">
+                    <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                    <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest leading-normal">
+                      By authorizing, you agree to the D-Blanks training protocol and code of conduct.
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Nav Controls */}
+            <div className="flex justify-between items-center pt-10 border-t border-white/5">
+              <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+                Uplink Phase 0{step} / 03
+              </div>
+              <div className="flex gap-4">
+                {step > 1 && (
+                  <button onClick={handleBack} className="h-12 px-8 border border-white/10 hover:bg-white/5 font-mono text-[10px] uppercase tracking-widest transition-all">
+                    Previous
+                  </button>
+                )}
+                {step < 3 ? (
+                  <button onClick={handleNext} className="h-12 px-10 bg-white text-black hover:bg-zinc-200 font-mono text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 group">
+                    Continue <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                ) : (
+                  <button onClick={handleSubmit} disabled={submitting} className="h-14 px-12 bg-emerald-600 hover:bg-emerald-500 text-black font-black text-[11px] uppercase tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all flex items-center gap-3 disabled:opacity-50">
+                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Cpu className="w-4 h-4" />}
+                    {submitting ? 'AUTHORIZING...' : `CONFIRM ENROLLMENT // ${formatCurrency(course?.price || 0)}`}
+                  </button>
+                )}
               </div>
             </div>
           </div>
+
+          {/* Sidebar Summary */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-32 space-y-6">
+              <div className="bg-zinc-900 border border-white/5 overflow-hidden">
+                <div className="relative aspect-[4/3] opacity-40">
+                  <Image src={course?.thumbnailUrl || '/placeholder-course.jpg'} alt="" fill className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent" />
+                </div>
+                <div className="p-6 space-y-4">
+                  <div>
+                    <div className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Target Mission</div>
+                    <h3 className="text-lg font-bold text-white uppercase tracking-tight leading-tight">{course?.title}</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                    <div>
+                      <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Duration</div>
+                      <div className="text-[10px] font-mono text-zinc-300">{course?.duration}</div>
+                    </div>
+                    <div>
+                      <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Category</div>
+                      <div className="text-[10px] font-mono text-zinc-300">{course?.category}</div>
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t border-white/5 flex justify-between items-end">
+                    <div className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">Operation Fee</div>
+                    <div className="text-2xl font-black text-emerald-500 font-display italic">{formatCurrency(course?.price || 0)}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 text-center space-y-2">
+                <div className="text-[10px] font-mono text-emerald-500/80 uppercase tracking-widest">Secure Gateway Enabled</div>
+                <p className="text-[9px] font-mono text-zinc-600 uppercase leading-relaxed">
+                  Encryption Layer 256-bit AES <br />
+                  Digital Transmission Active
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </main>

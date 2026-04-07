@@ -34,7 +34,9 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Plus, Edit, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Plus, Edit, AlertCircle, CheckCircle2, Loader2, BookOpen } from 'lucide-react';
+import CourseForm from '@/components/admin/courses/CourseForm';
+import { CourseFormData } from '@/lib/validations';
 
 interface Course {
   _id: string;
@@ -129,18 +131,11 @@ export default function AdminCoursesPage() {
     setTimeout(() => setSuccessMessage(null), 3000);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (data: CourseFormData) => {
     setSaving(true);
     setError(null);
 
     try {
-      const payload = {
-        ...formData,
-        tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-        originalPrice: formData.originalPrice || undefined,
-      };
-
       const url = editingCourse 
         ? `/api/admin/courses/${editingCourse._id}`
         : '/api/admin/courses';
@@ -148,17 +143,16 @@ export default function AdminCoursesPage() {
       const res = await fetch(url, {
         method: editingCourse ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(data),
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to save course');
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to save course');
       }
 
       setIsModalOpen(false);
       setEditingCourse(null);
-      setFormData(initialFormState);
       fetchCourses();
       showSuccess(editingCourse ? 'Course updated successfully' : 'Course created successfully');
     } catch (err) {
@@ -169,26 +163,8 @@ export default function AdminCoursesPage() {
     }
   };
 
-  const handleEdit = (course: Course) => {
+  const handleEdit = (course: any) => {
     setEditingCourse(course);
-    setFormData({
-      title: course.title,
-      slug: course.slug,
-      shortDescription: '',
-      fullDescription: '',
-      duration: '',
-      schedule: '',
-      price: course.price,
-      originalPrice: course.originalPrice || 0,
-      category: course.category,
-      tags: '',
-      totalSeats: course.totalSeats,
-      instructorName: course.instructorName || '',
-      meetLink: course.meetLink || '',
-      isPublished: course.isPublished,
-      thumbnailUrl: course.thumbnailUrl || '',
-      syllabusUrl: course.syllabusUrl || '',
-    });
     setIsModalOpen(true);
   };
 
@@ -247,7 +223,7 @@ export default function AdminCoursesPage() {
                 Initialize Module
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-ink border-white/5 max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <DialogContent className="bg-ink border-white/5 max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar">
               <DialogHeader className="border-b border-white/5 pb-4 mb-6">
                 <DialogTitle className="text-xl font-display font-black text-white uppercase tracking-tighter">
                   {editingCourse ? 'Configure Module' : 'Initialize New Module'}
@@ -264,194 +240,11 @@ export default function AdminCoursesPage() {
                 </div>
               )}
               
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="title" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Module Designation *</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        title: e.target.value,
-                        slug: generateSlug(e.target.value)
-                      })}
-                      required
-                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="slug" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Access Key (Slug) *</Label>
-                    <Input
-                      id="slug"
-                      value={formData.slug}
-                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                      required
-                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Category *</Label>
-                    <Select value={formData.category} onValueChange={(v: string) => setFormData({ ...formData, category: v })}>
-                      <SelectTrigger className="bg-black/40 border-white/5 text-[10px] font-mono uppercase tracking-widest h-10">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-ink border-white/5">
-                        {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat} className="text-[10px] font-mono uppercase tracking-widest">{cat}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="totalSeats" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Capacity *</Label>
-                    <Input
-                      id="totalSeats"
-                      type="number"
-                      value={formData.totalSeats}
-                      onChange={(e) => setFormData({ ...formData, totalSeats: parseInt(e.target.value) || 0 })}
-                      min="1"
-                      required
-                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="price" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Credits (Price) *</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
-                      min="0"
-                      required
-                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="originalPrice" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Base Credits</Label>
-                    <Input
-                      id="originalPrice"
-                      type="number"
-                      value={formData.originalPrice}
-                      onChange={(e) => setFormData({ ...formData, originalPrice: parseInt(e.target.value) || 0 })}
-                      min="0"
-                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="duration" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Runtime (Duration) *</Label>
-                    <Input
-                      id="duration"
-                      value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                      placeholder="e.g. 45 Hours | 6 Weeks"
-                      required
-                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="schedule" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Operational Cycle *</Label>
-                    <Input
-                      id="schedule"
-                      value={formData.schedule}
-                      onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
-                      placeholder="e.g. Weekdays 7PM-9PM"
-                      required
-                      className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="shortDescription" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Quick Summary</Label>
-                  <Input
-                    id="shortDescription"
-                    value={formData.shortDescription}
-                    onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                    className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono h-10"
-                    maxLength={120}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="fullDescription" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Technical Briefing *</Label>
-                  <Textarea
-                    id="fullDescription"
-                    value={formData.fullDescription}
-                    onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
-                    required
-                    className="bg-black/40 border-white/5 focus:border-acid-green/50 text-sm font-mono min-h-[100px]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Module Visual</Label>
-                    <ImageUploader
-                      value={formData.thumbnailUrl}
-                      onChange={(url) => setFormData({ ...formData, thumbnailUrl: url })}
-                      type="image"
-                      label="Upload Visual"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Syllabus Matrix</Label>
-                    <ImageUploader
-                      value={formData.syllabusUrl}
-                      onChange={(url) => setFormData({ ...formData, syllabusUrl: url })}
-                      type="pdf"
-                      label="Upload Matrix"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 bg-black/40 p-4 border border-white/5 rounded-sm">
-                  <Checkbox 
-                    id="isPublished" 
-                    checked={formData.isPublished}
-                    onCheckedChange={(checked) => setFormData({ ...formData, isPublished: checked as boolean })}
-                    className="border-white/20"
-                  />
-                  <Label htmlFor="isPublished" className="text-[10px] font-mono uppercase tracking-widest text-zinc-300 cursor-pointer">
-                    Deploy to Public Uplink
-                  </Label>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-6 border-t border-white/5">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsModalOpen(false)}
-                    className="border-white/5 hover:bg-white/5 text-[10px] font-mono uppercase tracking-widest"
-                    disabled={saving}
-                  >
-                    Abort
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={saving}
-                    className="bg-acid-green text-black hover:bg-acid-green/90 text-[10px] font-mono font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(57,255,20,0.3)]"
-                  >
-                    {saving ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" aria-hidden="true" />
-                        Processing...
-                      </>
-                    ) : (
-                      editingCourse ? 'Update Module' : 'Confirm Initialization'
-                    )}
-                  </Button>
-                </div>
-              </form>
+              <CourseForm 
+                initialData={editingCourse} 
+                onSubmit={handleSubmit} 
+                loading={saving} 
+              />
             </DialogContent>
           </Dialog>
         </div>

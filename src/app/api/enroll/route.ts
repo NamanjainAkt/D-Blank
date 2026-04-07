@@ -1,43 +1,12 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
+import { Enroller } from '@/models/Enroller';
 import { Course } from '@/models/Course';
 import { enrollmentSchema } from '@/lib/validations';
-import { generateEnrollmentId } from '@/lib/utils';
-
-// Simple in-memory rate limiter (for production, use Redis)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 5; // Max requests
-const RATE_WINDOW_MS = 60 * 1000; // 1 minute
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  
-  if (!record || now > record.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_WINDOW_MS });
-    return true;
-  }
-  
-  if (record.count >= RATE_LIMIT) {
-    return false;
-  }
-  
-  record.count++;
-  return true;
-}
 
 export async function POST(request: Request) {
   try {
-    // Rate limiting
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
-    if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 }
-      );
-    }
-
     await dbConnect();
 
     const body = await request.json();
@@ -51,75 +20,74 @@ export async function POST(request: Request) {
       );
     }
 
-    const { courseId, phone, email } = body;
+    const { courseId, studentData, paymentMethod } = body;
 
-    // Validate courseId format
     if (!courseId.match(/^[0-9a-fA-F]{24}$/)) {
-      return NextResponse.json(
-        { error: 'Invalid course ID format' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid course ID' }, { status: 400 });
     }
 
-    // Check if course exists
     const course = await Course.findById(courseId);
     if (!course) {
-      return NextResponse.json(
-        { error: 'Course not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    // Check for existing enrollment
+    // 1. Find or Create Enroller
+    let enroller = await Enroller.findOne({ 
+      $or: [{ email: studentData.email }, { phone: studentData.phone }] 
+    });
+
+    if (enroller) {
+      // Update existing enroller profile with latest data
+      enroller = await Enroller.findByIdAndUpdate(enroller._id, {
+        ...studentData,
+        updatedAt: new Date()
+      }, { new: true });
+    } else {
+      // Create new enroller
+      enroller = await Enroller.create(studentData);
+    }
+
+    // 2. Check if already enrolled in THIS course
     const existingEnrollment = await Enrollment.findOne({
-      courseId,
-      $or: [{ phone }, { email }]
+      studentId: enroller._id,
+      courseId: course._id
     });
 
     if (existingEnrollment && existingEnrollment.paymentStatus === 'paid') {
       return NextResponse.json(
-        { error: 'You have already enrolled in this course' },
+        { error: 'System detects active authorization for this module already.' },
         { status: 400 }
       );
     }
 
-    // Create or update enrollment
+    // 3. Create/Update Enrollment
     const enrollmentData = {
-      ...body,
+      studentId: enroller._id,
+      courseId: course._id,
       courseName: course.title,
-      enrollmentId: generateEnrollmentId(),
+      studentName: enroller.name,
+      studentEmail: enroller.email,
       paymentStatus: 'pending',
       enrollmentStatus: 'pending',
+      paymentAmount: course.price,
+      paymentMethod: paymentMethod || 'UPI',
     };
 
     let enrollment;
-
     if (existingEnrollment) {
-      // Update existing pending enrollment
-      enrollment = await Enrollment.findByIdAndUpdate(
-        existingEnrollment._id,
-        enrollmentData,
-        { new: true }
-      );
+      enrollment = await Enrollment.findByIdAndUpdate(existingEnrollment._id, enrollmentData, { new: true });
     } else {
-      // Create new enrollment
       enrollment = await Enrollment.create(enrollmentData);
     }
 
     return NextResponse.json({
       success: true,
-      enrollment: {
-        id: enrollment._id,
-        enrollmentId: enrollment.enrollmentId,
-        courseName: enrollment.courseName,
-        amount: course.price,
-      },
+      enrollmentId: enrollment._id,
+      courseName: course.title,
+      amount: course.price,
     });
   } catch (error) {
-    console.error('Error creating enrollment:', error);
-    return NextResponse.json(
-      { error: 'Failed to create enrollment' },
-      { status: 500 }
-    );
+    console.error('Enrollment error:', error);
+    return NextResponse.json({ error: 'System failure during authorization' }, { status: 500 });
   }
 }

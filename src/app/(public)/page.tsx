@@ -25,54 +25,31 @@ import AnimatedContent from "@/components/AnimatedContent";
 import WhyChooseUs from "@/components/sections/WhyChooseUs";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import FoundersSection from "@/components/sections/FoundersSection";
-import { games } from "@/lib/placeholder-data";
+import { GameCard } from "@/components/GameCard";
+import { useState, useEffect } from "react";
 
 const currentYear = new Date().getFullYear();
 
-const genreStyles: Record<
-  string,
-  { gradient: string; border: string; badge: string }
-> = {
-  RPG: {
-    gradient: "from-purple-900/70 to-violet-950/80",
-    border: "hover:border-violet-500/60",
-    badge: "bg-violet-600/90",
-  },
-  Racing: {
-    gradient: "from-cyan-900/70 to-blue-950/80",
-    border: "hover:border-cyan-500/60",
-    badge: "bg-cyan-600/90",
-  },
-  Strategy: {
-    gradient: "from-blue-900/70 to-indigo-950/80",
-    border: "hover:border-blue-500/60",
-    badge: "bg-blue-600/90",
-  },
-  Action: {
-    gradient: "from-red-900/70 to-rose-950/80",
-    border: "hover:border-red-500/60",
-    badge: "bg-red-600/90",
-  },
-  Roguelike: {
-    gradient: "from-amber-900/70 to-orange-950/80",
-    border: "hover:border-amber-500/60",
-    badge: "bg-amber-600/90",
-  },
-};
-
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <div className="flex items-center justify-center gap-3 mb-4">
-      <div className="w-8 h-px bg-gradient-to-r from-transparent to-violet-500" />
-      <span className="text-violet-400 text-[10px] font-display tracking-[0.35em] uppercase">
-        {children}
-      </span>
-      <div className="w-8 h-px bg-gradient-to-l from-transparent to-violet-500" />
-    </div>
-  );
-}
-
 export default function HomePage() {
+  const [featuredGames, setFeaturedGames] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGames() {
+      try {
+        const res = await fetch('/api/games?featured=true&limit=3');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        setFeaturedGames(data.games || []);
+      } catch (err) {
+        console.error('Error fetching games:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchGames();
+  }, []);
+
   return (
     <main className="min-h-screen bg-black text-white">
       {/* ===== HERO ===== */}
@@ -173,68 +150,21 @@ export default function HomePage() {
           </AnimatedContent>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-            {games.slice(0, 3).map((game, index) => {
-              const style = genreStyles[game.genre] ?? {
-                gradient: "from-violet-900/70 to-fuchsia-950/80",
-                border: "hover:border-violet-500/60",
-                badge: "bg-violet-600/90",
-              };
-              return (
-                <AnimatedContent key={game.id} delay={index * 0.1}>
-                  <HoverScale scale={1.02} className="h-full">
-                    <div
-                      className={`group h-full rounded-xl overflow-hidden border border-zinc-800 ${style.border} transition-all duration-400 bg-zinc-900/50 hover:shadow-xl hover:shadow-violet-500/10`}
-                    >
-                      {/* Genre-colored top area */}
-                      <div
-                        className={`relative aspect-video bg-gradient-to-br ${style.gradient} overflow-hidden`}
-                      >
-                        {/* Subtle grid inside */}
-                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px]" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Gamepad2 className="w-14 h-14 text-white/10 group-hover:text-white/20 group-hover:scale-110 transition-all duration-500" />
-                        </div>
-                        {/* Bottom-left: rating */}
-                        <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/70 backdrop-blur-sm rounded-md px-2.5 py-1">
-                          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                          <span className="text-xs font-bold text-amber-400">
-                            {game.rating}
-                          </span>
-                        </div>
-                        {/* Top-right: genre */}
-                        <div
-                          className={`absolute top-3 right-3 text-white text-[10px] font-bold px-2.5 py-1 rounded-md ${style.badge}`}
-                        >
-                          {game.genre}
-                        </div>
-                        {game.featured && (
-                          <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-2 py-0.5 rounded tracking-widest">
-                            FEATURED
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-5">
-                        <h3 className="text-base font-bold mb-1.5 group-hover:text-violet-400 transition-colors tracking-wide">
-                          {game.title}
-                        </h3>
-                        <p className="text-xs text-zinc-500 mb-4 line-clamp-2 leading-relaxed">
-                          {game.description}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-zinc-600 bg-zinc-800/60 px-2.5 py-1 rounded-md border border-zinc-700/50">
-                            {game.platform}
-                          </span>
-                          <span className="text-xs text-zinc-700">
-                            {game.releaseDate}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </HoverScale>
+            {loading ? (
+              Array(3).fill(0).map((_, i) => (
+                <div key={i} className="aspect-video bg-white/5 rounded-xl animate-pulse" />
+              ))
+            ) : featuredGames.length > 0 ? (
+              featuredGames.map((game) => (
+                <AnimatedContent key={game._id}>
+                  <GameCard game={game} />
                 </AnimatedContent>
-              );
-            })}
+              ))
+            ) : (
+              <div className="col-span-full py-20 text-center text-zinc-500 font-mono text-xs uppercase tracking-widest">
+                No featured titles currently deployed.
+              </div>
+            )}
           </div>
 
           {/* Mobile: View All link */}

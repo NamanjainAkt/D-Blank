@@ -3,301 +3,330 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Navbar } from '@/components/Navbar';
-
-interface Course {
-  _id: string;
-  title: string;
-  slug: string;
-  shortDescription: string;
-  fullDescription: string;
-  duration: string;
-  schedule: string;
-  price: number;
-  originalPrice?: number;
-  category: string;
-  tags?: string[];
-  thumbnailUrl?: string;
-  syllabusUrl?: string;
-  totalSeats: number;
-  enrolledCount: number;
-  meetLink?: string;
-  instructorName?: string;
-}
+import { Footer } from '@/components/Footer';
+import Footer2 from "@/components/Footer2";
+import { 
+  Clock, 
+  Users, 
+  Calendar, 
+  CheckCircle2, 
+  BookOpen, 
+  Play, 
+  Info, 
+  ShieldCheck, 
+  Award, 
+  Infinity,
+  ArrowRight,
+  ChevronRight,
+  MessageCircle,
+  Mail,
+  Video,
+  Code
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { formatCurrency, formatDate } from '@/lib/utils';
 
 export default function CourseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
-  const router = useRouter();
-  const [course, setCourse] = useState<Course | null>(null);
+  const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://dblanks.site';
+  const [activeTab, setActiveCategory] = useState('overview');
 
   useEffect(() => {
     async function fetchCourse() {
       try {
         const res = await fetch(`/api/courses/${resolvedParams.slug}`);
         const data = await res.json();
-
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setCourse(data.course);
-        }
+        if (data.error) setError(data.error);
+        else setCourse(data.course);
       } catch (err) {
-        setError('Failed to load course');
+        setError('Failed to load course details.');
       } finally {
         setLoading(false);
       }
     }
-
     fetchCourse();
   }, [resolvedParams.slug]);
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Navbar />
-        <div className="pt-32 flex items-center justify-center">
-          <div className="flex items-center gap-3 text-gray-500">
-            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            Loading course details...
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (error || !course) {
-    return (
-      <main className="min-h-screen bg-black">
-        <Navbar />
-        <div className="pt-32 flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold mb-2">{error || 'Course not found'}</h2>
-          <Link href="/courses" className="mt-4 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl border border-white/10 transition-all">
-            Browse Courses
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
-  const seatsLeft = course.totalSeats - course.enrolledCount;
-  const seatsPercentage = (course.enrolledCount / course.totalSeats) * 100;
-
-  const courseSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Course',
-    name: course.title,
-    description: course.shortDescription,
-    provider: {
-      '@type': 'Organization',
-      name: 'D-Blanks',
-      url: baseUrl,
-    },
-    offers: {
-      '@type': 'Offer',
-      price: course.price,
-      priceCurrency: 'INR',
-      availability: seatsLeft > 0
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/SoldOut',
-    },
-    hasCourseInstance: {
-      '@type': 'CourseInstance',
-      courseMode: 'online',
-      courseWorkload: course.duration,
-    },
+  const getYoutubeEmbedUrl = (url: string) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    const id = (match && match[2].length === 11) ? match[2] : null;
+    return id ? `https://www.youtube.com/embed/${id}` : null;
   };
 
+  if (loading) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" />
+    </div>
+  );
+
+  if (error || !course) return (
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 text-center">
+      <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tighter">{error || 'Transmission Lost'}</h2>
+      <Link href="/courses">
+        <Button className="bg-emerald-600 hover:bg-emerald-500 text-black font-black uppercase tracking-widest">Return to Grid</Button>
+      </Link>
+    </div>
+  );
+
+  const embedUrl = getYoutubeEmbedUrl(course.promoVideoUrl);
+  const seatsLeft = course.totalSeats - course.enrolledCount;
+
   return (
-    <main className="min-h-screen bg-black">
-      {/* JSON-LD Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(courseSchema),
-        }}
-      />
+    <main className="min-h-screen bg-black text-white">
       <Navbar />
+      
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/20 via-black to-black" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] -mr-64 -mt-64" />
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-mono uppercase tracking-widest px-3 py-1">
+                  {course.category}
+                </Badge>
+                <Badge variant="outline" className="text-zinc-500 border-zinc-800 text-[10px] font-mono uppercase tracking-widest px-3 py-1">
+                  {course.level} Level
+                </Badge>
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl font-black tracking-tight uppercase italic leading-[0.9]">
+                {course.title}
+              </h1>
+              
+              <p className="text-zinc-400 text-lg leading-relaxed font-mono text-[14px] uppercase tracking-tight max-w-xl">
+                {course.shortDescription}
+              </p>
 
-      <div className="pt-24 pb-16">
-        <div className="max-w-6xl mx-auto px-8">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
-            <Link href="/courses" className="hover:text-laser-cyan transition-colors">Courses</Link>
-            <span>/</span>
-            <span className="text-gray-400">{course.category}</span>
-            <span>/</span>
-            <span className="text-white">{course.title}</span>
-          </div>
+              <div className="flex flex-wrap gap-6 pt-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-emerald-500" />
+                  <span className="text-xs font-mono text-zinc-300 uppercase tracking-widest">{course.duration}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-emerald-500" />
+                  <span className="text-xs font-mono text-zinc-300 uppercase tracking-widest">{course.enrolledCount} Active Operators</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Video className="w-4 h-4 text-emerald-500" />
+                  <span className="text-xs font-mono text-zinc-300 uppercase tracking-widest">{course.language}</span>
+                </div>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              {/* Hero Image */}
-              <div className="relative h-64 md:h-80 bg-zinc-900/50 border border-white/10 rounded-2xl overflow-hidden mb-8 group">
-                {course.thumbnailUrl ? (
-                  <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-violet-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+              <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden border border-white/10">
+                {embedUrl ? (
+                  <iframe src={embedUrl} className="w-full h-full" allowFullScreen />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-6xl">
-                    {course.category === 'IT & Software' && (
-                      <svg className="w-20 h-20 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    )}
-                    {course.category === 'Electronics' && (
-                      <svg className="w-20 h-20 text-laser-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    )}
-                    {course.category === 'Mechanical' && (
-                      <svg className="w-20 h-20 text-cyber-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    )}
-                    {course.category === 'Civil' && (
-                      <svg className="w-20 h-20 text-laser-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    )}
-                  </div>
+                  <img src={course.thumbnailUrl || '/placeholder-course.jpg'} alt="" className="w-full h-full object-cover" />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6">
-                  <span className="px-3 py-1.5 text-xs font-semibold bg-neon-purple/20 text-neon-purple border border-neon-purple/30 rounded-full backdrop-blur-sm">
-                    {course.category}
-                  </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content Grid */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-3 gap-12">
+            {/* Left Column: Details */}
+            <div className="lg:col-span-2 space-y-16">
+              
+              {/* Mission Briefing */}
+              <div className="space-y-6">
+                <h2 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
+                  <Info className="w-6 h-6 text-emerald-500" /> Mission Briefing
+                </h2>
+                <div className="prose prose-invert max-w-none">
+                  <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap font-mono text-[13px] uppercase tracking-tight">
+                    {course.fullDescription}
+                  </p>
                 </div>
               </div>
 
-              {/* Title & Description */}
-              <h1 className="text-3xl md:text-4xl font-display font-bold tracking-tight mb-4">
-                {course.title}
-              </h1>
-
-              <p className="text-gray-400 text-lg leading-relaxed mb-8">
-                {course.fullDescription}
-              </p>
-
-              {/* Tags */}
-              {course.tags && course.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {course.tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1.5 text-xs font-mono uppercase tracking-wide text-laser-cyan/70 bg-laser-cyan/5 border border-laser-cyan/10 rounded-lg hover:border-laser-cyan/20 transition-colors cursor-default">
-                      {tag}
-                    </span>
-                  ))}
+              {/* Learning Outcomes */}
+              {course.learningOutcomes?.length > 0 && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
+                    <Award className="w-6 h-6 text-emerald-500" /> Tactical Gains (Outcomes)
+                  </h2>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {course.learningOutcomes.map((item: string, i: number) => (
+                      <div key={i} className="flex gap-3 p-4 bg-zinc-900/50 border border-white/5 rounded-lg group hover:border-emerald-500/30 transition-colors">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                        <span className="text-xs font-mono text-zinc-300 uppercase tracking-tight leading-normal">{item}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
-              {/* Course Info Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-zinc-900/50 border border-white/10 rounded-xl p-4 hover:border-neon-purple/20 transition-colors backdrop-blur-sm">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Duration</div>
-                  <div className="font-semibold text-white">{course.duration}</div>
+              {/* Syllabus Matrix */}
+              {course.curriculum?.length > 0 && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
+                    <BookOpen className="w-6 h-6 text-emerald-500" /> Syllabus Matrix
+                  </h2>
+                  <Accordion type="single" collapsible className="w-full space-y-3">
+                    {course.curriculum.map((module: any, i: number) => (
+                      <AccordionItem key={i} value={`module-${i}`} className="border border-white/5 bg-zinc-900/30 rounded-lg px-4 overflow-hidden">
+                        <AccordionTrigger className="hover:no-underline py-4 text-xs font-mono uppercase tracking-widest text-zinc-300">
+                          <div className="flex items-center gap-4 text-left">
+                            <span className="text-emerald-500 font-black">{String(i+1).padStart(2, '0')}</span>
+                            <span>{module.title}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-4 pt-2">
+                          <ul className="space-y-3 pl-10 border-l border-emerald-500/20 ml-2.5">
+                            {module.lessons.map((lesson: string, li: number) => (
+                              <li key={li} className="flex items-center gap-3 text-[11px] font-mono text-zinc-500 uppercase tracking-tight group">
+                                <div className="w-1.5 h-1.5 rounded-full bg-zinc-800 group-hover:bg-emerald-500 transition-colors" />
+                                {lesson}
+                              </li>
+                            ))}
+                          </ul>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
-                <div className="bg-zinc-900/50 border border-white/10 rounded-xl p-4 hover:border-neon-purple/20 transition-colors backdrop-blur-sm">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Schedule</div>
-                  <div className="font-semibold text-white">{course.schedule}</div>
-                </div>
-                <div className="bg-zinc-900/50 border border-white/10 rounded-xl p-4 hover:border-neon-purple/20 transition-colors backdrop-blur-sm">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Seats</div>
-                  <div className="font-semibold text-white">{course.totalSeats}</div>
-                </div>
-                <div className="bg-zinc-900/50 border border-white/10 rounded-xl p-4 hover:border-neon-purple/20 transition-colors backdrop-blur-sm">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">Instructor</div>
-                  <div className="font-semibold text-white">{course.instructorName || 'TBA'}</div>
-                </div>
-              </div>
+              )}
 
-              {/* Seats Progress */}
-              <div className="bg-zinc-900/50 border border-white/10 rounded-xl p-6 hover:border-neon-purple/20 transition-colors backdrop-blur-sm">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-sm text-gray-400 font-display">Seat Availability</span>
-                  <span className={`font-mono text-sm ${
-                    seatsPercentage >= 90 ? 'text-cyber-pink' :
-                    seatsPercentage >= 60 ? 'text-neon-yellow' : 'text-laser-cyan'
-                  }`}>
-                    {seatsLeft} seats left
-                  </span>
-                </div>
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      seatsPercentage >= 90 ? 'bg-cyber-pink shadow-[0_0_10px_var(--cyber-pink)]' :
-                      seatsPercentage >= 60 ? 'bg-neon-yellow shadow-[0_0_10px_var(--neon-yellow)]' : 'bg-laser-cyan shadow-[0_0_10px_var(--laser-cyan)]'
-                    }`}
-                    style={{ width: `${Math.min(seatsPercentage, 100)}%` }}
-                  />
-                </div>
-                <div className="text-xs text-gray-500 mt-2">
-                  {course.enrolledCount} enrolled out of {course.totalSeats}
-                </div>
+              {/* Prerequisites & Software */}
+              <div className="grid md:grid-cols-2 gap-12">
+                {course.prerequisites?.length > 0 && (
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
+                      <ShieldCheck className="w-5 h-5 text-emerald-500" /> Pre-Flight Requirements
+                    </h3>
+                    <ul className="space-y-2">
+                      {course.prerequisites.map((p: string, i: number) => (
+                        <li key={i} className="flex items-center gap-3 text-[11px] font-mono text-zinc-400 uppercase">
+                          <ChevronRight className="w-3 h-3 text-emerald-500" /> {p}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {course.softwareRequired?.length > 0 && (
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
+                      <Code className="w-5 h-5 text-emerald-500" /> Hardware/Software
+                    </h3>
+                    <ul className="space-y-2">
+                      {course.softwareRequired.map((s: string, i: number) => (
+                        <li key={i} className="flex items-center gap-3 text-[11px] font-mono text-zinc-400 uppercase">
+                          <div className="w-1 h-1 bg-emerald-500 rounded-full" /> {s}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Sidebar - Enrollment Card */}
+            {/* Right Column: Enrollment Card */}
             <div className="lg:col-span-1">
-              <div className="sticky top-24 bg-zinc-900/50 border border-white/10 rounded-2xl overflow-hidden hover:border-neon-purple/20 transition-colors backdrop-blur-sm">
-                <div className="p-6 border-b border-white/10">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-2">Course Fee</div>
-                  <div className="flex items-baseline gap-2">
-                    {course.originalPrice && (
-                      <span className="text-lg text-gray-500 font-mono line-through">
-                        ₹{course.originalPrice.toLocaleString()}
-                      </span>
-                    )}
-                    <span className="text-4xl font-mono font-medium text-white">
-                      ₹{course.price.toLocaleString()}
-                    </span>
+              <div className="sticky top-24 space-y-6">
+                <Card className="bg-zinc-900 border-emerald-500/20 overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+                  <div className="p-6 space-y-6">
+                    <div className="space-y-2">
+                      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500">Operation Cost</div>
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-4xl font-black font-display text-white italic">{formatCurrency(course.price)}</span>
+                        {course.originalPrice > course.price && (
+                          <span className="text-lg text-zinc-600 font-mono line-through">{formatCurrency(course.originalPrice)}</span>
+                        )}
+                      </div>
+                      {course.originalPrice > course.price && (
+                        <Badge className="bg-emerald-500 text-black font-black text-[10px] px-2 py-0">
+                          -{Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}% EFFICIENCY GAIN
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                      <div className="flex justify-between items-center text-[11px] font-mono uppercase">
+                        <span className="text-zinc-500 flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> Start Cycle</span>
+                        <span className="text-zinc-200">{course.batchStartDate ? formatDate(course.batchStartDate) : 'TBA'}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[11px] font-mono uppercase">
+                        <span className="text-zinc-500 flex items-center gap-2"><Clock className="w-3.5 h-3.5" /> Timing</span>
+                        <span className="text-zinc-200 text-right">{course.schedule}</span>
+                      </div>
+                      <div className="space-y-2 pt-2">
+                        <div className="flex justify-between text-[10px] font-mono uppercase">
+                          <span className="text-emerald-500">{seatsLeft} Slots Available</span>
+                          <span className="text-zinc-600">{Math.round((course.enrolledCount / course.totalSeats) * 100)}% Saturation</span>
+                        </div>
+                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-500 shadow-[0_0_8px_#10b981]" style={{ width: `${(course.enrolledCount / course.totalSeats) * 100}%` }} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <Link href={`/enroll/${course._id}`} className="block">
+                      <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-black uppercase tracking-widest h-14 text-sm group">
+                        Authorize Enrollment <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
+                    
+                    <p className="text-[9px] font-mono text-zinc-600 text-center uppercase tracking-widest">
+                      Secure Uplink via Digital Gateway
+                    </p>
                   </div>
-                </div>
+                  
+                  <div className="bg-white/[0.02] p-6 space-y-4 border-t border-white/5">
+                    {[
+                      { icon: Infinity, text: 'Lifetime Auth Grant' },
+                      { icon: Award, text: 'Credential Issuance' },
+                      { icon: ShieldCheck, text: 'Session Logs Archive' },
+                      { icon: MessageCircle, text: 'Comm Channel Access' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+                        <item.icon className="w-3.5 h-3.5 text-emerald-500/50" />
+                        {item.text}
+                      </div>
+                    ))}
+                  </div>
+                </Card>
 
-                <div className="p-6 space-y-4">
-                  <Link
-                    href={`/enroll/${course._id}`}
-                    className="btn btn-laser w-full"
-                  >
-                    Enroll Now
-                  </Link>
-
-                  <p className="text-xs text-gray-500 text-center">
-                    Secure payment via PhonePe
-                  </p>
-                </div>
-
-                <div className="p-6 border-t border-white/10">
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Duration</span>
-                      <span className="text-white">{course.duration}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Schedule</span>
-                      <span className="text-white">{course.schedule}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Category</span>
-                      <span className="text-white">{course.category}</span>
-                    </div>
+                {/* Support Terminal */}
+                <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-xl space-y-4">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Support Terminal</div>
+                  <div className="space-y-2">
+                    <a href={`mailto:${course.supportEmail || 'support@dblanks.site'}`} className="flex items-center gap-3 text-xs font-mono text-zinc-300 hover:text-emerald-400 transition-colors uppercase">
+                      <Mail className="w-4 h-4" /> {course.supportEmail || 'support@dblanks.site'}
+                    </a>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <Footer />
+      <Footer2 />
     </main>
   );
 }

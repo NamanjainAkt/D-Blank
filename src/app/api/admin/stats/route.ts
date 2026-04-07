@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
 import { Course } from '@/models/Course';
+import { Game } from '@/models/Game';
+import { Enroller } from '@/models/Enroller';
 import { authOptions } from '@/lib/auth';
 
 export async function GET(request: Request) {
@@ -28,6 +30,10 @@ export async function GET(request: Request) {
       createdAt: { $gte: today, $lt: tomorrow },
     });
 
+    const todayEnrollers = await Enroller.countDocuments({
+      createdAt: { $gte: today, $lt: tomorrow },
+    });
+
     const todayRevenue = await Enrollment.aggregate([
       {
         $match: {
@@ -44,8 +50,10 @@ export async function GET(request: Request) {
     ]);
 
     // Overall stats
-    const totalStudents = await Enrollment.countDocuments();
+    const totalEnrollments = await Enrollment.countDocuments();
+    const totalEnrollers = await Enroller.countDocuments();
     const totalCourses = await Course.countDocuments({ isPublished: true });
+    const totalGames = await Game.countDocuments({ isPublished: true });
 
     const revenueData = await Enrollment.aggregate([
       { $match: { paymentStatus: 'paid' } },
@@ -74,6 +82,9 @@ export async function GET(request: Request) {
       .sort({ createdAt: -1 })
       .limit(10);
 
+    // Recent games
+    const recentGames = await Game.find().sort({ createdAt: -1 }).limit(5);
+
     // Enrollment trend (last 30 days)
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -98,11 +109,14 @@ export async function GET(request: Request) {
     return NextResponse.json({
       today: {
         enrollments: todayEnrollments,
+        enrollers: todayEnrollers,
         revenue: todayRevenue[0]?.total || 0,
       },
       overall: {
-        totalStudents,
+        totalEnrollments,
+        totalEnrollers,
         totalCourses,
+        totalGames,
         totalRevenue: revenueData[0]?.total || 0,
         totalPaid: revenueData[0]?.count || 0,
       },
@@ -111,6 +125,7 @@ export async function GET(request: Request) {
         return acc;
       }, {}),
       recentEnrollments,
+      recentGames,
       enrollmentTrend,
       courseSaturation: courses.map((c: any) => ({
         name: c.title,

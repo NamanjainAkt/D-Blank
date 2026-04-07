@@ -4,97 +4,100 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
+import Footer2 from "@/components/Footer2";
+import { CheckCircle2, ShieldCheck, ArrowRight, MessageCircle, Mail, Terminal, Cpu, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
-  const enrollmentId = searchParams.get('id') || searchParams.get('enrollmentId');
-  const isBypass = searchParams.get('bypass') === 'true';
+  const enrollmentId = searchParams.get('enrollmentId');
+  const transactionId = searchParams.get('transactionId');
+  const isBypass = process.env.NEXT_PUBLIC_BYPASS_PAYMENT === 'true';
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-black text-white">
       <Navbar />
 
-      <div className="pt-24 pb-16 px-8">
-        <div className="max-w-lg mx-auto">
-          <div className="bg-zinc-900/50 border border-white/10 rounded-2xl overflow-hidden hover:border-laser-cyan/20 transition-colors backdrop-blur-sm">
-            {/* Test Mode Banner */}
-            {isBypass && (
-              <div className="bg-laser-cyan/10 border-b border-laser-cyan/20 px-6 py-3 text-center">
-                <span className="text-laser-cyan text-[10px] font-mono uppercase tracking-widest flex items-center justify-center gap-2">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                  </svg>
-                  TEST MODE - Simulated Enrollment
-                </span>
-              </div>
-            )}
-
-            {/* Success Line */}
-            <div className="h-0.5 bg-gradient-to-r from-laser-cyan via-neon-purple to-laser-cyan bg-[length:200%_100%] animate-shimmer" />
-
-            <div className="p-12 text-center">
+      <div className="pt-32 pb-20 px-4 flex flex-col items-center justify-center min-h-[80vh]">
+        <div className="max-w-2xl w-full">
+          <div className="bg-zinc-900 border border-emerald-500/20 overflow-hidden relative group">
+            {/* Top Glow */}
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent shadow-[0_0_15px_#10b981]" />
+            
+            <div className="p-8 md:p-12 text-center space-y-8">
               {/* Success Icon */}
-              <div className="w-20 h-20 mx-auto mb-7 rounded-full bg-laser-cyan/10 border border-laser-cyan/30 flex items-center justify-center animate-scale-in shadow-[0_0_40px_rgba(0,240,255,0.3)]">
-                <svg className="w-10 h-10 text-laser-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full animate-pulse" />
+                <div className="relative w-20 h-20 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                </div>
               </div>
 
-              <h1 className="text-3xl font-display font-bold tracking-tight mb-3 text-white">
-                Enrollment Confirmed!
-              </h1>
+              <div className="space-y-2">
+                <h1 className="text-4xl font-black uppercase tracking-tighter italic">Mission Authorized</h1>
+                <p className="text-[10px] font-mono text-emerald-500 uppercase tracking-[0.3em]">// System access granted successfully</p>
+              </div>
 
-              <p className="text-gray-400 leading-relaxed mb-8">
-                {isBypass
-                  ? 'Test enrollment was successful. In production, payment would have been processed.'
-                  : 'Your enrollment has been successfully processed. Check your email for course details, schedule, and Google Meet link.'
-                }
+              <p className="text-zinc-400 font-mono text-sm leading-relaxed uppercase">
+                Your authorization protocol is complete. The training modules are now active for your unique signature.
               </p>
 
-              {/* Enrollment ID */}
-              {enrollmentId && (
-                <div className="bg-zinc-800/50 border border-white/10 rounded-lg p-4 mb-8">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-gray-500 mb-1">
-                    Enrollment ID
-                  </div>
-                  <div className="font-mono text-lg text-white">{enrollmentId}</div>
+              {/* Transaction Grid */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-4 bg-black/40 border border-white/5 text-left space-y-1">
+                  <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest">Enrollment ID</div>
+                  <div className="text-[11px] font-mono text-emerald-500 uppercase truncate">{enrollmentId}</div>
                 </div>
-              )}
+                <div className="p-4 bg-black/40 border border-white/5 text-left space-y-1">
+                  <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest">Transaction ID</div>
+                  <div className="text-[11px] font-mono text-emerald-500 uppercase truncate">{transactionId || 'SIMULATED_UPLINK'}</div>
+                </div>
+              </div>
 
-              {/* Checklist */}
-              <div className="text-left space-y-3.5 mb-8">
-                {(isBypass ? [
-                  { text: 'Test enrollment created in database' },
-                  { text: 'Simulated payment recorded' },
-                  { text: 'Ready for production with PhonePe' },
-                ] : [
-                  { text: 'Check your email for course details' },
-                  { text: 'Join the WhatsApp group (check email)' },
-                  { text: 'Attend your first session on Google Meet' },
-                ]).map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-laser-cyan/10 border border-laser-cyan/30 flex items-center justify-center text-[10px] text-laser-cyan flex-shrink-0 mt-0.5">
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className="text-sm text-gray-400 font-mono">{item.text}</span>
+              {/* Next Steps */}
+              <div className="space-y-4 text-left border-t border-white/5 pt-8">
+                <h3 className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-4">Post-Authorization Protocol:</h3>
+                {[
+                  { icon: Mail, text: 'Check your comms terminal (email) for authorization keys.' },
+                  { icon: MessageCircle, text: 'Join the private operator group on WhatsApp.' },
+                  { icon: Terminal, text: 'Attend your first tactical session via the Meet Link.' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4 p-3 bg-white/[0.02] border border-white/5">
+                    <item.icon className="w-4 h-4 text-emerald-500/50" />
+                    <span className="text-[10px] font-mono text-zinc-300 uppercase tracking-wider">{item.text}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="flex flex-col gap-3">
-                <Link href="/courses" className="btn btn-laser w-full">
-                  Browse More Courses
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Link href="/courses" className="flex-1">
+                  <Button className="w-full bg-white text-black font-black uppercase tracking-widest h-12 text-[10px]">
+                    Explore More Grid
+                  </Button>
                 </Link>
-                <Link href="/" className="w-full px-6 py-3.5 text-sm font-display font-medium text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl flex items-center justify-center transition-all">
-                  Back to Home
+                <Link href="/" className="flex-1">
+                  <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 text-zinc-400 font-black uppercase tracking-widest h-12 text-[10px]">
+                    Return to Hub
+                  </Button>
                 </Link>
               </div>
+            </div>
+
+            {/* Bottom Status */}
+            <div className="bg-emerald-500/5 border-t border-white/5 px-8 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                <span className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest">Authorized by D-Blanks Core</span>
+              </div>
+              <span className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest">Secure Uplink: Stable</span>
             </div>
           </div>
         </div>
       </div>
+
+      <Footer />
+      <Footer2 />
     </main>
   );
 }
@@ -102,15 +105,10 @@ function SuccessContent() {
 export default function PaymentSuccessPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-black flex items-center justify-center">
-        <div className="flex items-center gap-3 text-gray-500">
-          <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-          Loading...
-        </div>
-      </main>
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Decrypting Transaction...</span>
+      </div>
     }>
       <SuccessContent />
     </Suspense>
