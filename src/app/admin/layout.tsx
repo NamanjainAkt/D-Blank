@@ -19,9 +19,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const titleMap: Record<string, string> = {
       '/admin': 'Dashboard',
       '/admin/dashboard': 'Dashboard',
-      '/admin/students': 'Students',
-      '/admin/courses': 'Courses',
       '/admin/enrollments': 'Enrollments',
+      '/admin/courses': 'Courses',
       '/admin/analytics': 'Analytics',
     };
     const title = titleMap[pathname] || 'Admin';
@@ -54,9 +53,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const titleMap: Record<string, string> = {
     '/admin': 'Dashboard',
     '/admin/dashboard': 'Dashboard',
-    '/admin/students': 'Students',
-    '/admin/courses': 'Courses',
     '/admin/enrollments': 'Enrollments',
+    '/admin/courses': 'Courses',
     '/admin/analytics': 'Analytics',
   };
   const pageTitle = titleMap[pathname] || 'Admin';

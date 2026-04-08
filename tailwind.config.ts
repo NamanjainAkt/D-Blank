@@ -50,10 +50,10 @@ const config: Config = {
   			carbon: '#1a1a1a',
   			ash: '#222222',
   			slate: '#333333',
-  			'neon-purple': '#B026FF',
-  			'cyber-pink': '#FF007F',
-  			'laser-cyan': '#00F0FF',
-  			'acid-green': '#39FF14',
+  			'neon-purple': '#7c3aed',
+  			'cyber-pink': '#c026d3',
+  			'laser-cyan': '#06b6d4',
+  			'acid-green': '#10b981',
   			'neon-yellow': '#FFF700',
   			emerald: '#10b981',
   			'emerald-dim': 'rgba(16,185,129,0.12)',
@@ -84,12 +84,12 @@ const config: Config = {
   		backgroundImage: {
   			'emerald-gradient': 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
   			'emerald-dark-gradient': 'linear-gradient(135deg, #059669 0%, #0d9488 100%)',
-  			'cyber-gradient': 'linear-gradient(135deg, #B026FF 0%, #FF007F 100%)',
-  			'laser-gradient': 'linear-gradient(135deg, #00F0FF 0%, #B026FF 100%)',
+  			'cyber-gradient': 'linear-gradient(135deg, #7c3aed 0%, #c026d3 100%)',
+  			'laser-gradient': 'linear-gradient(135deg, #06b6d4 0%, #7c3aed 100%)',
   			'dark-gradient': 'linear-gradient(135deg, #000000 0%, #050505 50%, #0a1a15 100%)',
   			'radial-emerald': 'radial-gradient(ellipse at center, rgba(16,185,129,0.15) 0%, transparent 70%)',
   			'radial-teal': 'radial-gradient(ellipse at center, rgba(20,184,166,0.1) 0%, transparent 70%)',
-  			'radial-cyber': 'radial-gradient(ellipse at center, rgba(176,38,255,0.15) 0%, transparent 70%)'
+  			'radial-cyber': 'radial-gradient(ellipse at center, rgba(124,58,237,0.15) 0%, transparent 70%)'
   		},
   		spacing: {
   			'8': '8px',
@@ -171,10 +171,10 @@ const config: Config = {
   			},
   			neonPulse: {
   				'from': {
-  					boxShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #B026FF, 0 0 20px #B026FF'
+  					boxShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #7c3aed, 0 0 20px #7c3aed'
   				},
   				'to': {
-  					boxShadow: '0 0 10px #fff, 0 0 20px #fff, 0 0 30px #FF007F, 0 0 40px #FF007F'
+  					boxShadow: '0 0 10px #fff, 0 0 20px #fff, 0 0 30px #c026d3, 0 0 40px #c026d3'
   				}
   			},
   			fadeUp: {

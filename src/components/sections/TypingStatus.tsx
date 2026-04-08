@@ -56,12 +56,12 @@ export default function TypingStatus() {
   return (
     <div ref={containerRef} className="flex items-center gap-3">
       <div className="relative flex items-center justify-center">
-        <div className="absolute w-2 h-2 rounded-full bg-violet-500/30 animate-ping" />
-        <div className="w-2 h-2 rounded-full bg-violet-600" />
+        <div className="absolute w-2 h-2 rounded-full bg-primary/30 animate-ping" />
+        <div className="w-2 h-2 rounded-full bg-primary" />
       </div>
       <p className="text-[10px] font-mono text-zinc-500 tracking-wider">
-        <span className="text-violet-400 opacity-50">&gt;</span> {text}
-        <span className="inline-block w-1.5 h-3 ml-1 bg-violet-500/50 animate-pulse align-middle" />
+        <span className="text-primary opacity-50">&gt;</span> {text}
+        <span className="inline-block w-1.5 h-3 ml-1 bg-primary/50 animate-pulse align-middle" />
       </p>
     </div>
   );

@@ -1,7 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 interface Particle {
   id: number;
@@ -11,6 +10,7 @@ interface Particle {
   opacity: number;
   duration: number;
   delay: number;
+  drift: number;
 }
 
 interface ParticleFieldProps {
@@ -20,16 +20,14 @@ interface ParticleFieldProps {
 }
 
 export function ParticleField({
-  particleCount = 50,
+  particleCount = 20,
   className = '',
   color = 'rgba(16, 185, 129, 0.3)'
 }: ParticleFieldProps) {
-  const [particles, setParticles] = useState<Particle[]>([]);
-
-  useEffect(() => {
-    const newParticles: Particle[] = [];
+  const particles = useMemo<Particle[]>(() => {
+    const arr: Particle[] = [];
     for (let i = 0; i < particleCount; i++) {
-      newParticles.push({
+      arr.push({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
@@ -37,35 +35,34 @@ export function ParticleField({
         opacity: Math.random() * 0.5 + 0.1,
         duration: Math.random() * 10 + 10,
         delay: Math.random() * 5,
+        drift: Math.random() * 50 - 25,
       });
     }
-    setParticles(newParticles);
+    return arr;
   }, [particleCount]);
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
-      {particles.map((particle) => (
-        <motion.div
-          key={particle.id}
+      <style>{`
+        @keyframes particle-float {
+          0%, 100% { transform: translate(0, 0); opacity: var(--p-opacity); }
+          50% { transform: translate(var(--p-drift), -100px); opacity: calc(var(--p-opacity) * 0.3); }
+        }
+      `}</style>
+      {particles.map((p) => (
+        <div
+          key={p.id}
           className="absolute rounded-full"
           style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
             backgroundColor: color,
-            opacity: particle.opacity,
-          }}
-          animate={{
-            y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
-            opacity: [particle.opacity, particle.opacity * 0.3, particle.opacity],
-          }}
-          transition={{
-            duration: particle.duration,
-            delay: particle.delay,
-            repeat: Infinity,
-            ease: "linear",
+            ['--p-opacity' as string]: p.opacity,
+            ['--p-drift' as string]: `${p.drift}px`,
+            animation: `particle-float ${p.duration}s ${p.delay}s linear infinite`,
+            opacity: p.opacity,
           }}
         />
       ))}

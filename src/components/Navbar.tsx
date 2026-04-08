@@ -57,7 +57,7 @@ export function Navbar() {
       <div className={cn(
         'absolute top-0 left-0 right-0 h-px transition-all duration-500',
         isScrolled ? 'opacity-100' : 'opacity-0',
-        'bg-gradient-to-r from-transparent via-violet-500/40 to-transparent'
+        'bg-gradient-to-r from-transparent via-primary/40 to-transparent'
       )} />
 
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
@@ -86,8 +86,8 @@ export function Navbar() {
                   {/* Active indicator */}
                   {active && (
                     <>
-                      <span className="absolute bottom-0.5 left-3 right-3 h-px bg-gradient-to-r from-transparent via-violet-400 to-transparent" />
-                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-6 h-px bg-violet-400 blur-[2px]" />
+                      <span className="absolute bottom-0.5 left-3 right-3 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-6 h-px bg-primary blur-[2px]" />
                     </>
                   )}
 
@@ -134,15 +134,15 @@ export function Navbar() {
                         className={cn(
                           'flex items-center gap-3 px-3.5 py-3 text-[11px] font-display tracking-[0.15em] transition-all duration-200',
                           active
-                            ? 'text-violet-400'
+                            ? 'text-primary'
                             : 'text-zinc-500 hover:text-zinc-200'
                         )}
                       >
                         {Icon && (
-                          <Icon className={cn('w-4 h-4 shrink-0', active ? 'text-violet-400' : 'text-zinc-600')} />
+                          <Icon className={cn('w-4 h-4 shrink-0', active ? 'text-primary' : 'text-zinc-600')} />
                         )}
                         <span className="flex-1">{item.label}</span>
-                        {active && <span className="w-1.5 h-1.5 bg-violet-400 shrink-0" />}
+                        {active && <span className="w-1.5 h-1.5 bg-primary shrink-0" />}
                       </Link>
                     );
                   })}

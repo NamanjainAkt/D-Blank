@@ -4,7 +4,25 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 
-export const CrystalButton = ({ href, className }: { href?: string, className?: string }) => {
+export const CrystalButton = ({ 
+  href, 
+  className, 
+  primaryText = "Explore Games", 
+  secondaryText = "Let's Play!" 
+}: { 
+  href?: string, 
+  className?: string, 
+  primaryText?: string, 
+  secondaryText?: string 
+}) => {
+  const renderText = (text: string) => {
+    return text.split('').map((char, i) => (
+      <span key={i} style={{ '--i': i + 1 } as React.CSSProperties}>
+        <span>{char === ' ' ? '\u00A0' : char}</span>
+      </span>
+    ));
+  };
+
   const content = (
     <StyledWrapper className={className}>
       <div>
@@ -12,6 +30,7 @@ export const CrystalButton = ({ href, className }: { href?: string, className?: 
           <input type="checkbox" />
           <div className="area-button">
             <svg width={423} height={274} viewBox="0 0 423 274" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              {/* ... paths remain the same ... */}
               <path d="M93.3368 136.663C49.6104 128.127 30.5087 134.168 2.08112 145.122" strokeLinecap="round" />
               <path d="M94.6914 170.451C55.042 190.819 43.7361 207.401 28.1198 233.623" strokeLinecap="round" />
               <path d="M147.365 181.074C124.487 219.412 123.652 239.483 124.252 270.021" strokeLinecap="round" />
@@ -25,9 +44,10 @@ export const CrystalButton = ({ href, className }: { href?: string, className?: 
               <path d="M150.289 93.3922C136.331 50.9621 121.736 37.204 98.3089 17.6894" strokeLinecap="round" />
               <path d="M93.6422 104.665C66.4898 69.244 48.1828 61.0955 19.6421 50.4414" strokeLinecap="round" />
             </svg>
-            <button className="button">
+            <button className="button" type="button">
               <div className="wrap">
                 <span className="particles">
+                  {/* ... particles remain the same ... */}
                   <span className="particle" style={{ '--a': '-45deg', '--x': '53%', '--y': '15%', '--d': '4em', '--f': '0.7', '--t': '0.15' } as React.CSSProperties} />
                   <span className="particle" style={{ '--a': '150deg', '--x': '40%', '--y': '70%', '--d': '7.5em', '--f': '0.8', '--t': '0.08' } as React.CSSProperties} />
                   <span className="particle" style={{ '--a': '10deg', '--x': '90%', '--y': '65%', '--d': '7em', '--f': '0.6', '--t': '0.25' } as React.CSSProperties} />
@@ -47,32 +67,12 @@ export const CrystalButton = ({ href, className }: { href?: string, className?: 
                 <div className="outline">
                   <div className="rainbow" />
                 </div>
-                <div className="text">
+                <div className="text px-4">
                   <p className="state-1">
-                    <span style={{ '--i': 1 } as React.CSSProperties}><span>E</span></span>
-                    <span style={{ '--i': 2 } as React.CSSProperties}><span>x</span></span>
-                    <span style={{ '--i': 3 } as React.CSSProperties}><span>p</span></span>
-                    <span style={{ '--i': 4 } as React.CSSProperties}><span>l</span></span>
-                    <span style={{ '--i': 5 } as React.CSSProperties}><span>o</span></span>
-                    <span style={{ '--i': 6 } as React.CSSProperties}><span>r</span></span>
-                    <span style={{ '--i': 7 } as React.CSSProperties}><span>e</span></span>
-                    <span style={{ '--i': 8 } as React.CSSProperties}><span>G</span></span>
-                    <span style={{ '--i': 9 } as React.CSSProperties}><span>a</span></span>
-                    <span style={{ '--i': 10 } as React.CSSProperties}><span>m</span></span>
-                    <span style={{ '--i': 11 } as React.CSSProperties}><span>e</span></span>
-                    <span style={{ '--i': 12 } as React.CSSProperties}><span>s</span></span>
+                    {renderText(primaryText)}
                   </p>
                   <p className="state-2">
-                    <span style={{ '--i': 1 } as React.CSSProperties}><span>L</span></span>
-                    <span style={{ '--i': 2 } as React.CSSProperties}><span>e</span></span>
-                    <span style={{ '--i': 3 } as React.CSSProperties}><span>t</span></span>
-                    <span style={{ '--i': 4 } as React.CSSProperties}><span>'</span></span>
-                    <span style={{ '--i': 5 } as React.CSSProperties}><span>s</span></span>
-                    <span style={{ '--i': 6 } as React.CSSProperties}><span>P</span></span>
-                    <span style={{ '--i': 7 } as React.CSSProperties}><span>l</span></span>
-                    <span style={{ '--i': 8 } as React.CSSProperties}><span>a</span></span>
-                    <span style={{ '--i': 9 } as React.CSSProperties}><span>y</span></span>
-                    <span style={{ '--i': 9 } as React.CSSProperties}><span>!</span></span>
+                    {renderText(secondaryText)}
                   </p>
                 </div>
                 <div className="liquid">
@@ -84,6 +84,8 @@ export const CrystalButton = ({ href, className }: { href?: string, className?: 
           </div>
         </label>
         <svg className="svg-turbulence" aria-hidden="true" width={0} height={0}>
+          {/* ... filters remain the same ... */}
+
           <defs>
             <filter id="turbulent-displace-0" colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="260px" height="520px">
               <feTurbulence type="turbulence" baseFrequency="0.020" numOctaves={9} seed={1} result="n1" />

@@ -77,7 +77,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 text-center">
       <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tighter">{error || 'Transmission Lost'}</h2>
       <Link href="/courses">
-        <Button className="bg-emerald-600 hover:bg-emerald-500 text-black font-black uppercase tracking-widest">Return to Grid</Button>
+        <Button className="bg-primary hover:bg-primary text-white font-black uppercase tracking-widest border border-primary/50">Return to Grid</Button>
       </Link>
     </div>
   );
@@ -91,14 +91,14 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/20 via-black to-black" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] -mr-64 -mt-64" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-black to-black" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] -mr-64 -mt-64" />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-mono uppercase tracking-widest px-3 py-1">
+                <Badge className="bg-accent/10 text-accent border-accent/20 text-[10px] font-mono uppercase tracking-widest px-3 py-1">
                   {course.category}
                 </Badge>
                 <Badge variant="outline" className="text-zinc-500 border-zinc-800 text-[10px] font-mono uppercase tracking-widest px-3 py-1">
@@ -116,22 +116,22 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
 
               <div className="flex flex-wrap gap-6 pt-4">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-emerald-500" />
+                  <Clock className="w-4 h-4 text-primary" />
                   <span className="text-xs font-mono text-zinc-300 uppercase tracking-widest">{course.duration}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-emerald-500" />
+                  <Users className="w-4 h-4 text-primary" />
                   <span className="text-xs font-mono text-zinc-300 uppercase tracking-widest">{course.enrolledCount} Active Operators</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Video className="w-4 h-4 text-emerald-500" />
+                  <Video className="w-4 h-4 text-primary" />
                   <span className="text-xs font-mono text-zinc-300 uppercase tracking-widest">{course.language}</span>
                 </div>
               </div>
             </div>
 
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-violet-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-accent to-primary rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden border border-white/10">
                 {embedUrl ? (
                   <iframe src={embedUrl} className="w-full h-full" allowFullScreen />
@@ -154,7 +154,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               {/* Mission Briefing */}
               <div className="space-y-6">
                 <h2 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
-                  <Info className="w-6 h-6 text-emerald-500" /> Mission Briefing
+                  <Info className="w-6 h-6 text-primary" /> Mission Briefing
                 </h2>
                 <div className="prose prose-invert max-w-none">
                   <p className="text-zinc-400 leading-relaxed whitespace-pre-wrap font-mono text-[13px] uppercase tracking-tight">
@@ -167,12 +167,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               {course.learningOutcomes?.length > 0 && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
-                    <Award className="w-6 h-6 text-emerald-500" /> Tactical Gains (Outcomes)
+                    <Award className="w-6 h-6 text-accent" /> Tactical Gains (Outcomes)
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {course.learningOutcomes.map((item: string, i: number) => (
-                      <div key={i} className="flex gap-3 p-4 bg-zinc-900/50 border border-white/5 rounded-lg group hover:border-emerald-500/30 transition-colors">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                      <div key={i} className="flex gap-3 p-4 bg-zinc-900/50 border border-white/5 rounded-lg group hover:border-accent/30 transition-colors">
+                        <CheckCircle2 className="w-5 h-5 text-accent flex-shrink-0" />
                         <span className="text-xs font-mono text-zinc-300 uppercase tracking-tight leading-normal">{item}</span>
                       </div>
                     ))}
@@ -184,22 +184,22 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               {course.curriculum?.length > 0 && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
-                    <BookOpen className="w-6 h-6 text-emerald-500" /> Syllabus Matrix
+                    <BookOpen className="w-6 h-6 text-primary" /> Syllabus Matrix
                   </h2>
                   <Accordion type="single" collapsible className="w-full space-y-3">
                     {course.curriculum.map((module: any, i: number) => (
                       <AccordionItem key={i} value={`module-${i}`} className="border border-white/5 bg-zinc-900/30 rounded-lg px-4 overflow-hidden">
                         <AccordionTrigger className="hover:no-underline py-4 text-xs font-mono uppercase tracking-widest text-zinc-300">
                           <div className="flex items-center gap-4 text-left">
-                            <span className="text-emerald-500 font-black">{String(i+1).padStart(2, '0')}</span>
+                            <span className="text-primary font-black">{String(i+1).padStart(2, '0')}</span>
                             <span>{module.title}</span>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="pb-4 pt-2">
-                          <ul className="space-y-3 pl-10 border-l border-emerald-500/20 ml-2.5">
+                          <ul className="space-y-3 pl-10 border-l border-primary/20 ml-2.5">
                             {module.lessons.map((lesson: string, li: number) => (
                               <li key={li} className="flex items-center gap-3 text-[11px] font-mono text-zinc-500 uppercase tracking-tight group">
-                                <div className="w-1.5 h-1.5 rounded-full bg-zinc-800 group-hover:bg-emerald-500 transition-colors" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-zinc-800 group-hover:bg-primary transition-colors" />
                                 {lesson}
                               </li>
                             ))}
@@ -216,12 +216,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 {course.prerequisites?.length > 0 && (
                   <div className="space-y-6">
                     <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
-                      <ShieldCheck className="w-5 h-5 text-emerald-500" /> Pre-Flight Requirements
+                      <ShieldCheck className="w-5 h-5 text-accent" /> Pre-Flight Requirements
                     </h3>
                     <ul className="space-y-2">
                       {course.prerequisites.map((p: string, i: number) => (
                         <li key={i} className="flex items-center gap-3 text-[11px] font-mono text-zinc-400 uppercase">
-                          <ChevronRight className="w-3 h-3 text-emerald-500" /> {p}
+                          <ChevronRight className="w-3 h-3 text-accent" /> {p}
                         </li>
                       ))}
                     </ul>
@@ -230,12 +230,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 {course.softwareRequired?.length > 0 && (
                   <div className="space-y-6">
                     <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
-                      <Code className="w-5 h-5 text-emerald-500" /> Hardware/Software
+                      <Code className="w-5 h-5 text-primary" /> Hardware/Software
                     </h3>
                     <ul className="space-y-2">
                       {course.softwareRequired.map((s: string, i: number) => (
                         <li key={i} className="flex items-center gap-3 text-[11px] font-mono text-zinc-400 uppercase">
-                          <div className="w-1 h-1 bg-emerald-500 rounded-full" /> {s}
+                          <div className="w-1 h-1 bg-primary rounded-full" /> {s}
                         </li>
                       ))}
                     </ul>
@@ -247,7 +247,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
             {/* Right Column: Enrollment Card */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
-                <Card className="bg-zinc-900 border-emerald-500/20 overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+                <Card className="bg-zinc-900 border-primary/20 overflow-hidden shadow-[0_0_30px_rgba(176,38,255,0.05)]">
                   <div className="p-6 space-y-6">
                     <div className="space-y-2">
                       <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500">Operation Cost</div>
@@ -258,7 +258,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                         )}
                       </div>
                       {course.originalPrice > course.price && (
-                        <Badge className="bg-emerald-500 text-black font-black text-[10px] px-2 py-0">
+                        <Badge className="bg-primary text-white font-black text-[10px] px-2 py-0">
                           -{Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}% EFFICIENCY GAIN
                         </Badge>
                       )}
@@ -275,17 +275,17 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                       </div>
                       <div className="space-y-2 pt-2">
                         <div className="flex justify-between text-[10px] font-mono uppercase">
-                          <span className="text-emerald-500">{seatsLeft} Slots Available</span>
+                          <span className="text-accent">{seatsLeft} Slots Available</span>
                           <span className="text-zinc-600">{Math.round((course.enrolledCount / course.totalSeats) * 100)}% Saturation</span>
                         </div>
                         <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-emerald-500 shadow-[0_0_8px_#10b981]" style={{ width: `${(course.enrolledCount / course.totalSeats) * 100}%` }} />
+                          <div className="h-full bg-accent shadow-[0_0_8px_#d946ef]" style={{ width: `${(course.enrolledCount / course.totalSeats) * 100}%` }} />
                         </div>
                       </div>
                     </div>
 
                     <Link href={`/enroll/${course._id}`} className="block">
-                      <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-black uppercase tracking-widest h-14 text-sm group">
+                      <Button className="w-full bg-primary hover:bg-primary text-white font-black uppercase tracking-widest h-14 text-sm group shadow-[0_0_15px_rgba(176,38,255,0.4)]">
                         Authorize Enrollment <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
@@ -303,7 +303,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                       { icon: MessageCircle, text: 'Comm Channel Access' },
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-3 text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
-                        <item.icon className="w-3.5 h-3.5 text-emerald-500/50" />
+                        <item.icon className="w-3.5 h-3.5 text-primary/50" />
                         {item.text}
                       </div>
                     ))}
@@ -314,7 +314,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-xl space-y-4">
                   <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Support Terminal</div>
                   <div className="space-y-2">
-                    <a href={`mailto:${course.supportEmail || 'support@dblanks.site'}`} className="flex items-center gap-3 text-xs font-mono text-zinc-300 hover:text-emerald-400 transition-colors uppercase">
+                    <a href={`mailto:${course.supportEmail || 'support@dblanks.site'}`} className="flex items-center gap-3 text-xs font-mono text-zinc-300 hover:text-cyan-400 transition-colors uppercase">
                       <Mail className="w-4 h-4" /> {course.supportEmail || 'support@dblanks.site'}
                     </a>
                   </div>

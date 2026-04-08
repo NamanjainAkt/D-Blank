@@ -72,7 +72,7 @@ export default function GradientHeading({
       <br className="md:hidden" />
       <span
         ref={highlightRef}
-        className={`inline-block bg-gradient-to-br from-violet-400 via-fuchsia-300 to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)] ${highlightClassName}`}
+        className={`inline-block bg-gradient-to-br from-primary via-accent to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)] ${highlightClassName}`}
       >
         {highlight}
       </span>

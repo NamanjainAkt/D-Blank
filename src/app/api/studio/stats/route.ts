@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
-import { Enroller } from '@/models/Enroller';
+import { Student } from '@/models/Student';
 import { Game } from '@/models/Game';
 
 export async function GET() {
@@ -22,14 +22,14 @@ export async function GET() {
       paymentStatus: 'paid'
     });
 
-    // Total enrollers (students who enrolled in courses)
-    const totalEnrollers = await Enroller.countDocuments();
+    // Total students
+    const totalStudents = await Student.countDocuments();
 
     return NextResponse.json({
       totalGames,
       featuredGames,
       totalEnrollments,
-      totalEnrollers
+      totalStudents
     });
   } catch (error) {
     console.error('Error fetching studio stats:', error);

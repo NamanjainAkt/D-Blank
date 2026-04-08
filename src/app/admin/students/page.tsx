@@ -1,186 +1,82 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { format } from 'date-fns';
-import { formatCurrency, cn } from '@/lib/utils';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Download, Search, ChevronLeft, ChevronRight, Eye, AlertCircle, Loader2 } from 'lucide-react';
-
-interface Student {
-  _id: string;
-  enrollmentId: string;
-  studentName: string;
-  email: string;
-  phone: string;
-  collegeName: string;
-  branch: string;
-  semester: string;
-  rollNumber: string;
-  city: string;
-  courseId?: { title: string };
-  courseName: string;
-  paymentStatus: 'paid' | 'pending' | 'failed';
-  paymentAmount: number;
-  enrollmentStatus: string;
-  createdAt: string;
-}
-
-interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  pages: number;
-}
+  UserCheck, 
+  Search, 
+  Mail, 
+  Phone, 
+  School, 
+  MapPin, 
+  BookOpen, 
+  Calendar, 
+  ChevronRight, 
+  Loader2,
+  AlertCircle,
+  BarChart3,
+  CreditCard
+} from 'lucide-react';
+import { cn, formatDate, formatCurrency } from '@/lib/utils';
 
 export default function AdminStudentsPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  
-  const [students, setStudents] = useState<Student[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, pages: 0 });
+  const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [statusFilter, setStatusFilter] = useState(() => {
-    const status = searchParams.get('status');
-    return status === '' || status === null ? 'all' : status;
-  });
-  
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [search, setSearch] = useState('');
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [studentDetails, setStudentDetails] = useState<any>(null);
 
-  // Check if "all" is selected (either explicitly or when value is empty)
-  const isAllStatus = statusFilter === 'all' || statusFilter === '';
-
-  const fetchStudents = useCallback(async (showLoading = true) => {
-    if (showLoading) setLoading(true);
-    setError(null);
+  const fetchStudents = useCallback(async () => {
     try {
-      const params = new URLSearchParams();
-      params.set('page', searchParams.get('page') || '1');
-      params.set('limit', '20');
-      if (search) params.set('search', search);
-      if (statusFilter && statusFilter !== 'all') params.set('paymentStatus', statusFilter);
-
-      const res = await fetch(`/api/admin/students?${params}`);
+      setLoading(true);
+      const res = await fetch(`/api/admin/students?search=${encodeURIComponent(search)}`);
       if (!res.ok) throw new Error('Failed to fetch students');
       const data = await res.json();
       setStudents(data.students || []);
-      setPagination(data.pagination || { page: 1, limit: 20, total: 0, pages: 0 });
     } catch (err) {
       console.error('Error fetching students:', err);
-      setError('Failed to load students. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, searchParams]);
+  }, [search]);
 
-  // Debounced search effect
   useEffect(() => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-    searchTimeoutRef.current = setTimeout(() => {
-      fetchStudents(false);
-    }, 300);
-    
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, [search, statusFilter]);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchStudents();
+    const timer = setTimeout(fetchStudents, 500);
+    return () => clearTimeout(timer);
   }, [fetchStudents]);
 
-  const showSuccess = (message: string) => {
-    setSuccessMessage(message);
-    setTimeout(() => setSuccessMessage(null), 3000);
-  };
-
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    const params = new URLSearchParams();
-    if (value) params.set('search', value);
-    if (statusFilter && statusFilter !== 'all') params.set('paymentStatus', statusFilter);
-    params.set('page', '1');
-    router.push(`/admin/students?${params.toString()}`);
-  };
-
-  const handleStatusFilter = (value: string) => {
-    setStatusFilter(value);
-    const params = new URLSearchParams();
-    if (search) params.set('search', search);
-    if (value && value !== 'all') params.set('paymentStatus', value);
-    params.set('page', '1');
-    router.push(`/admin/students?${params.toString()}`);
-  };
-
-  const handleExport = async () => {
+  const viewDetails = async (id: string) => {
     try {
-      const params = new URLSearchParams();
-      if (search) params.set('search', search);
-      if (statusFilter && statusFilter !== 'all') params.set('paymentStatus', statusFilter);
-
-      const res = await fetch(`/api/admin/export?${params}`);
-      if (!res.ok) throw new Error('Export failed');
-      
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `enrollments-${Date.now()}.csv`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-      showSuccess('Export completed successfully');
+      setDetailLoading(true);
+      setSelectedStudent(id);
+      const res = await fetch(`/api/admin/students/${id}`);
+      if (!res.ok) throw new Error('Failed to fetch details');
+      const data = await res.json();
+      setStudentDetails(data);
     } catch (err) {
-      console.error('Error exporting:', err);
-      setError('Failed to export data. Please try again.');
+      console.error('Error fetching student details:', err);
+    } finally {
+      setDetailLoading(false);
     }
-  };
-
-  const updateEnrollmentStatus = async (studentId: string, status: string) => {
-    try {
-      const res = await fetch(`/api/admin/students/${studentId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enrollmentStatus: status }),
-      });
-      if (!res.ok) throw new Error('Failed to update status');
-      fetchStudents(false);
-      showSuccess('Enrollment status updated');
-    } catch (err) {
-      console.error('Error updating status:', err);
-      setError('Failed to update enrollment status');
-    }
-  };
-
-  const navigateToPage = (page: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('page', String(page));
-    router.push(`/admin/students?${params.toString()}`);
   };
 
   return (
@@ -189,74 +85,46 @@ export default function AdminStudentsPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/5">
         <div>
           <h1 className="text-4xl font-display font-black text-white tracking-tighter uppercase">
-            Personnel <span className="text-laser-cyan shadow-laser-cyan">Database</span>
+            Student <span className="text-acid-green shadow-acid-green">Registry</span>
           </h1>
           <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF]" />
-            Records: {pagination.total} // Authorized Access Only
+            <span className="w-1.5 h-1.5 rounded-full bg-acid-green shadow-[0_0_8px_#39FF14]" />
+            Database Status: {students.length} Unique Entities Detected
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="outline" 
-            onClick={handleExport}
-            size="sm"
-            className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest h-9"
-          >
-            <Download className="w-3.5 h-3.5 mr-2" />
-            Export Archive
-          </Button>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-ink/40 p-4 border border-white/5 backdrop-blur-sm rounded-sm">
-        <div className="md:col-span-2 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-          <Input
-            placeholder="Search by name, email, or enrollment ID..."
+        <div className="relative w-full md:w-80 group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-acid-green transition-colors" />
+          <Input 
+            placeholder="SCAN BY NAME / EMAIL / PHONE..." 
             value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="pl-10 bg-black/40 border-white/5 focus:border-laser-cyan/50 text-sm font-mono placeholder:text-zinc-600 h-10"
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 bg-black/40 border-white/5 focus:border-acid-green/50 text-[10px] font-mono uppercase tracking-widest h-11"
           />
         </div>
-        <div>
-          <Select value={statusFilter} onValueChange={handleStatusFilter}>
-            <SelectTrigger className="bg-black/40 border-white/5 focus:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest h-10">
-              <SelectValue placeholder="Status Filter" />
-            </SelectTrigger>
-            <SelectContent className="bg-ink border-white/5">
-              <SelectItem value="all" className="text-[10px] font-mono uppercase tracking-widest">All Status</SelectItem>
-              <SelectItem value="paid" className="text-[10px] font-mono uppercase tracking-widest">Paid</SelectItem>
-              <SelectItem value="pending" className="text-[10px] font-mono uppercase tracking-widest">Pending</SelectItem>
-              <SelectItem value="failed" className="text-[10px] font-mono uppercase tracking-widest">Failed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main List */}
       <Card className="bg-ink/40 border-white/5 backdrop-blur-sm relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-laser-cyan/50 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-acid-green/50 to-transparent" />
         <CardContent className="p-0">
           <div className="overflow-x-auto custom-scrollbar">
             <Table>
               <TableHeader>
                 <TableRow className="border-white/5 hover:bg-transparent">
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Operator</TableHead>
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">ID / Origin</TableHead>
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Module</TableHead>
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Status</TableHead>
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4 text-right">Action</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4 px-6">Entity Signature</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Communication Uplink</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Origin Hub (College)</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Registered On</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4 text-right px-6">Protocol</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading ? (
+                {loading && students.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="py-20 text-center">
                       <div className="flex flex-col items-center gap-3">
-                        <Loader2 className="w-6 h-6 animate-spin text-laser-cyan" />
-                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500">Retrieving Records...</span>
+                        <Loader2 className="w-6 h-6 animate-spin text-acid-green" />
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500">Scanning Database...</span>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -265,50 +133,48 @@ export default function AdminStudentsPage() {
                     <TableCell colSpan={5} className="py-20 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <AlertCircle className="w-6 h-6 text-zinc-700" />
-                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600">No Records Found</span>
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600">No Entities Found</span>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  students.map((student) => (
-                    <TableRow key={student._id} className="border-white/5 hover:bg-white/[0.02] transition-colors group/row">
-                      <TableCell className="py-5">
+                  students.map((person) => (
+                    <TableRow key={person._id} className="border-white/5 hover:bg-white/[0.02] transition-colors group/row">
+                      <TableCell className="py-5 px-6">
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium text-zinc-200 group-hover/row:text-white transition-colors">{student.studentName}</span>
-                          <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-tight">{student.email}</span>
+                          <span className="text-sm font-medium text-zinc-200 group-hover/row:text-white transition-colors uppercase tracking-tight">{person.name}</span>
+                          <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-tight mt-0.5">ID: {person._id.slice(-8)}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-5">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-zinc-400">
+                            <Mail className="w-3 h-3 text-zinc-600" />
+                            <span className="text-[11px] font-mono lowercase">{person.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-zinc-400">
+                            <Phone className="w-3 h-3 text-zinc-600" />
+                            <span className="text-[11px] font-mono">{person.phone}</span>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="py-5">
                         <div className="flex flex-col">
-                          <span className="text-[11px] font-mono text-zinc-400">{student.enrollmentId}</span>
-                          <span className="text-[9px] font-mono text-zinc-600 uppercase">{student.collegeName}</span>
+                          <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-tight line-clamp-1">{person.collegeName}</span>
+                          <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">{person.branch} // {person.semester} SEM</span>
                         </div>
                       </TableCell>
-                      <TableCell className="py-5">
-                        <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-tighter">
-                          {student.courseId?.title || student.courseName}
-                        </span>
+                      <TableCell className="py-5 font-mono text-[11px] text-zinc-500">
+                        {formatDate(person.createdAt)}
                       </TableCell>
-                      <TableCell className="py-5">
-                        <Badge 
-                          variant="outline"
-                          className={`text-[9px] font-mono uppercase tracking-widest border px-2 py-0.5 ${
-                            student.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                            student.paymentStatus === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                            'bg-red-500/10 text-red-400 border-red-500/20'
-                          }`}
-                        >
-                          {student.paymentStatus}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right py-5">
+                      <TableCell className="text-right py-5 px-6">
                         <Button 
                           variant="outline" 
                           size="sm"
-                          className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 text-laser-cyan transition-all"
-                          onClick={() => router.push(`/admin/students/${student._id}`)}
+                          className="h-9 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green text-[10px] font-mono uppercase tracking-widest"
+                          onClick={() => viewDetails(person._id)}
                         >
-                          <Eye className="w-3.5 h-3.5" />
+                          Access Profile <ChevronRight className="w-3.5 h-3.5 ml-2" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -320,34 +186,149 @@ export default function AdminStudentsPage() {
         </CardContent>
       </Card>
 
-      {/* Pagination */}
-      {pagination.pages > 1 && (
-        <div className="flex items-center justify-between pt-6">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-600">
-            Page {pagination.page} of {pagination.pages}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.page <= 1}
-              onClick={() => navigateToPage(pagination.page - 1)}
-              className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 disabled:opacity-30"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.page >= pagination.pages}
-              onClick={() => navigateToPage(pagination.page + 1)}
-              className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 disabled:opacity-30"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Detail Modal */}
+      <Dialog open={!!selectedStudent} onOpenChange={(open) => !open && setSelectedStudent(null)}>
+        <DialogContent className="bg-ink border-white/5 max-w-3xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+          {detailLoading ? (
+            <div className="py-20 flex flex-col items-center gap-4">
+              <Loader2 className="w-8 h-8 animate-spin text-acid-green" />
+              <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-500">Extracting Profile Data...</span>
+            </div>
+          ) : studentDetails ? (
+            <>
+              <DialogHeader className="border-b border-white/5 pb-6 mb-8">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-full bg-acid-green/10 flex items-center justify-center border border-acid-green/20">
+                    <UserCheck className="w-8 h-8 text-acid-green" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-2xl font-display font-black text-white uppercase tracking-tighter">
+                      {studentDetails.student.name}
+                    </DialogTitle>
+                    <DialogDescription className="text-[10px] font-mono text-acid-green uppercase tracking-widest mt-1">
+                      Entity Profile // Level 01 Operator
+                    </DialogDescription>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                  <div className="p-3 bg-white/5 border border-white/5 rounded">
+                    <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Email Uplink</div>
+                    <div className="text-[10px] font-mono text-zinc-300 break-all">{studentDetails.student.email}</div>
+                  </div>
+                  <div className="p-3 bg-white/5 border border-white/5 rounded">
+                    <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Comm Link</div>
+                    <div className="text-[10px] font-mono text-zinc-300">{studentDetails.student.phone}</div>
+                  </div>
+                  <div className="p-3 bg-white/5 border border-white/5 rounded">
+                    <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Roll Signature</div>
+                    <div className="text-[10px] font-mono text-zinc-300">{studentDetails.student.rollNumber}</div>
+                  </div>
+                  <div className="p-3 bg-white/5 border border-white/5 rounded">
+                    <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Current Year</div>
+                    <div className="text-[10px] font-mono text-zinc-300 uppercase">{studentDetails.student.year} Year</div>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-8">
+                {/* Secondary Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
+                      <School className="w-3 h-3" /> Origin Information
+                    </h4>
+                    <div className="space-y-3 p-4 bg-black/40 border border-white/5 rounded">
+                      <div>
+                        <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">College/Institution</div>
+                        <div className="text-[11px] font-mono text-zinc-300 uppercase tracking-tight">{studentDetails.student.collegeName}</div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Branch</div>
+                          <div className="text-[11px] font-mono text-zinc-300 uppercase tracking-tight">{studentDetails.student.branch}</div>
+                        </div>
+                        <div>
+                          <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Semester</div>
+                          <div className="text-[11px] font-mono text-zinc-300 uppercase tracking-tight">{studentDetails.student.semester} SEM</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                        <MapPin className="w-3 h-3 text-zinc-600" />
+                        <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">{studentDetails.student.city}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
+                      <BarChart3 className="w-3 h-3" /> Intelligence Summary
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-4 bg-black/40 border border-white/5 rounded text-center">
+                        <div className="text-[20px] font-display font-black text-white">{studentDetails.enrollments.length}</div>
+                        <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mt-1">Module Uplinks</div>
+                      </div>
+                      <div className="p-4 bg-black/40 border border-white/5 rounded text-center">
+                        <div className="text-[20px] font-display font-black text-white">
+                          ₹{studentDetails.enrollments.reduce((acc: number, curr: any) => acc + (curr.paymentStatus === 'paid' ? curr.paymentAmount : 0), 0).toLocaleString()}
+                        </div>
+                        <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mt-1">LTV Contribution</div>
+                      </div>
+                      <div className="col-span-2 p-3 bg-white/5 border border-white/5 rounded">
+                        <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Acquisition Channel</div>
+                        <div className="text-[10px] font-mono text-zinc-400 uppercase">{studentDetails.student.referrer || 'Organic Discovery'}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Enrollments History */}
+                <div className="space-y-4 pb-4">
+                  <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
+                    <BookOpen className="w-3 h-3" /> Module Authorization History
+                  </h4>
+                  <div className="space-y-3">
+                    {studentDetails.enrollments.length === 0 ? (
+                      <div className="p-8 text-center border border-white/5 rounded bg-black/20">
+                        <span className="text-[10px] font-mono uppercase text-zinc-700">No active module authorizations found.</span>
+                      </div>
+                    ) : (
+                      studentDetails.enrollments.map((enr: any) => (
+                        <div key={enr._id} className="p-4 bg-black/40 border border-white/5 rounded flex items-center justify-between group hover:border-white/20 transition-all">
+                          <div className="flex items-center gap-4">
+                            <div className={cn(
+                              "w-1 h-8 rounded-full",
+                              enr.paymentStatus === 'paid' ? "bg-acid-green shadow-[0_0_8px_#39FF14]" : "bg-red-500 shadow-[0_0_8px_red]"
+                            )} />
+                            <div>
+                              <div className="text-[12px] font-mono font-bold text-zinc-200 uppercase tracking-tight group-hover:text-white transition-colors">{enr.courseId?.title || enr.courseName}</div>
+                              <div className="flex items-center gap-4 mt-1">
+                                <div className="text-[9px] font-mono text-zinc-600 uppercase flex items-center gap-1">
+                                  <Calendar className="w-2.5 h-2.5" /> {formatDate(enr.createdAt)}
+                                </div>
+                                <div className="text-[9px] font-mono text-zinc-600 uppercase flex items-center gap-1">
+                                  <CreditCard className="w-2.5 h-2.5" /> {formatCurrency(enr.paymentAmount || 0)}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <Badge className={cn(
+                            "text-[8px] font-mono uppercase tracking-widest px-2",
+                            enr.paymentStatus === 'paid' ? "bg-acid-green/10 text-acid-green border-acid-green/20" : "bg-red-500/10 text-red-400 border-red-500/20"
+                          )}>
+                            {enr.paymentStatus}
+                          </Badge>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

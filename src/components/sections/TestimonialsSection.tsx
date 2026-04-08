@@ -6,7 +6,7 @@ import { TestimonialsColumn } from '@/components/ui/TestimonialsColumn';
 import { testimonials } from '@/lib/placeholder-data';
 
 const avatarColors = [
-  'from-violet-600 to-purple-700',
+  'from-primary to-purple-700',
   'from-cyan-600 to-blue-700',
   'from-amber-600 to-orange-700',
   'from-emerald-600 to-green-700',
@@ -17,11 +17,11 @@ const avatarColors = [
 function SectionLabel({ children }: { children: string }) {
   return (
     <div className="flex items-center justify-center gap-3 mb-4">
-      <div className="w-8 h-px bg-gradient-to-r from-transparent to-violet-500" />
-      <span className="text-violet-400 text-[10px] font-display tracking-[0.35em] uppercase">
+      <div className="w-8 h-px bg-gradient-to-r from-transparent to-primary" />
+      <span className="text-primary text-[10px] font-display tracking-[0.35em] uppercase">
         {children}
       </span>
-      <div className="w-8 h-px bg-gradient-to-l from-transparent to-violet-500" />
+      <div className="w-8 h-px bg-gradient-to-l from-transparent to-primary" />
     </div>
   );
 }
@@ -54,7 +54,7 @@ const TestimonialsSection = () => {
         <div ref={headerRef} className="text-center mb-14 opacity-0">
           <SectionLabel>Testimonials</SectionLabel>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
-            What Our <span className="bg-gradient-to-br from-violet-400 via-fuchsia-300 to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]">Community</span> Says
+            What Our <span className="bg-gradient-to-br from-primary via-accent to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]">Community</span> Says
           </h2>
           <p className="text-zinc-500 mt-4 max-w-lg mx-auto text-sm leading-relaxed">
             See what our players and developers have to say about their experience with D-Blanks.

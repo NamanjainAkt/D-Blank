@@ -111,7 +111,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
   useEffect(() => {
     async function fetchStudent() {
       try {
-        const res = await fetch(`/api/admin/students/${resolvedParams.id}`);
+        const res = await fetch(`/api/admin/enrollments/${resolvedParams.id}`);
         const data = await res.json();
         
         if (!res.ok || data.error) {
@@ -142,7 +142,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
     setError(null);
 
     try {
-      const res = await fetch(`/api/admin/students/${student._id}`, {
+      const res = await fetch(`/api/admin/enrollments/${student._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enrollmentStatus: status }),
@@ -221,7 +221,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest">{error}</p>
         <Button 
           variant="outline" 
-          onClick={() => router.push('/admin/students')}
+          onClick={() => router.push('/admin/enrollments')}
           className="border-white/5 bg-white/5 hover:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest"
         >
           Return to Registry
@@ -250,7 +250,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/5">
         <div className="space-y-4">
           <Link 
-            href="/admin/students" 
+            href="/admin/enrollments" 
             className="text-[10px] font-mono text-zinc-600 hover:text-laser-cyan uppercase tracking-[0.2em] transition-colors flex items-center gap-2"
           >
             <span aria-hidden="true">←</span> Back to Registry

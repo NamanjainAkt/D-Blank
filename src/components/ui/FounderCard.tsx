@@ -17,7 +17,7 @@ interface FounderCardProps {
 
 export function FounderCard({ name, role, image, bio, index }: FounderCardProps) {
   return (
-    <Card className="relative rounded-xl overflow-hidden border border-zinc-800/80 hover:border-violet-500/40 transition-all duration-500 group bg-zinc-900/30">
+    <Card className="relative rounded-xl overflow-hidden border border-zinc-800/80 hover:border-primary/40 transition-all duration-500 group bg-zinc-900/30">
       {/* 3:4 Aspect Ratio Image Container */}
       <div className="relative aspect-[3/4] overflow-hidden">
         <Image
@@ -31,7 +31,7 @@ export function FounderCard({ name, role, image, bio, index }: FounderCardProps)
         
         {/* Role chip */}
         <div className="absolute top-4 right-4 z-10">
-          <Badge variant="outline" className="bg-black/60 border-violet-500/40 text-violet-300 backdrop-blur-sm uppercase text-[10px] tracking-widest px-2.5 py-1">
+          <Badge variant="outline" className="bg-black/60 border-primary/40 text-primary backdrop-blur-sm uppercase text-[10px] tracking-widest px-2.5 py-1">
             {role.split(" ")[0]}
           </Badge>
         </div>
@@ -39,9 +39,9 @@ export function FounderCard({ name, role, image, bio, index }: FounderCardProps)
 
       <CardHeader className="p-5 pb-1">
         <div className="flex items-center gap-3">
-          <Avatar className="w-8 h-8 border border-violet-500/20">
+          <Avatar className="w-8 h-8 border border-primary/20">
             <AvatarImage src={image} alt={name} className="object-cover" />
-            <AvatarFallback className="bg-zinc-800 text-xs text-violet-400 font-bold">
+            <AvatarFallback className="bg-zinc-800 text-xs text-primary font-bold">
               {name.split(' ').map(n => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
@@ -49,7 +49,7 @@ export function FounderCard({ name, role, image, bio, index }: FounderCardProps)
             <h3 className="font-bold text-white text-sm tracking-wide leading-none">
               {name}
             </h3>
-            <p className="text-violet-400 text-[11px] mt-1 font-medium leading-none">
+            <p className="text-primary text-[11px] mt-1 font-medium leading-none">
               {role}
             </p>
           </div>
@@ -63,7 +63,7 @@ export function FounderCard({ name, role, image, bio, index }: FounderCardProps)
       </CardContent>
 
       {/* Bottom hover accent */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
     </Card>
   );
 }

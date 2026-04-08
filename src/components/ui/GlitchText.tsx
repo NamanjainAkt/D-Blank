@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-
 interface GlitchTextProps {
   children: string;
   className?: string;
@@ -17,47 +15,41 @@ export function GlitchText({
 }: GlitchTextProps) {
   return (
     <div className={`relative inline-block ${className}`}>
+      <style>{`
+        @keyframes glitch-top {
+          0%, 90%, 100% { transform: translateX(0); opacity: 0; }
+          92% { transform: translateX(${glitchIntensity}px); opacity: 0.6; }
+          95% { transform: translateX(${-glitchIntensity * 0.5}px); opacity: 0; }
+        }
+        @keyframes glitch-bottom {
+          0%, 93%, 100% { transform: translateX(0); opacity: 0; }
+          95% { transform: translateX(${-glitchIntensity * 0.5}px); opacity: 0.4; }
+          97% { transform: translateX(${glitchIntensity * 0.8}px); opacity: 0; }
+        }
+      `}</style>
       {/* Main text */}
       <span className={`relative z-10 ${textClassName}`}>{children}</span>
 
-      {/* Glitch layers - only show occasionally */}
-      <motion.span
-        className="absolute inset-0 text-emerald-400 opacity-60"
-        animate={{
-          x: [0, glitchIntensity * 1, -glitchIntensity * 0.5, 0],
-          opacity: [0, 0.6, 0, 0],
-        }}
-        transition={{
-          duration: 0.2,
-          repeat: Infinity,
-          repeatDelay: 2,
-          ease: "easeInOut"
-        }}
+      {/* Glitch layers */}
+      <span
+        className="absolute inset-0 text-emerald-400"
         style={{
-          clipPath: 'polygon(0 0, 100% 0, 100% 45%, 0 45%)'
+          clipPath: 'polygon(0 0, 100% 0, 100% 45%, 0 45%)',
+          animation: 'glitch-top 2.2s ease-in-out infinite',
         }}
       >
         {children}
-      </motion.span>
+      </span>
 
-      <motion.span
-        className="absolute inset-0 text-teal-400 opacity-40"
-        animate={{
-          x: [0, -glitchIntensity * 0.5, glitchIntensity * 0.8, 0],
-          opacity: [0, 0.4, 0, 0],
-        }}
-        transition={{
-          duration: 0.15,
-          repeat: Infinity,
-          repeatDelay: 3,
-          ease: "easeInOut"
-        }}
+      <span
+        className="absolute inset-0 text-teal-400"
         style={{
-          clipPath: 'polygon(0 55%, 100% 55%, 100% 100%, 0 100%)'
+          clipPath: 'polygon(0 55%, 100% 55%, 100% 100%, 0 100%)',
+          animation: 'glitch-bottom 3.15s ease-in-out infinite',
         }}
       >
         {children}
-      </motion.span>
+      </span>
     </div>
   );
 }

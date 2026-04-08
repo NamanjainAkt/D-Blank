@@ -17,7 +17,7 @@
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 60%;
-    --accent: 286 83% 58%;
+    --accent: 293 83% 49%; /* Fuchsia 600 */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
@@ -43,11 +43,11 @@
     --font-body: "Space Grotesk", system-ui, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-    /* Neon Palette */
-    --neon-purple: #B026FF;
-    --cyber-pink: #FF007F;
-    --laser-cyan: #00F0FF;
-    --acid-green: #39FF14;
+    /* Neon Palette (Synced to Tailwind Violet/Fuchsia/Cyan) */
+    --neon-purple: #7c3aed; /* Violet-600 */
+    --cyber-pink: #c026d3; /* Fuchsia-600 */
+    --laser-cyan: #06b6d4; /* Cyan-500 */
+    --acid-green: #10b981; /* Emerald-500 */
     --neon-yellow: #FFF700;
 
     /* Admin Dimensions */

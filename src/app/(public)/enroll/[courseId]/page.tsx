@@ -98,7 +98,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
     setSubmitting(true);
     setError('');
     try {
-      // 1. Create Enrollment & Enroller Profile
+      // 1. Create Enrollment & Student Profile
       const enrollRes = await fetch('/api/enroll', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

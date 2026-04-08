@@ -5,8 +5,8 @@ import { gsap } from "gsap";
 import { Gamepad2, Sword, Ghost } from "lucide-react";
 
 const projects = [
-  { name: "RPG Demo", icon: Sword, gradient: "from-violet-500/30 to-indigo-500/30", accent: "#8B5CF6" },
-  { name: "Platformer", icon: Gamepad2, gradient: "from-fuchsia-500/30 to-pink-500/30", accent: "#D946EF" },
+  { name: "RPG Demo", icon: Sword, gradient: "from-primary/30 to-indigo-500/30", accent: "#8B5CF6" },
+  { name: "Platformer", icon: Gamepad2, gradient: "from-accent/30 to-pink-500/30", accent: "#D946EF" },
   { name: "Horror Game", icon: Ghost, gradient: "from-emerald-500/30 to-cyan-500/30", accent: "#10B981" },
 ];
 

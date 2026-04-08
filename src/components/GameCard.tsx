@@ -59,10 +59,12 @@ export function GameCard({ game }: { game: Game }) {
                 alt={game.title}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
+              {/* Scanline overlay for cyber effect */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.1)_1px,transparent_1px)] bg-[size:100%_3px] pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
               
               <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                <Badge className="bg-black/60 backdrop-blur-sm text-white text-[10px] font-mono border-white/10 uppercase tracking-widest">
+                <Badge className="bg-black/60 backdrop-blur-sm text-primary text-[10px] font-mono border-primary/20 shadow-[0_0_10px_rgba(124,58,237,0.2)] uppercase tracking-widest">
                   {game.genre}
                 </Badge>
               </div>
@@ -72,7 +74,7 @@ export function GameCard({ game }: { game: Game }) {
                   onClick={() => setShowTrailer(true)}
                   className="absolute inset-0 flex items-center justify-center group/btn"
                 >
-                  <div className="w-12 h-12 rounded-full bg-violet-600/80 backdrop-blur-sm flex items-center justify-center text-white scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_20px_rgba(139,92,246,0.5)]">
+                  <div className="w-12 h-12 rounded-full bg-primary/80 backdrop-blur-sm flex items-center justify-center text-white scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_20px_rgba(139,92,246,0.5)]">
                     <Play className="w-5 h-5 fill-current ml-1" />
                   </div>
                 </button>
@@ -82,7 +84,7 @@ export function GameCard({ game }: { game: Game }) {
             {/* Content Area */}
             <div className="p-5 flex-1 flex flex-col">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-lg font-bold text-white group-hover:text-violet-400 transition-colors uppercase tracking-tight">{game.title}</h3>
+                <h3 className="text-xl font-black text-white group-hover:text-primary drop-shadow-[0_0_10px_rgba(255,255,255,0.1)] transition-all uppercase tracking-tighter">{game.title}</h3>
                 <div className="flex items-center gap-1 text-amber-400">
                   <Star className="w-3.5 h-3.5 fill-current" />
                   <span className="text-xs font-bold font-mono">{game.rating}</span>
@@ -123,7 +125,7 @@ export function GameCard({ game }: { game: Game }) {
                     <Button 
                       asChild
                       className={cn(
-                        "bg-violet-600 hover:bg-violet-500 text-white text-[10px] font-mono uppercase tracking-widest h-9",
+                        "bg-primary hover:bg-primary text-white text-[10px] font-mono uppercase tracking-widest h-9",
                         !embedUrl && "col-span-2"
                       )}
                     >
@@ -135,7 +137,7 @@ export function GameCard({ game }: { game: Game }) {
                     <Button 
                       disabled
                       className={cn(
-                        "bg-white/5 text-zinc-500 border-white/5 text-[10px] font-mono uppercase tracking-widest h-9",
+                        "bg-black/50 text-zinc-500 border-zinc-800 text-[10px] font-mono uppercase tracking-widest h-9 border",
                         !embedUrl && "col-span-2"
                       )}
                     >

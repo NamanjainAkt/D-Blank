@@ -109,7 +109,7 @@ export default function MentorshipFlow() {
           {/* Progress line */}
           <div
             ref={progressRef}
-            className="h-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-indigo-500 origin-left"
+            className="h-full bg-gradient-to-r from-primary via-accent to-indigo-500 origin-left"
             style={{ width: "100%" }}
           />
         </div>
@@ -175,7 +175,7 @@ export default function MentorshipFlow() {
       {/* Decorative elements */}
       <div className="absolute top-[22px] left-[22px] right-[22px] h-[2px] pointer-events-none">
         {/* Start dot */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-violet-500 -ml-[2px]" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-primary -ml-[2px]" />
         {/* End dot */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-indigo-500 -mr-[2px]" />
       </div>

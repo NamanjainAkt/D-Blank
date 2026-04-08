@@ -14,11 +14,11 @@ export function SidebarMobile({ className }: SidebarMobileProps) {
   const { isMobileOpen, setMobileOpen } = useAdminStore();
 
   return (
-    <Sheet 
-      open={isMobileOpen} 
+    <Sheet
+      open={isMobileOpen}
       onOpenChange={setMobileOpen}
     >
-      <SheetContent side="left" className={cn("p-0 bg-black border-r border-white/[0.05] w-64 lg:hidden", className)}>
+      <SheetContent side="left" className={cn("p-0 bg-zinc-950 border-r border-zinc-800 w-64 lg:hidden", className)}>
         <div className="flex flex-col h-full">
           <SidebarHeader />
           <SidebarNav />

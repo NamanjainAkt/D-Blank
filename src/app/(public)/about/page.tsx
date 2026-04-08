@@ -21,13 +21,13 @@ export default function AboutPage() {
           className="z-0" 
         />
         
-        <div className="absolute inset-0 bg-gradient-to-b from-fuchsia-950/20 via-black to-black" />
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-violet-600/20 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-fuchsia-600/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-accent/20 via-black to-black" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-accent/20 rounded-full blur-[120px] pointer-events-none" />
         
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedContent>
-            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-sm font-medium border-fuchsia-500/50 bg-fuchsia-500/10 text-fuchsia-400">
+            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-sm font-medium border-accent/50 bg-accent/10 text-accent">
               <Sparkles className="w-4 h-4 mr-2" />
               About D-Blanks
             </Badge>
@@ -36,7 +36,7 @@ export default function AboutPage() {
                 Pioneering the Future
               </GlitchText>
               <br />
-              <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 of Game Development
               </span>
             </h1>
@@ -53,7 +53,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <AnimatedContent>
               <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-6">
-                Our <span className="text-fuchsia-400">Mission</span>
+                Our <span className="text-accent">Mission</span>
               </h2>
               <div className="space-y-6 text-zinc-400 text-lg leading-relaxed">
                 <p>
@@ -65,26 +65,26 @@ export default function AboutPage() {
               </div>
             </AnimatedContent>
             <AnimatedContent delay={0.2} className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 blur-3xl rounded-full" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-3xl rounded-full" />
               <div className="relative aspect-square rounded-2xl border border-zinc-800 bg-black overflow-hidden flex items-center justify-center p-8">
                 <div className="grid grid-cols-2 gap-4 w-full h-full">
-                  <div className="rounded-xl bg-zinc-900 flex flex-col items-center justify-center text-center p-6 border border-zinc-800 hover:border-violet-500/50 transition-colors">
-                    <Target className="w-10 h-10 text-violet-400 mb-4" />
+                  <div className="rounded-xl bg-zinc-900 flex flex-col items-center justify-center text-center p-6 border border-zinc-800 hover:border-primary/50 transition-colors">
+                    <Target className="w-10 h-10 text-primary mb-4" />
                     <h3 className="font-bold text-white mb-2">Precision</h3>
                     <p className="text-xs text-zinc-500">Industry standard workflows</p>
                   </div>
-                  <div className="rounded-xl bg-zinc-900 flex flex-col items-center justify-center text-center p-6 border border-zinc-800 hover:border-fuchsia-500/50 transition-colors mt-8">
-                    <Zap className="w-10 h-10 text-fuchsia-400 mb-4" />
+                  <div className="rounded-xl bg-zinc-900 flex flex-col items-center justify-center text-center p-6 border border-zinc-800 hover:border-accent/50 transition-colors mt-8">
+                    <Zap className="w-10 h-10 text-accent mb-4" />
                     <h3 className="font-bold text-white mb-2">Innovation</h3>
                     <p className="text-xs text-zinc-500">Cutting-edge technologies</p>
                   </div>
-                  <div className="rounded-xl bg-zinc-900 flex flex-col items-center justify-center text-center p-6 border border-zinc-800 hover:border-fuchsia-500/50 transition-colors -mt-8">
-                    <Users className="w-10 h-10 text-fuchsia-400 mb-4" />
+                  <div className="rounded-xl bg-zinc-900 flex flex-col items-center justify-center text-center p-6 border border-zinc-800 hover:border-accent/50 transition-colors -mt-8">
+                    <Users className="w-10 h-10 text-accent mb-4" />
                     <h3 className="font-bold text-white mb-2">Community</h3>
                     <p className="text-xs text-zinc-500">Collaborative learning</p>
                   </div>
-                  <div className="rounded-xl bg-zinc-900 flex flex-col items-center justify-center text-center p-6 border border-zinc-800 hover:border-violet-500/50 transition-colors">
-                    <Rocket className="w-10 h-10 text-violet-400 mb-4" />
+                  <div className="rounded-xl bg-zinc-900 flex flex-col items-center justify-center text-center p-6 border border-zinc-800 hover:border-primary/50 transition-colors">
+                    <Rocket className="w-10 h-10 text-primary mb-4" />
                     <h3 className="font-bold text-white mb-2">Launch</h3>
                     <p className="text-xs text-zinc-500">From concept to release</p>
                   </div>
@@ -98,12 +98,12 @@ export default function AboutPage() {
       {/* CALL TO ACTION */}
       <section className="py-32 px-4 bg-black relative overflow-hidden flex flex-col items-center justify-center">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)] pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[400px] bg-violet-600/10 blur-[120px] rounded-[100%] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[400px] bg-primary/10 blur-[120px] rounded-[100%] pointer-events-none" />
 
         <div className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center">
           <AnimatedContent>
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
-              Join the <span className="text-fuchsia-400 drop-shadow-[0_0_15px_rgba(217,70,239,0.4)]">Movement</span>
+              Join the <span className="text-accent drop-shadow-[0_0_15px_rgba(217,70,239,0.4)]">Movement</span>
             </h2>
             <p className="text-zinc-400 text-lg mb-12 max-w-2xl mx-auto leading-relaxed">
               Whether you want to play our upcoming titles or build the next big hit with us, there's a place for you at D-Blanks.

@@ -4,7 +4,7 @@ import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
 import { Course } from '@/models/Course';
 import { Game } from '@/models/Game';
-import { Enroller } from '@/models/Enroller';
+import { Student } from '@/models/Student';
 import { authOptions } from '@/lib/auth';
 
 export async function GET(request: Request) {
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
       createdAt: { $gte: today, $lt: tomorrow },
     });
 
-    const todayEnrollers = await Enroller.countDocuments({
+    const todayStudents = await Student.countDocuments({
       createdAt: { $gte: today, $lt: tomorrow },
     });
 
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
 
     // Overall stats
     const totalEnrollments = await Enrollment.countDocuments();
-    const totalEnrollers = await Enroller.countDocuments();
+    const totalStudents = await Student.countDocuments();
     const totalCourses = await Course.countDocuments({ isPublished: true });
     const totalGames = await Game.countDocuments({ isPublished: true });
 
@@ -109,12 +109,12 @@ export async function GET(request: Request) {
     return NextResponse.json({
       today: {
         enrollments: todayEnrollments,
-        enrollers: todayEnrollers,
+        students: todayStudents,
         revenue: todayRevenue[0]?.total || 0,
       },
       overall: {
         totalEnrollments,
-        totalEnrollers,
+        totalStudents,
         totalCourses,
         totalGames,
         totalRevenue: revenueData[0]?.total || 0,

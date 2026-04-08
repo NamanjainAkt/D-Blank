@@ -11,10 +11,11 @@ import {
   Send,
   MapPin,
   Clock,
-  Gamepad2
+  Terminal,
+  ShieldAlert,
+  Fingerprint,
+  Globe
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,9 +23,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { ParticleField } from '@/components/ui/ParticleField';
 import { GlitchText } from '@/components/ui/GlitchText';
 import { GlowButton } from '@/components/ui/GlowButton';
-import { HoverScale } from '@/components/ui/HoverScale';
+import { CrystalButton } from '@/components/ui/CrystalButton';
+import { MorphingBlobs } from '@/components/ui/MorphingBlobs';
+import { MagneticCursor } from '@/components/ui/MagneticCursor';
 import AnimatedContent from '@/components/AnimatedContent';
 import GlareHover from '@/components/GlareHover';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -36,223 +41,244 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    console.log('Operational dispatch initiated:', formData);
   };
 
   const contactMethods = [
     {
-      title: "Email Us",
-      description: "Send us an email anytime",
+      title: "Direct Uplink",
+      description: "Secure email channel",
       value: "arshgupta723@gmail.com",
-      icon: Mail
+      icon: Mail,
+      color: "text-primary"
     },
     {
-      title: "Join Discord",
-      description: "Connect with our community",
+      title: "Syndicate Hub",
+      description: "Discord community protocol",
       value: "discord.gg/dblanks",
-      icon: MessageCircle
+      icon: MessageCircle,
+      color: "text-accent"
     },
     {
-      title: "Call Us",
-      description: "Mon-Fri, 9am-6pm IST",
+      title: "Comms Link",
+      description: "Emergency voice authorization",
       value: "+91 9340576811",
-      icon: Smartphone
+      icon: Smartphone,
+      color: "text-blue-500"
     }
   ];
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        {/* Particle Field Background */}
-        <ParticleField 
-          particleCount={30} 
-          color="rgba(176, 38, 255, 0.2)" 
-          className="z-0" 
+    <main className="min-h-screen bg-black text-white relative isolate selection:bg-primary/30">
+      <MagneticCursor />
+      
+      {/* Background Atmosphere */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <MorphingBlobs 
+          colors={['rgba(176, 38, 255, 0.12)', 'rgba(56, 189, 248, 0.08)']} 
+          className="opacity-40"
         />
-        
-        <div className="absolute inset-0 bg-gradient-to-b from-violet-950/30 via-black to-black" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[128px]" />
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(176,38,255,0.05),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] opacity-20" />
+      </div>
+
+      {/* Hero */}
+      <section className="relative pt-40 pb-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <AnimatedContent>
-            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-sm font-medium border-violet-500/50 bg-violet-500/10 text-violet-400">
-              Contact Us
+            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.3em] border-primary/40 bg-primary/5 text-primary">
+              <Fingerprint className="w-4 h-4 mr-2 animate-pulse" />
+              Identification Required
             </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              <GlitchText textClassName="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-                Get in Touch
-              </GlitchText>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 uppercase italic leading-[0.85]">
+              <span className="bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent">
+                Establish
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-primary via-blue-500 to-primary bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(176,38,255,0.4)]">
+                <GlitchText glitchIntensity={1.8}>The Uplink</GlitchText>
+              </span>
             </h1>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-10">
-              Have questions? We would love to hear from you. Reach out and we will respond as soon as possible.
+            <p className="text-zinc-500 text-lg max-w-2xl mx-auto mb-10 font-mono text-[13px] uppercase tracking-[0.2em] leading-relaxed">
+              Dispatch your queries to the syndicate. Response latency: &lt; 24h standard protocol.
             </p>
           </AnimatedContent>
         </div>
       </section>
 
-      {/* Contact Methods */}
-      <section className="pb-12">
+      {/* Contact Methods - Node Matrix */}
+      <section className="pb-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {contactMethods.map((method, index) => (
               <AnimatedContent key={method.title} delay={index * 0.1}>
-                <HoverScale scale={1.05} className="h-full">
-                  <GlareHover
-                    background="linear-gradient(135deg, rgba(88, 28, 135, 0.2) 0%, rgba(30, 10, 60, 0.4) 100%)"
-                    borderColor="rgba(139, 92, 246, 0.2)"
-                    className="w-full h-full !rounded-xl border p-6"
-                  >
-                    <Card className="bg-transparent border-0 shadow-none w-full">
-                      <CardHeader className="p-0 mb-4">
-                        <div className="w-12 h-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4">
-                          <method.icon className="w-6 h-6 text-violet-400" />
-                        </div>
-                        <CardTitle className="text-lg">{method.title}</CardTitle>
-                        <CardDescription className="text-zinc-400">
-                          {method.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="p-0">
-                        <p className="text-violet-400 font-medium">{method.value}</p>
-                      </CardContent>
-                    </Card>
-                  </GlareHover>
-                </HoverScale>
+                <GlareHover
+                  background="linear-gradient(135deg, rgba(39, 39, 42, 0.4) 0%, rgba(9, 9, 11, 0.8) 100%)"
+                  borderColor="rgba(255, 255, 255, 0.05)"
+                  className="w-full h-full !rounded-[2rem] border relative group overflow-hidden"
+                >
+                  <div className="p-8 relative z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-white/5 flex items-center justify-center mb-8 group-hover:border-primary/40 transition-colors shadow-inner">
+                      <method.icon className={cn("w-7 h-7", method.color)} />
+                    </div>
+                    <h3 className="text-xl font-black italic uppercase tracking-tighter mb-2 group-hover:text-primary transition-colors">{method.title}</h3>
+                    <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest mb-6">
+                      {method.description}
+                    </p>
+                    <p className="font-mono text-xs text-white tracking-widest break-all">
+                      {method.value}
+                    </p>
+                  </div>
+                  {/* Background Detail */}
+                  <div className="absolute top-0 right-0 p-4 opacity-5">
+                    <Terminal className="w-20 h-20" />
+                  </div>
+                </GlareHover>
               </AnimatedContent>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact Form */}
-      <section className="py-12 bg-zinc-950">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Contact Form - Secure Uplink Terminal */}
+      <section className="py-24 relative">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <AnimatedContent>
-            <Card className="bg-zinc-900/50 border-zinc-800">
-              <CardHeader>
-                <CardTitle>Send us a message</CardTitle>
-                <CardDescription>
-                  Fill out the form below and we will get back to you within 24 hours.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Name</Label>
+            <div className="relative p-1 rounded-[3rem] bg-gradient-to-b from-white/10 to-transparent border border-white/5 overflow-hidden shadow-2xl">
+              <div className="bg-zinc-950/80 backdrop-blur-2xl rounded-[2.8rem] p-8 md:p-12 relative overflow-hidden">
+                {/* Scanline Effect Overlay */}
+                <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[size:100%_2px,3px_100%] opacity-[0.03]" />
+                
+                <div className="flex items-center gap-4 mb-10 pb-6 border-b border-white/5">
+                  <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+                    <Terminal className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black italic uppercase tracking-tighter">Secure Dispatch</h2>
+                    <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.3em]">Encrypted Channel_404</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <Label htmlFor="name" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Operative_ID</Label>
                       <Input
                         id="name"
-                        placeholder="Your name"
+                        placeholder="NAME_REQUIRED"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="bg-zinc-800 border-zinc-700"
+                        className="h-12 bg-zinc-900/50 border-white/5 focus:border-primary/50 text-[11px] font-mono uppercase tracking-widest rounded-xl transition-all"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="email" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Uplink_Node</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="your@email.com"
+                        placeholder="EMAIL_REQUIRED"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="bg-zinc-800 border-zinc-700"
+                        className="h-12 bg-zinc-900/50 border-white/5 focus:border-primary/50 text-[11px] font-mono uppercase tracking-widest rounded-xl transition-all"
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="subject" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Sector_Subject</Label>
                     <Input
                       id="subject"
-                      placeholder="How can we help?"
+                      placeholder="NATURE_OF_DISPATCH"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className="bg-zinc-800 border-zinc-700"
+                      className="h-12 bg-zinc-900/50 border-white/5 focus:border-primary/50 text-[11px] font-mono uppercase tracking-widest rounded-xl transition-all"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="message" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Payload_Data</Label>
                     <Textarea
                       id="message"
-                      placeholder="Your message..."
-                      rows={5}
+                      placeholder="DISPATCH_CONTENT..."
+                      rows={6}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="bg-zinc-800 border-zinc-700 resize-none"
+                      className="bg-zinc-900/50 border-white/5 focus:border-primary/50 text-[11px] font-mono uppercase tracking-[0.2em] rounded-2xl resize-none transition-all"
                     />
                   </div>
-                  <GlowButton type="submit" variant="primary" className="w-full">
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Message
-                  </GlowButton>
+                  
+                  <div className="flex justify-center pt-4">
+                    <div data-magnetic>
+                      <CrystalButton 
+                        primaryText="Transmit" 
+                        secondaryText="Confirming..." 
+                        className="scale-90 md:scale-100"
+                      />
+                    </div>
+                  </div>
                 </form>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </AnimatedContent>
         </div>
       </section>
 
-      {/* Location & Hours */}
-      <section className="py-16 bg-black">
+      {/* Location & Hours - Refined Matrix Cards */}
+      <section className="py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-12">
             <AnimatedContent>
-              <Card className="bg-zinc-900/50 border-zinc-800 h-full">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-violet-400" />
-                    Our Location
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-zinc-400 mb-4">
-                    Visit our studio to see what we are working on.
-                  </p>
-                  <div className="space-y-2 text-sm">
-                    <p className="text-white">D-Blanks Studio</p>
-                    <p className="text-zinc-500">Sindhya nagar, Durg 491001</p>
-                    <p className="text-zinc-500">India</p>
+              <div className="group p-10 rounded-[2.5rem] bg-zinc-900/40 border border-white/5 hover:border-primary/20 transition-all duration-500 h-full relative overflow-hidden">
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 rounded-xl bg-zinc-950 border border-white/10 group-hover:border-primary/30 transition-colors">
+                      <MapPin className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-tighter italic">Physical Node</h3>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="space-y-4 font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 group-hover:text-zinc-300 transition-colors leading-relaxed">
+                    <p className="text-white font-black italic">D-Blanks Studio_Core</p>
+                    <p>Sindhya nagar, Durg 491001</p>
+                    <p>Sub-Sector: Chhattisgarh, India</p>
+                  </div>
+                </div>
+                {/* Background Detail */}
+                <div className="absolute -bottom-10 -right-10 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                  <Globe className="w-60 h-60" />
+                </div>
+              </div>
             </AnimatedContent>
 
             <AnimatedContent delay={0.1}>
-              <Card className="bg-zinc-900/50 border-zinc-800 h-full">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-violet-400" />
-                    Working Hours
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-zinc-400 mb-4">
-                    We are available during these hours.
-                  </p>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500">Monday - Friday</span>
-                      <span className="text-white">9:00 AM - 6:00 PM</span>
+              <div className="group p-10 rounded-[2.5rem] bg-zinc-900/40 border border-white/5 hover:border-primary/20 transition-all duration-500 h-full relative overflow-hidden">
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 rounded-xl bg-zinc-950 border border-white/10 group-hover:border-primary/30 transition-colors">
+                      <Clock className="w-6 h-6 text-primary" />
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500">Saturday</span>
-                      <span className="text-white">10:00 AM - 4:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500">Sunday</span>
-                      <span className="text-red-400">Closed</span>
-                    </div>
+                    <h3 className="text-xl font-black uppercase tracking-tighter italic">Operational Cycle</h3>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="space-y-6 font-mono text-[10px] uppercase tracking-[0.25em]">
+                    {[
+                      { days: "Mon - Fri", hours: "09:00 - 18:00 IST", active: true },
+                      { days: "Saturday", hours: "10:00 - 16:00 IST", active: true },
+                      { days: "Sunday", hours: "OFFLINE", active: false }
+                    ].map((slot, i) => (
+                      <div key={i} className="flex justify-between items-center border-b border-white/5 pb-2">
+                        <span className="text-zinc-500">{slot.days}</span>
+                        <span className={cn(slot.active ? "text-white" : "text-red-500/60")}>{slot.hours}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Background Detail */}
+                <div className="absolute -bottom-10 -right-10 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                  <ShieldAlert className="w-60 h-60" />
+                </div>
+              </div>
             </AnimatedContent>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
       <Footer2 />
     </main>

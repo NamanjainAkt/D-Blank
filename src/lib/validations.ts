@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-// Student / Enroller Schema
-export const enrollerSchema = z.object({
+// Student Schema
+export const studentSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   phone: z.string().regex(/^[6-9]\d{9}$/, 'Invalid phone number (10 digits)'),
@@ -19,7 +19,7 @@ export const enrollerSchema = z.object({
 export const enrollmentSchema = z.object({
   courseId: z.string().min(1, 'Course is required'),
   studentId: z.string().optional(), // For logged in/existing students
-  studentData: enrollerSchema.optional(), // For new students
+  studentData: studentSchema.optional(), // For new students
   paymentMethod: z.string().optional(),
 });
 
@@ -96,4 +96,4 @@ export const gameSchema = z.object({
 export type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
 export type CourseFormData = z.infer<typeof courseSchema>;
 export type GameFormData = z.infer<typeof gameSchema>;
-export type EnrollerFormData = z.infer<typeof enrollerSchema>;
+export type StudentFormData = z.infer<typeof studentSchema>;

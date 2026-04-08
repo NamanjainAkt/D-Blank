@@ -1,7 +1,7 @@
 import mongoose, { Schema, models, model } from 'mongoose';
 
 const enrollmentSchema = new Schema({
-  studentId: { type: Schema.Types.ObjectId, ref: 'Enroller', required: true },
+  studentId: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
   courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
   courseName: { type: String, required: true },
   

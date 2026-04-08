@@ -10,7 +10,7 @@ interface SectionBadgeProps {
 
 export default function SectionBadge({
   label,
-  pulseColor = "bg-violet-400",
+  pulseColor = "bg-primary",
 }: SectionBadgeProps) {
   const badgeRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);

@@ -1,539 +1,121 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import * as React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Footer } from '@/components/Footer';
 import Footer2 from "@/components/Footer2";
 import { 
-  Gamepad2, 
   Users, 
-  Trophy,
-  Star,
-  ArrowRight,
+  Target, 
+  Rocket, 
   Sparkles,
-  Award,
-  Rocket,
-  Globe,
+  ArrowRight,
+  Shield,
   Zap,
-  Loader2
+  Cpu,
+  Globe
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ParticleField } from '@/components/ui/ParticleField';
 import { GlitchText } from '@/components/ui/GlitchText';
 import { GlowButton } from '@/components/ui/GlowButton';
-import { HoverScale } from '@/components/ui/HoverScale';
+import { CrystalButton } from '@/components/ui/CrystalButton';
+import { MorphingBlobs } from '@/components/ui/MorphingBlobs';
+import { MagneticCursor } from '@/components/ui/MagneticCursor';
+import ChromaGrid, { ChromaItem } from '@/components/ui/ChromaGrid';
 import AnimatedContent from '@/components/AnimatedContent';
-import GlareHover from '@/components/GlareHover';
-import { achievements, teamMembers, founders } from '@/lib/placeholder-data';
-
-// Types
-interface StudioStats {
-  totalGames: number;
-  featuredGames: number;
-  totalEnrollments: number;
-  totalEnrollers: number;
-}
-
-interface FeaturedGame {
-  _id: string;
-  title: string;
-  slug: string;
-  genre: string;
-  shortDescription: string;
-  thumbnailUrl: string;
-  rating: number;
-  platforms: string[];
-}
-
-// Animated Counter Component
-function AnimatedCounter({ 
-  value, 
-  suffix = '', 
-  color 
-}: { 
-  value: number; 
-  suffix?: string;
-  color: string;
-}) {
-  const [displayValue, setDisplayValue] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasStarted) {
-          setHasStarted(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasStarted]);
-
-  useEffect(() => {
-    if (!hasStarted) return;
-
-    const duration = 2000;
-    const steps = 60;
-    const stepValue = value / steps;
-    let current = 0;
-
-    const timer = setInterval(() => {
-      current += stepValue;
-      if (current >= value) {
-        setDisplayValue(value);
-        clearInterval(timer);
-      } else {
-        setDisplayValue(Math.floor(current));
-      }
-    }, duration / steps);
-
-    return () => clearInterval(timer);
-  }, [value, hasStarted]);
-
-  const colorClass = 
-    color === 'violet' ? 'text-violet-400' :
-    color === 'emerald' ? 'text-emerald-400' :
-    color === 'amber' ? 'text-amber-400' :
-    color === 'fuchsia' ? 'text-fuchsia-400' :
-    'text-cyan-400';
-
-  return (
-    <span ref={ref} className={colorClass}>
-      {displayValue.toLocaleString()}{suffix}
-    </span>
-  );
-}
-
-// Skeleton for Stats
-function StatsSkeleton() {
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="text-center">
-          <div className="w-14 h-14 rounded-xl mx-auto mb-4 bg-zinc-800 animate-pulse" />
-          <div className="h-9 w-20 mx-auto bg-zinc-800 rounded animate-pulse mb-1" />
-          <div className="h-4 w-16 mx-auto bg-zinc-800 rounded animate-pulse" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Game Card Component
-function GameCard({ game }: { game: FeaturedGame }) {
-  const platformIcons: Record<string, React.ReactNode> = {
-    PC: <Globe className="w-3 h-3" />,
-    Mobile: <Sparkles className="w-3 h-3" />,
-    Console: <Gamepad2 className="w-3 h-3" />,
-  };
-
-  return (
-    <HoverScale>
-      <Card className="bg-zinc-900/50 border-zinc-800 hover:border-violet-500/50 transition-all overflow-hidden group">
-        <div className="relative aspect-video overflow-hidden">
-          <Image
-            src={game.thumbnailUrl}
-            alt={game.title}
-            fill
-            className="object-cover transition-transform group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-          <div className="absolute top-3 right-3">
-            <Badge className="bg-violet-600/80 text-white text-xs">
-              <Star className="w-3 h-3 mr-1 fill-current" />
-              {game.rating.toFixed(1)}
-            </Badge>
-          </div>
-          <div className="absolute bottom-3 left-3 flex gap-1">
-            {game.platforms?.slice(0, 3).map((platform) => (
-              <Badge key={platform} variant="secondary" className="bg-black/60 text-zinc-300 text-xs">
-                {platformIcons[platform] || null}
-                {platform}
-              </Badge>
-            ))}
-          </div>
-        </div>
-        <CardContent className="p-4">
-          <Badge variant="outline" className="mb-2 text-xs border-violet-500/50 text-violet-400">
-            {game.genre}
-          </Badge>
-          <h3 className="font-bold text-lg mb-1 group-hover:text-violet-400 transition-colors">
-            {game.title}
-          </h3>
-          <p className="text-zinc-400 text-sm line-clamp-2">
-            {game.shortDescription}
-          </p>
-        </CardContent>
-        <CardFooter className="p-4 pt-0">
-          <Link href={`/games/${game.slug}`} className="w-full">
-            <Button variant="outline" size="sm" className="w-full border-violet-500/50 hover:bg-violet-500/20">
-              View Game
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-    </HoverScale>
-  );
-}
-
-// Skeleton for Game Cards
-function GameCardSkeleton() {
-  return (
-    <Card className="bg-zinc-900/50 border-zinc-800">
-      <div className="aspect-video bg-zinc-800 animate-pulse" />
-      <CardContent className="p-4">
-        <div className="h-4 w-16 bg-zinc-800 rounded animate-pulse mb-2" />
-        <div className="h-6 w-3/4 bg-zinc-800 rounded animate-pulse mb-2" />
-        <div className="h-4 w-full bg-zinc-800 rounded animate-pulse" />
-      </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <div className="h-9 w-full bg-zinc-800 rounded animate-pulse" />
-      </CardFooter>
-    </Card>
-  );
-}
-
-// Fallback stats (used when API fails)
-const fallbackStats = [
-  { icon: Gamepad2, label: 'Games', value: '120+', color: 'violet' },
-  { icon: Users, label: 'Players', value: '50K+', color: 'emerald' },
-  { icon: Trophy, label: 'Awards', value: '15+', color: 'amber' },
-  { icon: Rocket, label: 'Founded', value: '2025', color: 'fuchsia' },
-];
-
-// Fallback featured games (used when API fails)
-const fallbackFeaturedGames: FeaturedGame[] = [
-  {
-    _id: '1',
-    title: 'Cyber Drifter',
-    slug: 'cyber-drifter',
-    genre: 'Action RPG',
-    shortDescription: 'Explore a neon-soaked metropolis in this action-packed RPG adventure.',
-    thumbnailUrl: '/games/cyber-drifter/thumbnail.jpg',
-    rating: 4.8,
-    platforms: ['PC', 'Console'],
-  },
-  {
-    _id: '2',
-    title: 'Neon Warriors',
-    slug: 'neon-warriors',
-    genre: 'Fighting',
-    shortDescription: 'Battle your way through intense combat arenas with electrifying fighters.',
-    thumbnailUrl: '/games/neon-warriors/thumbnail.jpg',
-    rating: 4.6,
-    platforms: ['PC', 'Mobile'],
-  },
-  {
-    _id: '3',
-    title: 'Void Runner',
-    slug: 'void-runner',
-    genre: 'Endless Runner',
-    shortDescription: 'Race through the void in this high-speed endless runner with stunning visuals.',
-    thumbnailUrl: '/games/void-runner/thumbnail.jpg',
-    rating: 4.5,
-    platforms: ['Mobile', 'PC'],
-  },
-];
+import { founders, teamMembers } from '@/lib/placeholder-data';
+import { motion } from 'framer-motion';
 
 export default function StudioPage() {
-  const [stats, setStats] = useState<StudioStats | null>(null);
-  const [featuredGames, setFeaturedGames] = useState<FeaturedGame[]>([]);
-  const [isLoadingStats, setIsLoadingStats] = useState(true);
-  const [isLoadingGames, setIsLoadingGames] = useState(true);
-  const [statsError, setStatsError] = useState(false);
-  const [gamesError, setGamesError] = useState(false);
-
-  const currentYear = new Date().getFullYear();
-
-  // Fetch stats on mount
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const res = await fetch('/api/studio/stats');
-        if (!res.ok) throw new Error('Failed to fetch stats');
-        const data = await res.json();
-        setStats(data);
-        setStatsError(false);
-      } catch (error) {
-        console.error('Error fetching studio stats:', error);
-        setStatsError(true);
-      } finally {
-        setIsLoadingStats(false);
-      }
-    }
-    fetchStats();
-  }, []);
-
-  // Fetch featured games on mount
-  useEffect(() => {
-    async function fetchFeaturedGames() {
-      try {
-        const res = await fetch('/api/studio/games');
-        if (!res.ok) throw new Error('Failed to fetch games');
-        const data = await res.json();
-        setFeaturedGames(data);
-        setGamesError(false);
-      } catch (error) {
-        console.error('Error fetching featured games:', error);
-        setGamesError(true);
-      } finally {
-        setIsLoadingGames(false);
-      }
-    }
-    fetchFeaturedGames();
-  }, []);
-
-  // Determine which stats to display
-  const displayStats = statsError || !stats
-    ? fallbackStats
-    : [
-        { icon: Gamepad2, label: 'Games', value: stats.totalGames, color: 'violet', isAnimated: true },
-        { icon: Users, label: 'Players', value: stats.totalEnrollers, color: 'emerald', isAnimated: true, suffix: '+' },
-        { icon: Trophy, label: 'Featured', value: stats.featuredGames, color: 'amber', isAnimated: true },
-        { icon: Rocket, label: 'Founded', value: '2025', color: 'fuchsia', isAnimated: false },
-      ];
-
-  // Determine which games to display
-  const displayGames = gamesError || featuredGames.length === 0
-    ? fallbackFeaturedGames
-    : featuredGames;
+  // Map founders to ChromaItem format for the Visionaries section
+  const visionaryItems: ChromaItem[] = founders.map(founder => ({
+    image: founder.image,
+    title: founder.name,
+    subtitle: founder.role,
+    handle: `@${founder.name.split(' ')[0].toLowerCase()}`,
+  }));
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden min-h-[70vh] flex items-center">
-        {/* Particle Field Background */}
-        <ParticleField 
-          particleCount={40} 
-          color="rgba(176, 38, 255, 0.2)" 
-          className="z-0" 
+    <main className="min-h-screen bg-black text-white relative isolate selection:bg-primary/30">
+      <MagneticCursor />
+      
+      {/* Background Atmosphere */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <MorphingBlobs 
+          colors={['rgba(176, 38, 255, 0.08)', 'rgba(217, 70, 239, 0.08)']} 
+          className="opacity-50"
         />
-        
-        <div className="absolute inset-0 bg-gradient-to-b from-violet-950/30 via-black to-black" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-[128px]" />
-        
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <AnimatedContent>
-            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-sm font-medium border-violet-500/50 bg-violet-500/10 text-violet-400">
-              <Sparkles className="w-4 h-4 mr-2" />
-              Inside the Studio
-            </Badge>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8">
-              <GlitchText textClassName="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-                We Build Worlds
-              </GlitchText>
-            </h1>
-            <p className="text-zinc-400 text-lg max-w-3xl mx-auto leading-relaxed">
-              D-Blanks is a high-performance game studio and creative collective pushing the boundaries of interactive entertainment.
-            </p>
-          </AnimatedContent>
-        </div>
-      </section>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(176,38,255,0.05),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
+      </div>
 
-      {/* Stats */}
-      <section className="py-16 bg-zinc-950 border-y border-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {isLoadingStats ? (
-            <StatsSkeleton />
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {displayStats.map((stat, index) => (
-                <AnimatedContent key={stat.label} delay={index * 0.1}>
-                  <div className="text-center cursor-pointer">
-                    <div className={`w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center transition-transform hover:scale-110 ${
-                        stat.color === 'violet' ? 'bg-violet-500/20' :
-                        stat.color === 'emerald' ? 'bg-emerald-500/20' :
-                        stat.color === 'amber' ? 'bg-amber-500/20' :
-                        'bg-fuchsia-500/20'
-                      }`}>
-                      <stat.icon className={`w-7 h-7 ${
-                        stat.color === 'violet' ? 'text-violet-400' :
-                        stat.color === 'emerald' ? 'text-emerald-400' :
-                        stat.color === 'amber' ? 'text-amber-400' :
-                        'text-fuchsia-400'
-                      }`} />
-                    </div>
-                    <div className={`text-3xl md:text-4xl font-bold mb-1 ${
-                        stat.color === 'violet' ? 'text-violet-400' :
-                        stat.color === 'emerald' ? 'text-emerald-400' :
-                        stat.color === 'amber' ? 'text-amber-400' :
-                        'text-fuchsia-400'
-                      }`}>
-                      {'isAnimated' in stat && stat.isAnimated ? (
-                        <AnimatedCounter 
-                          value={typeof stat.value === 'number' ? stat.value : 0}
-                          suffix={'suffix' in stat ? stat.suffix || '' : ''}
-                          color={stat.color}
-                        />
-                      ) : (
-                        <span>{'value' in stat ? stat.value : ''}</span>
-                      )}
-                    </div>
-                    <div className="text-sm text-zinc-500">{stat.label}</div>
-                  </div>
-                </AnimatedContent>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Featured Games */}
-      <section className="py-24 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedContent className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-1.5 text-sm font-medium border-violet-500/50 bg-violet-500/10 text-violet-400">
-              <Zap className="w-4 h-4 mr-2" />
-              Featured Games
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              Our Latest Creations
-            </h2>
-            <p className="text-zinc-400 mt-4 max-w-2xl mx-auto">
-              Discover our most popular titles, crafted with passion and precision.
-            </p>
-          </AnimatedContent>
-
-          {isLoadingGames ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <GameCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {displayGames.map((game, index) => (
-                <AnimatedContent key={game._id} delay={index * 0.1}>
-                  <GameCard game={game} />
-                </AnimatedContent>
-              ))}
-            </div>
-          )}
-
-          {displayGames.length > 0 && (
-            <AnimatedContent className="text-center mt-12">
-              <Link href="/games">
-                <GlowButton variant="secondary" className="min-w-[200px]">
-                  View All Games
-                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
-                </GlowButton>
-              </Link>
+      {/* Hero Section */}
+      <section className="relative pt-40 pb-32 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center">
+            <AnimatedContent>
+              <Badge variant="outline" className="mb-6 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.3em] border-primary/40 bg-primary/5 text-primary shadow-[0_0_15px_rgba(176,38,255,0.2)]">
+                The Collective
+              </Badge>
+              <h1 className="text-5xl md:text-7xl lg:text-9xl font-black tracking-tighter mb-8 uppercase italic leading-[0.85]">
+                <span className="bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent">
+                  Engineering
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-primary via-fuchsia-500 to-primary bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(176,38,255,0.5)]">
+                  <GlitchText glitchIntensity={1.2}>Realities</GlitchText>
+                </span>
+              </h1>
+              <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-12 font-mono text-[13px] uppercase tracking-[0.2em] leading-relaxed opacity-80">
+                A syndicate of rogue architects, artists, and engineers pushing the boundaries of digital sovereignty.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-6">
+                <Link href="#crew" data-magnetic>
+                  <GlowButton variant="primary" className="min-w-[200px] h-14">
+                    Meet the Syndicate
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </GlowButton>
+                </Link>
+              </div>
             </AnimatedContent>
-          )}
-        </div>
-      </section>
-
-      {/* Leadership */}
-      <section className="py-24 bg-zinc-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedContent className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 text-violet-400 border-violet-500/50">
-              Leadership
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              The Visionaries
-            </h2>
-          </AnimatedContent>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {founders.map((founder, index) => (
-              <AnimatedContent key={founder.id} delay={index * 0.1}>
-                <GlareHover
-                  background="linear-gradient(135deg, rgba(88, 28, 135, 0.3) 0%, rgba(30, 10, 60, 0.5) 100%)"
-                  borderColor="rgba(139, 92, 246, 0.2)"
-                  className="w-full !rounded-xl border"
-                >
-                  <Card className="bg-transparent border-0 shadow-none w-full">
-                    <CardContent className="pt-6 text-center">
-                      <div className="w-28 h-28 rounded-full bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 border-2 border-violet-500/30 mx-auto mb-6 overflow-hidden">
-                        <div className="w-full h-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-3xl font-bold text-white/50">
-                          {founder.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                      </div>
-                      <h3 className="text-xl font-bold mb-2">{founder.name}</h3>
-                      <p className="text-violet-400 text-sm mb-4">{founder.role}</p>
-                      <p className="text-zinc-400 text-sm leading-relaxed">{founder.bio}</p>
-                    </CardContent>
-                  </Card>
-                </GlareHover>
-              </AnimatedContent>
-            ))}
           </div>
         </div>
       </section>
 
-      {/* Team */}
-      <section className="py-24 bg-zinc-950">
+      {/* Philosophy Section - Minimalist replacement for Stats/Journey */}
+      <section className="py-32 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedContent className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 text-violet-400 border-violet-500/50">
-              The Crew
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              Our Talented Developers
-            </h2>
-          </AnimatedContent>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {teamMembers.slice(0, 8).map((member, index) => (
-              <AnimatedContent key={member.id} delay={index * 0.05}>
-                <Card className="bg-zinc-900/50 border-zinc-800 hover:border-violet-500/50 transition-colors">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-sm font-bold text-white">
-                        {member.name[0]}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm">{member.name}</h4>
-                        <p className="text-xs text-violet-400">@{member.handle}</p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-zinc-500 line-clamp-2">{member.bio}</p>
-                  </CardContent>
-                </Card>
-              </AnimatedContent>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Achievements */}
-      <section className="py-24 bg-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedContent className="mb-12">
-            <Badge variant="outline" className="mb-4 text-emerald-400 border-emerald-500/50">
-              Milestones
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-              Our Journey
-            </h2>
-          </AnimatedContent>
-
-          <div className="space-y-4">
-            {achievements.map((achievement, index) => (
-              <AnimatedContent key={index} delay={index * 0.1}>
-                <div className="flex gap-4 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/30 transition-colors">
-                  <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-xl font-bold flex-shrink-0">
-                    {achievement.year.slice(2)}
+          <div className="grid md:grid-cols-3 gap-12">
+            {[
+              { 
+                icon: Cpu, 
+                title: "Core Architecture", 
+                desc: "Low-level optimization meets high-fidelity visual fidelity.",
+                color: "text-primary"
+              },
+              { 
+                icon: Shield, 
+                title: "Sovereign Design", 
+                desc: "Immersion without compromise. Decoupled from legacy standards.",
+                color: "text-blue-500"
+              },
+              { 
+                icon: Zap, 
+                title: "Hyper-Response", 
+                desc: "Synchronous experience delivery across all digital touchpoints.",
+                color: "text-accent"
+              }
+            ].map((item, i) => (
+              <AnimatedContent key={i} delay={i * 0.1}>
+                <div className="group p-8 rounded-[2rem] bg-zinc-900/40 border border-white/5 hover:border-primary/20 transition-all duration-500">
+                  <div className={`p-4 rounded-2xl bg-zinc-950 border border-white/5 w-fit mb-6 shadow-glow transition-transform group-hover:scale-110 group-hover:rotate-3 ${item.color}`}>
+                    <item.icon className="w-8 h-8" />
                   </div>
-                  <div className="flex-1">
-                    <Badge variant="secondary" className="mb-2 bg-violet-500/20 text-violet-400">
-                      {achievement.title}
-                    </Badge>
-                    <p className="text-zinc-400">{achievement.event}</p>
-                  </div>
+                  <h3 className="text-xl font-black uppercase tracking-tight mb-3 italic">{item.title}</h3>
+                  <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
               </AnimatedContent>
             ))}
@@ -541,34 +123,123 @@ export default function StudioPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 bg-gradient-to-b from-zinc-950 to-black border-t border-zinc-800">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <AnimatedContent>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Be Part of the <span className="text-violet-400">Future</span>
-            </h2>
-            <p className="text-zinc-400 mb-8 max-w-lg mx-auto">
-              Whether you are a player or a future developer, there is a place for you at D-Blanks.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/games">
-                <GlowButton 
-                  variant="primary"
-                  className="min-w-[200px]"
+      {/* Visionaries (ChromaGrid) */}
+      <section className="py-32 relative overflow-hidden bg-zinc-950/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <AnimatedContent className="text-center mb-24">
+            <Badge variant="outline" className="mb-4 text-accent border-accent/40 bg-accent/5">Syndicate Heads</Badge>
+            <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter">The Visionaries</h2>
+          </AnimatedContent>
+
+          <div className="min-h-[600px] w-full">
+            <ChromaGrid 
+              items={visionaryItems} 
+              radius={350}
+              damping={0.6}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* The Crew (Developer Grid) */}
+      <section id="crew" className="py-32 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedContent className="mb-20">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div>
+                <Badge variant="outline" className="mb-4 text-primary border-primary/40 bg-primary/5">Field Operators</Badge>
+                <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter">The Crew</h2>
+              </div>
+              <p className="max-w-md text-zinc-500 font-mono text-xs uppercase tracking-[0.2em] leading-relaxed">
+                A specialized unit of designers, developers, and artists from across the globe.
+              </p>
+            </div>
+          </AnimatedContent>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {teamMembers.map((member, i) => (
+              <AnimatedContent key={member.id} delay={i * 0.05}>
+                <motion.div 
+                  whileHover={{ y: -5 }}
+                  className="group relative h-full flex flex-col p-6 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-primary/40 transition-all duration-500 overflow-hidden"
                 >
-                  Play Our Games
-                  <ArrowRight className="inline-block w-4 h-4 ml-2" />
-                </GlowButton>
-              </Link>
-              <Link href="/courses">
-                <GlowButton 
-                  variant="secondary"
-                  className="min-w-[200px]"
-                >
-                  Join the Studio
-                </GlowButton>
-              </Link>
+                  {/* Hover Accent Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                  
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="p-3 rounded-2xl bg-zinc-950 border border-white/5 group-hover:border-primary/30 transition-colors shadow-inner">
+                        <Users className="w-5 h-5 text-zinc-500 group-hover:text-primary transition-colors" />
+                      </div>
+                      <span className="text-[9px] font-mono text-primary/60 uppercase tracking-[0.3em] font-black group-hover:text-primary transition-colors">
+                        OP_{member.id.toString().padStart(3, '0')}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-black italic uppercase tracking-tighter mb-1 text-white group-hover:text-primary transition-colors">
+                      {member.name}
+                    </h3>
+                    <p className="text-[10px] font-mono text-accent/80 uppercase tracking-widest mb-4">
+                      {member.role}
+                    </p>
+                    
+                    <p className="text-[10px] font-mono text-zinc-500 uppercase leading-relaxed mb-6 group-hover:text-zinc-400 transition-colors">
+                      {member.bio}
+                    </p>
+
+                    <div className="mt-auto pt-4 border-t border-white/5 flex flex-wrap gap-2">
+                      {member.skills.map((skill, si) => (
+                        <span key={si} className="px-2 py-0.5 rounded-full bg-zinc-950 border border-white/5 text-[8px] font-mono text-zinc-500 uppercase group-hover:border-primary/10 group-hover:text-primary/60 transition-colors">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Cyber-Path SVG Accent */}
+                  <div className="absolute bottom-0 right-0 w-24 h-24 overflow-hidden pointer-events-none opacity-20 group-hover:opacity-100 transition-all duration-700">
+                    <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-primary/30 group-hover:stroke-primary/60 stroke-[0.5] transition-colors">
+                      <path d="M0 100 L100 0 L100 100 Z" />
+                      <circle cx="90" cy="90" r="2" className="fill-primary" />
+                    </svg>
+                  </div>
+                </motion.div>
+              </AnimatedContent>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section - Be Part of the Future */}
+      <section className="py-40 relative group overflow-hidden">
+        <ParticleField 
+          particleCount={50} 
+          color="rgba(176, 38, 255, 0.2)" 
+          className="absolute inset-0 opacity-40"
+        />
+        
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <AnimatedContent className="text-center p-16 rounded-[3rem] bg-gradient-to-b from-zinc-900/50 to-black/50 border border-white/5 backdrop-blur-xl relative overflow-hidden group/card shadow-[0_0_100px_rgba(0,0,0,1)]">
+            {/* Focal Point Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-1000" />
+            
+            <div className="relative z-10">
+              <Badge variant="outline" className="mb-8 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.4em] border-accent/40 bg-accent/5 text-accent">Initiation Portal</Badge>
+              <h2 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter mb-8 leading-[0.95]">
+                Be Part Of The <span className="text-primary italic">Matrix</span>
+              </h2>
+              <p className="text-zinc-500 font-mono text-sm uppercase tracking-widest max-w-xl mx-auto mb-16 leading-relaxed">
+                The syndicate is always looking for rogue talent. Are you ready to initialize your future?
+              </p>
+              
+              <div className="flex flex-col items-center gap-8 translate-y-4">
+                <div data-magnetic>
+                  <CrystalButton href="/contact" />
+                </div>
+                <Link href="/courses" className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] hover:text-primary transition-colors hover:underline decoration-primary underline-offset-8">
+                  View Mission Training Modules
+                </Link>
+              </div>
             </div>
           </AnimatedContent>
         </div>

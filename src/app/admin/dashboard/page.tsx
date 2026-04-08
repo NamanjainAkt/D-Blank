@@ -3,28 +3,26 @@
 import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { 
-  Users, 
-  DollarSign, 
-  TrendingUp, 
+import {
+  Users,
+  DollarSign,
+  TrendingUp,
   CreditCard,
   ArrowUpRight,
-  ArrowDownRight,
   AlertCircle,
   RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '@/components/ui/table';
-import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 
@@ -42,11 +40,11 @@ interface Enrollment {
 interface DashboardStats {
   today: {
     enrollments: number;
-    enrollers: number;
+    students: number;
     revenue: number;
   };
   overall: {
-    totalEnrollers: number;
+    totalStudents: number;
     totalEnrollments: number;
     totalCourses: number;
     totalGames: number;
@@ -67,30 +65,27 @@ interface StatCardProps {
   title: string;
   value: string | number;
   icon: React.ElementType;
-  colorClass: string;
-  bgColorClass: string;
   trend: string;
   trendUp: boolean;
 }
 
-function StatCard({ title, value, icon: Icon, colorClass, bgColorClass, trend, trendUp }: StatCardProps) {
+function StatCard({ title, value, icon: Icon, trend, trendUp }: StatCardProps) {
   return (
-    <Card className="bg-black border-white/5 hover:border-white/10 transition-all duration-300 group overflow-hidden relative rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,255,255,0.05)] hover:-translate-y-0.5">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-      <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10 px-6 pt-6">
-        <CardTitle className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-[#A0A0A0]">{title}</CardTitle>
-        <div className={cn(bgColorClass, "p-2 rounded-lg border border-white/5 group-hover:scale-105 transition-transform duration-300")}>
-          <Icon className={cn(colorClass, "w-4 h-4")} aria-hidden="true" />
+    <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-colors rounded-xl">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 px-5 pt-5">
+        <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-wide">{title}</CardTitle>
+        <div className="p-2 rounded-lg bg-zinc-800">
+          <Icon className="w-4 h-4 text-zinc-400" aria-hidden="true" />
         </div>
       </CardHeader>
-      <CardContent className="relative z-10 px-6 pb-6 pt-2">
-        <div className="text-4xl font-display font-light text-[#E5E7EB] tracking-tight mb-2">{value}</div>
-        <div className="flex items-center gap-2 mt-1">
-          <div className={cn("flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-medium tracking-wider", 
-            trendUp ? "text-[#00FFFF] bg-[#00FFFF]/10 border border-[#00FFFF]/20 shadow-[0_0_10px_rgba(0,255,255,0.1)]" : "text-[#FF007F] bg-[#FF007F]/10 border border-[#FF007F]/20 shadow-[0_0_10px_rgba(255,0,127,0.1)]")}>
-            {trendUp ? '▲' : '▼'} {trend}
-          </div>
-          <span className="text-[10px] font-mono uppercase tracking-[0.1em] text-[#555555]">vs period</span>
+      <CardContent className="px-5 pb-5 pt-1">
+        <div className="text-3xl font-semibold text-zinc-100 tracking-tight mb-2">{value}</div>
+        <div className="flex items-center gap-2">
+          <span className={cn("text-xs font-medium px-1.5 py-0.5 rounded",
+            trendUp ? "text-emerald-400 bg-emerald-400/10" : "text-red-400 bg-red-400/10")}>
+            {trendUp ? '+' : ''}{trend}
+          </span>
+          <span className="text-xs text-zinc-600">vs last period</span>
         </div>
       </CardContent>
     </Card>
@@ -126,18 +121,18 @@ export default function AdminDashboardPage() {
       <div className="space-y-6" aria-busy="true" aria-label="Loading dashboard">
         <div className="flex items-center justify-between">
           <div>
-            <Skeleton className="h-8 w-40 bg-carbon" />
-            <Skeleton className="h-4 w-56 mt-2 bg-carbon" />
+            <Skeleton className="h-8 w-40 bg-zinc-800" />
+            <Skeleton className="h-4 w-56 mt-2 bg-zinc-800" />
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-36 bg-carbon" />
+            <Skeleton key={i} className="h-36 bg-zinc-800 rounded-xl" />
           ))}
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="lg:col-span-2 h-80 bg-carbon" />
-          <Skeleton className="h-80 bg-carbon" />
+          <Skeleton className="lg:col-span-2 h-80 bg-zinc-800 rounded-xl" />
+          <Skeleton className="h-80 bg-zinc-800 rounded-xl" />
         </div>
       </div>
     );
@@ -147,7 +142,7 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center h-96 space-y-4">
         <AlertCircle className="w-12 h-12 text-red-400" aria-hidden="true" />
-        <p className="text-zinc-400 font-mono text-sm">{error}</p>
+        <p className="text-zinc-400 text-sm">{error}</p>
         <Button onClick={fetchStats} variant="outline" size="sm">
           Retry
         </Button>
@@ -155,35 +150,27 @@ export default function AdminDashboardPage() {
     );
   }
 
-  if (!stats) {
-    return null;
-  }
+  if (!stats) return null;
 
   const statCards: StatCardProps[] = [
     {
       title: "Today's Enrollments",
       value: stats.today.enrollments,
       icon: Users,
-      colorClass: "text-[#00FFFF]",
-      bgColorClass: "bg-[#00FFFF]/10 shadow-[0_0_15px_rgba(0,255,255,0.15)]",
-      trend: "+12%",
+      trend: "12%",
       trendUp: true
     },
     {
       title: "Today's Revenue",
       value: `₹${stats.today.revenue.toLocaleString()}`,
       icon: DollarSign,
-      colorClass: "text-[#8B5CF6]",
-      bgColorClass: "bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.15)]",
-      trend: "+8%",
+      trend: "8%",
       trendUp: true
     },
     {
       title: "Total Students",
-      value: stats.overall.totalEnrollers ?? 0,
+      value: stats.overall.totalStudents ?? 0,
       icon: TrendingUp,
-      colorClass: "text-[#00FFFF]",
-      bgColorClass: "bg-[#00FFFF]/10 shadow-[0_0_15px_rgba(0,255,255,0.15)]",
       trend: "+23",
       trendUp: true
     },
@@ -191,97 +178,89 @@ export default function AdminDashboardPage() {
       title: "Total Revenue",
       value: `₹${(stats.overall.totalRevenue / 100000).toFixed(1)}L`,
       icon: CreditCard,
-      colorClass: "text-[#8B5CF6]",
-      bgColorClass: "bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.15)]",
-      trend: "+15%",
+      trend: "15%",
       trendUp: true
     }
   ];
 
   return (
-    <div className="space-y-10 animate-fade-up">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/[0.08] relative">
-        <div className="absolute bottom-0 left-0 w-1/3 h-[1px] bg-gradient-to-r from-[#00FFFF] to-transparent shadow-[0_0_10px_#00FFFF]" />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-zinc-800">
         <div>
-          <h1 className="text-[28px] md:text-[32px] font-display font-light text-[#E5E7EB] tracking-widest uppercase">
-            Operational <span className="font-bold text-[#FF10F0] drop-shadow-[0_0_10px_rgba(0,255,255,0.4)]">Hub</span>
+          <h1 className="text-2xl font-semibold text-zinc-100">
+            Dashboard
           </h1>
-          <p className="text-[11px] font-mono text-[#71717a] uppercase tracking-[0.2em] mt-3 flex items-center gap-3">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FFFF] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00FFFF] shadow-[0_0_8px_#00FFFF]"></span>
-            </span>
-            System Status: Nominal <span className="text-white/20">|</span> {format(new Date(), 'yyyy.MM.dd HH:mm')}
+          <p className="text-sm text-zinc-500 mt-1">
+            {format(new Date(), 'EEEE, MMMM d, yyyy')}
           </p>
         </div>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={fetchStats}
           size="sm"
-          className="border-white/10 bg-black hover:bg-white/[0.02] hover:border-[#00FFFF]/50 hover:shadow-[0_0_15px_rgba(0,255,255,0.15)] text-[11px] font-mono text-[#E5E7EB] uppercase tracking-widest h-10 px-6 transition-all duration-300"
+          className="border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-sm h-9 px-4"
           aria-label="Refresh dashboard"
         >
-          <RefreshCw className="w-3.5 h-3.5 mr-2 text-[#00FFFF]" />
-          Sync Data
+          <RefreshCw className="w-3.5 h-3.5 mr-2" />
+          Refresh
         </Button>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Key statistics">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="region" aria-label="Key statistics">
         {statCards.map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}
       </div>
 
       {/* Content Grid */}
-      <div className="grid gap-8 lg:grid-cols-3">
-        {/* Recent Uplinks */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Recent Enrollments */}
         <div className="lg:col-span-2">
-          <Card className="bg-black border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] rounded-xl relative overflow-hidden group hover:border-white/10 transition-colors duration-300">
-            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00FFFF]/30 to-transparent" />
-            <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.05] py-5 px-6">
-              <CardTitle className="text-xs font-display font-medium uppercase tracking-[0.2em] text-[#E5E7EB]">Recent Uplinks</CardTitle>
-              <Link 
-                href="/admin/students" 
-                className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#8B5CF6]/70 hover:text-[#8B5CF6] hover:drop-shadow-[0_0_5px_#8B5CF6] transition-all flex items-center gap-1.5 group/link"
-                aria-label="View all students"
+          <Card className="bg-zinc-900 border-zinc-800 rounded-xl">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-800 py-4 px-5">
+              <CardTitle className="text-sm font-medium text-zinc-200">Recent Enrollments</CardTitle>
+              <Link
+                href="/admin/enrollments"
+                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors flex items-center gap-1"
+                aria-label="View all enrollments"
               >
-                Access Archives <ArrowUpRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                View All <ArrowUpRight className="w-3.5 h-3.5" />
               </Link>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto custom-scrollbar">
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-white/[0.05] hover:bg-transparent">
-                      <TableHead className="text-[10px] font-mono uppercase tracking-widest text-[#71717a] py-4 pl-6">Operator</TableHead>
-                      <TableHead className="text-[10px] font-mono uppercase tracking-widest text-[#71717a] py-4">Module</TableHead>
-                      <TableHead className="text-[10px] font-mono uppercase tracking-widest text-[#71717a] py-4 text-right pr-6">Status</TableHead>
+                    <TableRow className="border-zinc-800 hover:bg-transparent">
+                      <TableHead className="text-xs text-zinc-500 py-3 pl-5">Student</TableHead>
+                      <TableHead className="text-xs text-zinc-500 py-3">Course</TableHead>
+                      <TableHead className="text-xs text-zinc-500 py-3 text-right pr-5">Payment</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {stats.recentEnrollments.map((enrollment) => (
-                      <TableRow key={enrollment._id} className="border-white/[0.05] hover:bg-white/[0.02] transition-colors group/row">
-                        <TableCell className="py-4 pl-6">
-                          <div className="flex flex-col">
-                            <span className="text-[13px] font-medium text-[#E5E7EB] group-hover/row:text-white transition-colors">{enrollment.studentName}</span>
-                            <span className="text-[10px] font-mono text-[#71717a] uppercase tracking-tight mt-1">{enrollment.email}</span>
+                      <TableRow key={enrollment._id} className="border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                        <TableCell className="py-3 pl-5">
+                          <div>
+                            <span className="text-sm text-zinc-200">{enrollment.studentName}</span>
+                            <span className="block text-xs text-zinc-500 mt-0.5">{enrollment.email}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="py-4">
-                          <span className="text-[11px] font-mono text-[#A0A0A0] uppercase tracking-tighter">
+                        <TableCell className="py-3">
+                          <span className="text-sm text-zinc-400">
                             {enrollment.courseId?.title || enrollment.courseName}
                           </span>
                         </TableCell>
-                        <TableCell className="text-right py-4 pr-6">
-                          <Badge 
+                        <TableCell className="text-right py-3 pr-5">
+                          <Badge
                             variant="outline"
                             className={cn(
-                              "text-[9px] font-mono uppercase tracking-widest border px-2.5 py-1 rounded",
-                              enrollment.paymentStatus === 'paid' ? 'bg-[#00FFFF]/10 text-[#00FFFF] border-[#00FFFF]/20 shadow-[0_0_10px_rgba(0,255,255,0.1)]' :
-                              enrollment.paymentStatus === 'pending' ? 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]' :
-                              'bg-[#FF007F]/10 text-[#FF007F] border-[#FF007F]/20 shadow-[0_0_10px_rgba(255,0,127,0.1)]'
+                              "text-xs border px-2 py-0.5 rounded-md",
+                              enrollment.paymentStatus === 'paid' ? 'text-emerald-400 border-emerald-400/30 bg-emerald-400/5' :
+                              enrollment.paymentStatus === 'pending' ? 'text-amber-400 border-amber-400/30 bg-amber-400/5' :
+                              'text-red-400 border-red-400/30 bg-red-400/5'
                             )}
                           >
                             {enrollment.paymentStatus}
@@ -296,22 +275,22 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
 
-        {/* System Saturation */}
-        <div className="space-y-8">
-          <Card className="bg-black border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] rounded-xl hover:border-white/10 transition-colors duration-300">
-            <CardHeader className="border-b border-white/[0.05] py-5 px-6">
-              <CardTitle className="text-xs font-display font-medium uppercase tracking-[0.2em] text-[#E5E7EB]">Module Saturation</CardTitle>
+        {/* Course Saturation */}
+        <div>
+          <Card className="bg-zinc-900 border-zinc-800 rounded-xl">
+            <CardHeader className="border-b border-zinc-800 py-4 px-5">
+              <CardTitle className="text-sm font-medium text-zinc-200">Course Capacity</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 space-y-7">
+            <CardContent className="p-5 space-y-5">
               {stats.courseSaturation.map((course, index) => (
-                <div key={index} className="space-y-3 group/sat">
-                  <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest">
-                    <span className="text-[#A0A0A0] group-hover/sat:text-[#00FFFF] transition-colors">{course.name}</span>
-                    <span className="text-[#71717a] font-medium">{course.percentage}%</span>
+                <div key={index} className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-zinc-400">{course.name}</span>
+                    <span className="text-zinc-500 font-medium">{course.percentage}%</span>
                   </div>
-                  <div className="relative h-1.5 w-full bg-white/[0.03] overflow-hidden rounded-full border border-white/[0.05]">
-                    <div 
-                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#00FFFF] to-[#8B5CF6] transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(0,255,255,0.4)]"
+                  <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-zinc-400 rounded-full transition-all duration-700 ease-out"
                       style={{ width: `${course.percentage}%` }}
                     />
                   </div>

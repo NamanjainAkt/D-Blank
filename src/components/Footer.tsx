@@ -9,8 +9,8 @@ export function Footer() {
   return (
     <footer className="relative bg-black overflow-hidden pt-24 pb-8 border-t border-zinc-800/50">
       {/* BACKGROUND EFFECTS */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-fuchsia-600/5 blur-[100px] rounded-[100%] pointer-events-none" />
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-fuchsia-500/30 to-transparent shadow-[0_0_15px_rgba(217,70,239,0.3)]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-accent/5 blur-[100px] rounded-[100%] pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent/30 to-transparent shadow-[0_0_15px_rgba(217,70,239,0.3)]" />
       <NoiseOverlay opacity={10} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,14 +28,14 @@ export function Footer() {
             {/* SOCIALS */}
             <div className="flex items-center gap-3">
               {/* Instagram */}
-              <a href="https://www.instagram.com/d_blanks.games" target="_blank" rel="noopener noreferrer" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 transition-all duration-300">
-                <div className="absolute inset-0 rounded-xl bg-fuchsia-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Instagram className="w-4 h-4 text-zinc-400 group-hover:text-fuchsia-400 relative z-10 transition-colors" />
+              <a href="https://www.instagram.com/d_blanks.games" target="_blank" rel="noopener noreferrer" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-accent/50 hover:bg-accent/10 transition-all duration-300">
+                <div className="absolute inset-0 rounded-xl bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Instagram className="w-4 h-4 text-zinc-400 group-hover:text-accent relative z-10 transition-colors" />
               </a>
               {/* YouTube */}
-              <a href="https://youtube.com/@aashu01in?si=3YMh3iXi0uqgMiG6" target="_blank" rel="noopener noreferrer" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-fuchsia-500/50 hover:bg-fuchsia-500/10 transition-all duration-300">
-                <div className="absolute inset-0 rounded-xl bg-fuchsia-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Youtube className="w-4 h-4 text-zinc-400 group-hover:text-fuchsia-400 relative z-10 transition-colors" />
+              <a href="https://youtube.com/@aashu01in?si=3YMh3iXi0uqgMiG6" target="_blank" rel="noopener noreferrer" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-accent/50 hover:bg-accent/10 transition-all duration-300">
+                <div className="absolute inset-0 rounded-xl bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Youtube className="w-4 h-4 text-zinc-400 group-hover:text-accent relative z-10 transition-colors" />
               </a>
             </div>
           </div>
@@ -46,7 +46,7 @@ export function Footer() {
             {/* Explore */}
             <div>
               <h4 className="text-white text-xs font-display tracking-[0.25em] uppercase mb-6 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-sm bg-fuchsia-500 shadow-[0_0_8px_rgba(217,70,239,0.8)]" />
+                <span className="w-2 h-2 rounded-sm bg-accent shadow-[0_0_8px_rgba(217,70,239,0.8)]" />
                 Explore
               </h4>
               <ul className="space-y-3">
@@ -58,10 +58,10 @@ export function Footer() {
                 ].map(([href, label]) => (
                   <li key={href}>
                     <Link href={href} className="group flex items-center text-sm text-zinc-400 hover:text-white transition-colors w-fit">
-                      <ChevronRight className="w-3.5 h-3.5 mr-0 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:mr-1 group-hover:translate-x-0 group-hover:text-fuchsia-400 transition-all duration-300" />
+                      <ChevronRight className="w-3.5 h-3.5 mr-0 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:mr-1 group-hover:translate-x-0 group-hover:text-accent transition-all duration-300" />
                       <span className="relative">
                         {label}
-                        <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-fuchsia-500 group-hover:w-full transition-all duration-300" />
+                        <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-accent group-hover:w-full transition-all duration-300" />
                       </span>
                     </Link>
                   </li>
@@ -72,7 +72,7 @@ export function Footer() {
             {/* Support */}
             <div>
               <h4 className="text-white text-xs font-display tracking-[0.25em] uppercase mb-6 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-sm bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.8)]" />
+                <span className="w-2 h-2 rounded-sm bg-primary shadow-[0_0_8px_rgba(139,92,246,0.8)]" />
                 Support
               </h4>
               <ul className="space-y-3">
@@ -84,10 +84,10 @@ export function Footer() {
                 ].map(([href, label]) => (
                   <li key={href}>
                     <Link href={href} className="group flex items-center text-sm text-zinc-400 hover:text-white transition-colors w-fit">
-                      <ChevronRight className="w-3.5 h-3.5 mr-0 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:mr-1 group-hover:translate-x-0 group-hover:text-violet-400 transition-all duration-300" />
+                      <ChevronRight className="w-3.5 h-3.5 mr-0 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:mr-1 group-hover:translate-x-0 group-hover:text-primary transition-all duration-300" />
                       <span className="relative">
                         {label}
-                        <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-violet-500 group-hover:w-full transition-all duration-300" />
+                        <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
                       </span>
                     </Link>
                   </li>
@@ -97,7 +97,7 @@ export function Footer() {
 
             {/* Contact Info (Spans 2 cols on md, 1 on lg) */}
             <div className="col-span-2 lg:col-span-1 bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <h4 className="text-white text-xs font-display tracking-[0.25em] uppercase mb-4 relative z-10">
                 HQ
               </h4>
@@ -126,7 +126,7 @@ export function Footer() {
             © {currentYear} D-Blanks Gaming Studio.
           </p>
           <div className="flex items-center gap-2 text-xs font-display tracking-widest text-zinc-600 uppercase">
-            <Sparkles className="w-3 h-3 text-fuchsia-500/70" />
+            <Sparkles className="w-3 h-3 text-accent/70" />
             <span>Built for the Future</span>
           </div>
         </div>

@@ -16,6 +16,14 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Fix HMR on Windows — use polling for file change detection
+  webpack: (config) => {
+    config.watchOptions = {
+      poll: 1000,
+      aggregateTimeout: 300,
+    };
+    return config;
+  },
   // Security headers for SEO and trust
   async headers() {
     return [
