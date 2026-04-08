@@ -19,7 +19,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ParticleField } from '@/components/ui/ParticleField';
-import { GlitchText } from '@/components/ui/GlitchText';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { MorphingBlobs } from '@/components/ui/MorphingBlobs';
 import { MagneticCursor } from '@/components/ui/MagneticCursor';
@@ -259,9 +258,9 @@ export default function GamesPage() {
                 </Badge>
                 
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 uppercase tracking-tighter italic">
-                  <GlitchText textClassName="bg-gradient-to-r from-white via-white to-zinc-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                    INITIALIZE A NEW GRID
-                  </GlitchText>
+                  <span className="bg-gradient-to-r from-white via-white to-zinc-400 bg-clip-text text-transparent">
+                    Initialize A New Grid
+                  </span>
                 </h2>
                 
                 <p className="text-zinc-400 mb-10 max-w-2xl mx-auto font-mono text-[13px] leading-relaxed uppercase tracking-widest border-x border-primary/30 px-8">

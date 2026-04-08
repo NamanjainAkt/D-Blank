@@ -55,46 +55,6 @@ interface Course {
   syllabusUrl?: string;
 }
 
-const categories = ['IT & Software', 'Electronics', 'Mechanical', 'Civil', 'Tech', 'Design', 'Creative'];
-
-interface FormState {
-  title: string;
-  slug: string;
-  shortDescription: string;
-  fullDescription: string;
-  duration: string;
-  schedule: string;
-  price: number;
-  originalPrice: number;
-  category: string;
-  tags: string;
-  totalSeats: number;
-  instructorName: string;
-  meetLink: string;
-  isPublished: boolean;
-  thumbnailUrl: string;
-  syllabusUrl: string;
-}
-
-const initialFormState: FormState = {
-  title: '',
-  slug: '',
-  shortDescription: '',
-  fullDescription: '',
-  duration: '',
-  schedule: '',
-  price: 0,
-  originalPrice: 0,
-  category: 'IT & Software',
-  tags: '',
-  totalSeats: 50,
-  instructorName: '',
-  meetLink: '',
-  isPublished: true,
-  thumbnailUrl: '',
-  syllabusUrl: '',
-};
-
 export default function AdminCoursesPage() {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -104,8 +64,6 @@ export default function AdminCoursesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [saving, setSaving] = useState(false);
-
-  const [formData, setFormData] = useState<FormState>(initialFormState);
 
   const fetchCourses = useCallback(async () => {
     try {
@@ -186,7 +144,6 @@ export default function AdminCoursesPage() {
   };
 
   const resetForm = () => {
-    setFormData(initialFormState);
     setEditingCourse(null);
   };
 
@@ -217,7 +174,7 @@ export default function AdminCoursesPage() {
                 variant="outline" 
                 size="sm"
                 className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-acid-green/50 text-acid-green text-[10px] font-mono uppercase tracking-widest h-9 shadow-[0_0_15px_rgba(57,255,20,0.1)]"
-                onClick={() => { resetForm(); }}
+                onClick={() => setEditingCourse(null)}
               >
                 <Plus className="w-3.5 h-3.5 mr-2" />
                 Initialize Module
@@ -241,6 +198,7 @@ export default function AdminCoursesPage() {
               )}
               
               <CourseForm 
+                key={editingCourse ? editingCourse._id : 'new-module'}
                 initialData={editingCourse} 
                 onSubmit={handleSubmit} 
                 loading={saving} 

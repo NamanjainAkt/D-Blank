@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     }
 
     const course = await Course.create({
-      ...body,
+      ...validation.data,
       enrolledCount: 0,
     });
 

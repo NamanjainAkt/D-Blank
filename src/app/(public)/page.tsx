@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { GlitchText } from "@/components/ui/GlitchText";
 import { TypingText } from "@/components/ui/TypingText";
 import { GlowButton } from "@/components/ui/GlowButton";
 import { CrystalButton } from "@/components/ui/CrystalButton";
@@ -154,13 +153,8 @@ export default function HomePage() {
                     <span className="block text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                       Build. Play.
                     </span>
-                    <span className="block mt-2">
-                      <GlitchText
-                        glitchIntensity={1.2}
-                        textClassName="bg-gradient-to-br from-primary via-accent to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]"
-                      >
-                        Create.
-                      </GlitchText>
+                    <span className="block mt-2 bg-gradient-to-br from-primary via-accent to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]">
+                      Create.
                     </span>
                   </h1>
                 </AnimatedContent>

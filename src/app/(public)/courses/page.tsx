@@ -25,7 +25,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { ParticleField } from '@/components/ui/ParticleField';
-import { GlitchText } from '@/components/ui/GlitchText';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { MorphingBlobs } from '@/components/ui/MorphingBlobs';
 import { MagneticCursor } from '@/components/ui/MagneticCursor';
@@ -38,19 +37,19 @@ import { motion } from 'framer-motion';
 const outcomes = [
   {
     title: "Production Pipeline",
-    description: "Master the end-to-end industrial pipeline from mesh to main-net deployment.",
+    description: "Master the complete development pipeline from concept to deployment.",
     icon: Code2,
     color: "text-primary"
   },
   {
-    title: "Syndicate Portfolio",
-    description: "Build a verified dossier of 3+ fully functional modules for your career matrix.",
+    title: "Professional Portfolio",
+    description: "Build a portfolio of 3+ fully functional projects for your career.",
     icon: Trophy,
     color: "text-accent"
   },
   {
-    title: "Global Uplink",
-    description: "Direct referrals to industry syndicates and partner studios globally.",
+    title: "Job Placement",
+    description: "Get direct referrals to industry partners and partner studios.",
     icon: Users,
     color: "text-blue-500"
   }
@@ -97,32 +96,28 @@ export default function CoursesPage() {
       <section className="relative pt-40 pb-32 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <AnimatedContent>
-            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.3em] border-primary/40 bg-primary/5 text-primary shadow-[0_0_15px_rgba(176,38,255,0.2)]">
+            <Badge variant="outline" className="mb-8 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.3em] border-primary/40 bg-primary/5 text-primary shadow-[0_0_15px_rgba(176,38,255,0.2)]">
               <Sparkles className="w-4 h-4 mr-2 animate-pulse" />
-              Direct Uplink Training
+              Training Courses
             </Badge>
-            <h1 className="text-5xl md:text-7xl lg:text-9xl font-black tracking-tighter mb-8 uppercase italic leading-[0.85]">
-              <span className="bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent italic">
-                Initialize
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-primary via-fuchsia-500 to-primary bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.5)]">
-                <GlitchText glitchIntensity={1.5}>The Career Matrix</GlitchText>
+            <h1 className="text-4xl md:text-6xl lg:text-8xl font-black tracking-tighter mb-8 uppercase italic leading-[0.95] px-4">
+              <span className="bg-gradient-to-r from-primary via-fuchsia-500 to-primary bg-clip-text text-transparent">
+                Start Your Career
               </span>
             </h1>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-12 font-mono text-[13px] uppercase tracking-[0.2em] leading-relaxed opacity-80">
-              From zero to architect. Master the digital forge with the industry's most specialized operatives.
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto mb-12 font-mono text-[13px] uppercase tracking-[0.2em] leading-relaxed opacity-80 px-4">
+              Master in-demand skills with industry-certified courses taught by experts.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 px-4">
               <Link href="#modules" data-magnetic>
                 <GlowButton variant="primary" className="min-w-[220px] h-14">
-                  Explore Grid
+                  Browse Courses
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </GlowButton>
               </Link>
               <Link href="/contact" data-magnetic>
                 <GlowButton variant="secondary" className="min-w-[220px] h-14 border-zinc-800 text-zinc-500 hover:text-white">
-                  Talk to Advisor
+                  Contact Us
                 </GlowButton>
               </Link>
             </div>
@@ -136,9 +131,9 @@ export default function CoursesPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             {[
               { label: "Success Rate", value: "98%", color: "text-primary" },
-              { label: "Operatives Trained", value: "50K+", color: "text-accent" },
-              { label: "Verified Modules", value: "100%", color: "text-primary" },
-              { label: "Certification", value: "PHASE-IV", color: "text-accent" }
+              { label: "Students Trained", value: "50K+", color: "text-accent" },
+              { label: "Verified Courses", value: "100%", color: "text-primary" },
+              { label: "Certification", value: "Industry", color: "text-accent" }
             ].map((stat, i) => (
               <div key={i} className="text-center group">
                 <div className={cn("text-3xl md:text-4xl font-black italic tracking-tighter group-hover:scale-110 transition-transform duration-500", stat.color)}>
@@ -158,8 +153,8 @@ export default function CoursesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <AnimatedContent>
-              <Badge variant="outline" className="mb-6 text-accent border-accent/40 bg-accent/5">Protocol Outcomes</Badge>
-              <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-12">Achievement Matrix</h2>
+              <Badge variant="outline" className="mb-6 text-accent border-accent/40 bg-accent/5">What You'll Get</Badge>
+              <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-12">Our Achievements</h2>
               <div className="space-y-6">
                 {outcomes.map((item, index) => (
                   <motion.div 
@@ -213,8 +208,8 @@ export default function CoursesPage() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <AnimatedContent className="mb-20 text-center">
-            <Badge variant="outline" className="mb-4 text-primary border-primary/40 bg-primary/5">Module sector</Badge>
-            <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-12">Available Modules</h2>
+            <Badge variant="outline" className="mb-4 text-primary border-primary/40 bg-primary/5">Course Categories</Badge>
+            <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-12">Browse Courses</h2>
             
             <div className="inline-flex p-1.5 bg-zinc-900/80 backdrop-blur-md rounded-2xl border border-white/5">
               <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
@@ -236,7 +231,7 @@ export default function CoursesPage() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-32 gap-6">
               <Loader2 className="w-12 h-12 animate-spin text-primary" />
-              <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-zinc-600 animate-pulse">Synchronizing Grid...</span>
+              <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-zinc-600 animate-pulse">Loading courses...</span>
             </div>
           ) : courses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -284,7 +279,7 @@ export default function CoursesPage() {
                         </div>
                         <div className="flex items-center gap-3 text-[10px] font-mono uppercase text-zinc-400">
                           <Users className="w-4 h-4 text-primary" />
-                          <span className="tracking-[0.2em] font-black">{course.enrolledCount} Seats Serialized</span>
+                          <span className="tracking-[0.2em] font-black">{course.enrolledCount} Students Enrolled</span>
                         </div>
                       </div>
 

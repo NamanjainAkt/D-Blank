@@ -21,6 +21,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       '/admin/dashboard': 'Dashboard',
       '/admin/enrollments': 'Enrollments',
       '/admin/courses': 'Courses',
+      '/admin/students': 'Registry',
+      '/admin/games': 'Game Matrix',
       '/admin/analytics': 'Analytics',
     };
     const title = titleMap[pathname] || 'Admin';
@@ -50,14 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return <>{children}</>;
   }
 
-  const titleMap: Record<string, string> = {
-    '/admin': 'Dashboard',
-    '/admin/dashboard': 'Dashboard',
-    '/admin/enrollments': 'Enrollments',
-    '/admin/courses': 'Courses',
-    '/admin/analytics': 'Analytics',
-  };
-  const pageTitle = titleMap[pathname] || 'Admin';
+  const pageTitle = useAdminStore.getState().lastPageTitle || 'Admin';
 
   return (
     <AdminShell pageTitle={pageTitle}>

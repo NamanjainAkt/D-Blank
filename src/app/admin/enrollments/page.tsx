@@ -51,7 +51,7 @@ interface Pagination {
   pages: number;
 }
 
-export default function AdminStudentsPage() {
+export default function AdminEnrollmentsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   

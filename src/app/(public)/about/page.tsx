@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Sparkles, Users, Target, Rocket, Zap, ArrowRight } from 'lucide-react';
 import { ParticleField } from '@/components/ui/ParticleField';
-import { GlitchText } from '@/components/ui/GlitchText';
 import { GlowButton } from '@/components/ui/GlowButton';
 import AnimatedContent from '@/components/AnimatedContent';
 import { Footer } from '@/components/Footer';
@@ -32,9 +31,9 @@ export default function AboutPage() {
               About D-Blanks
             </Badge>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-8">
-              <GlitchText textClassName="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
                 Pioneering the Future
-              </GlitchText>
+              </span>
               <br />
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 of Game Development

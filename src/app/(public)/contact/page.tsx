@@ -21,7 +21,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ParticleField } from '@/components/ui/ParticleField';
-import { GlitchText } from '@/components/ui/GlitchText';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { CrystalButton } from '@/components/ui/CrystalButton';
 import { MorphingBlobs } from '@/components/ui/MorphingBlobs';
@@ -46,22 +45,22 @@ export default function ContactPage() {
 
   const contactMethods = [
     {
-      title: "Direct Uplink",
-      description: "Secure email channel",
+      title: "Email",
+      description: "Send us an email",
       value: "arshgupta723@gmail.com",
       icon: Mail,
       color: "text-primary"
     },
     {
-      title: "Syndicate Hub",
-      description: "Discord community protocol",
+      title: "Discord",
+      description: "Join our community",
       value: "discord.gg/dblanks",
       icon: MessageCircle,
       color: "text-accent"
     },
     {
-      title: "Comms Link",
-      description: "Emergency voice authorization",
+      title: "Phone",
+      description: "Call us anytime",
       value: "+91 9340576811",
       icon: Smartphone,
       color: "text-blue-500"
@@ -88,19 +87,15 @@ export default function ContactPage() {
           <AnimatedContent>
             <Badge variant="outline" className="mb-6 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.3em] border-primary/40 bg-primary/5 text-primary">
               <Fingerprint className="w-4 h-4 mr-2 animate-pulse" />
-              Identification Required
+              Contact Us
             </Badge>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 uppercase italic leading-[0.85]">
-              <span className="bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent">
-                Establish
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-primary via-blue-500 to-primary bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(176,38,255,0.4)]">
-                <GlitchText glitchIntensity={1.8}>The Uplink</GlitchText>
+            <h1 className="text-4xl md:text-6xl lg:text-8xl font-black tracking-tighter mb-8 uppercase italic leading-[0.95] px-4">
+              <span className="bg-gradient-to-r from-primary via-blue-500 to-primary bg-clip-text text-transparent">
+                Get In Touch
               </span>
             </h1>
-            <p className="text-zinc-500 text-lg max-w-2xl mx-auto mb-10 font-mono text-[13px] uppercase tracking-[0.2em] leading-relaxed">
-              Dispatch your queries to the syndicate. Response latency: &lt; 24h standard protocol.
+            <p className="text-zinc-500 text-lg max-w-2xl mx-auto mb-10 font-mono text-[13px] uppercase tracking-[0.2em] leading-relaxed px-4">
+              Have questions? We'd love to hear from you. We'll get back to you within 24 hours.
             </p>
           </AnimatedContent>
         </div>
@@ -154,29 +149,29 @@ export default function ContactPage() {
                     <Terminal className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black italic uppercase tracking-tighter">Secure Dispatch</h2>
-                    <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.3em]">Encrypted Channel_404</p>
+                    <h2 className="text-2xl font-black italic uppercase tracking-tighter">Send Us a Message</h2>
+                    <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-[0.3em]">We'll respond within 24 hours</p>
                   </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-3">
-                      <Label htmlFor="name" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Operative_ID</Label>
+                      <Label htmlFor="name" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Your Name</Label>
                       <Input
                         id="name"
-                        placeholder="NAME_REQUIRED"
+                        placeholder="Enter your name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="h-12 bg-zinc-900/50 border-white/5 focus:border-primary/50 text-[11px] font-mono uppercase tracking-widest rounded-xl transition-all"
                       />
                     </div>
                     <div className="space-y-3">
-                      <Label htmlFor="email" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Uplink_Node</Label>
+                      <Label htmlFor="email" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Email Address</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="EMAIL_REQUIRED"
+                        placeholder="Enter your email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className="h-12 bg-zinc-900/50 border-white/5 focus:border-primary/50 text-[11px] font-mono uppercase tracking-widest rounded-xl transition-all"
@@ -184,20 +179,20 @@ export default function ContactPage() {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <Label htmlFor="subject" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Sector_Subject</Label>
+                    <Label htmlFor="subject" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Subject</Label>
                     <Input
                       id="subject"
-                      placeholder="NATURE_OF_DISPATCH"
+                      placeholder="What is this about?"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       className="h-12 bg-zinc-900/50 border-white/5 focus:border-primary/50 text-[11px] font-mono uppercase tracking-widest rounded-xl transition-all"
                     />
                   </div>
                   <div className="space-y-3">
-                    <Label htmlFor="message" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Payload_Data</Label>
+                    <Label htmlFor="message" className="text-[10px] font-mono uppercase tracking-[0.4em] text-primary/80 ml-1">Message</Label>
                     <Textarea
                       id="message"
-                      placeholder="DISPATCH_CONTENT..."
+                      placeholder="Tell us more about your inquiry..."
                       rows={6}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -208,8 +203,8 @@ export default function ContactPage() {
                   <div className="flex justify-center pt-4">
                     <div data-magnetic>
                       <CrystalButton 
-                        primaryText="Transmit" 
-                        secondaryText="Confirming..." 
+                        primaryText="Send Message" 
+                        secondaryText="Sending..." 
                         className="scale-90 md:scale-100"
                       />
                     </div>
@@ -232,12 +227,12 @@ export default function ContactPage() {
                     <div className="p-3 rounded-xl bg-zinc-950 border border-white/10 group-hover:border-primary/30 transition-colors">
                       <MapPin className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="text-xl font-black uppercase tracking-tighter italic">Physical Node</h3>
+                    <h3 className="text-xl font-black uppercase tracking-tighter italic">Our Location</h3>
                   </div>
                   <div className="space-y-4 font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 group-hover:text-zinc-300 transition-colors leading-relaxed">
-                    <p className="text-white font-black italic">D-Blanks Studio_Core</p>
-                    <p>Sindhya nagar, Durg 491001</p>
-                    <p>Sub-Sector: Chhattisgarh, India</p>
+                    <p className="text-white font-black italic">D-Blanks Gaming Studio</p>
+                    <p>Sindhya Nagar, Durg 491001</p>
+                    <p>Chhattisgarh, India</p>
                   </div>
                 </div>
                 {/* Background Detail */}
@@ -254,7 +249,7 @@ export default function ContactPage() {
                     <div className="p-3 rounded-xl bg-zinc-950 border border-white/10 group-hover:border-primary/30 transition-colors">
                       <Clock className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="text-xl font-black uppercase tracking-tighter italic">Operational Cycle</h3>
+                    <h3 className="text-xl font-black uppercase tracking-tighter italic">Business Hours</h3>
                   </div>
                   <div className="space-y-6 font-mono text-[10px] uppercase tracking-[0.25em]">
                     {[

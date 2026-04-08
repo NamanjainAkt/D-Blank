@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ChromaGrid, { ChromaItem } from '@/components/ui/ChromaGrid';
+import { MorphingBlobs } from '@/components/ui/MorphingBlobs';
 import { founders } from '@/lib/placeholder-data';
 
 function SectionLabel({ children }: { children: string }) {
@@ -64,6 +65,15 @@ const FoundersSection = () => {
 
   return (
     <section className="py-32 px-4 bg-black relative overflow-hidden">
+      {/* Background Atmosphere */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <MorphingBlobs 
+          colors={['rgba(176, 38, 255, 0.08)', 'rgba(217, 70, 239, 0.08)']} 
+          className="opacity-50"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(176,38,255,0.05),transparent_70%)]" />
+      </div>
+
       {/* Background accents */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl aspect-square bg-primary/[0.03] rounded-full blur-[60px] pointer-events-none" />

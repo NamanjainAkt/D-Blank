@@ -43,7 +43,7 @@ export async function PATCH(
 
     const course = await Course.findByIdAndUpdate(
       id,
-      { $set: body },
+      { $set: validation.data },
       { new: true }
     );
 
