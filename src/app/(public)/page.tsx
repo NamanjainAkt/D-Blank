@@ -26,6 +26,7 @@ import FoundersSection from "@/components/sections/FoundersSection";
 import { GameCard } from "@/components/GameCard";
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
+import { MobileHeroHUD } from "@/components/hero/MobileHeroHUD";
 
 const HeroModels = dynamic(() => import("@/components/HeroModels"), {
   ssr: false,
@@ -134,42 +135,36 @@ export default function HomePage() {
       <main className="min-h-screen bg-black text-white">
         {/* ===== HERO ===== */}
         <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden px-4 py-12 pt-32 sm:pt-40">
+          {/* Mobile HUD Overlays */}
+          <MobileHeroHUD />
+
           {/* Layered background / Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-black/40 to-black pointer-events-none" />
-          <div className="absolute top-1/3 -left-[10%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
+          <video className="absolute inset-0 w-full h-full object-cover sm:hidden" src="https://res.cloudinary.com/dj17ecslh/video/upload/v1775921016/scifi_gjhvck.mp4" muted autoPlay loop playsInline />
+<div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-black/40 to-black pointer-events-none" />
+          <div className="absolute top-1/4 sm:top-1/3 -left-[10%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[radial-gradient(circle,rgba(139,92,246,0.2)_0%,transparent_70%)] rounded-full pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
 
           {/* Top edge glow */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent pointer-events-none" />
 
           {/* Grid — violet tinted */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.045)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.045)_1px,transparent_1px)] bg-[size:32px_32px] sm:bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)] pointer-events-none" />
 
           <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pointer-events-none">
             <div className="lg:grid lg:grid-cols-[1fr_1fr] items-center min-h-[60vh]">
               {/* Left — Text content */}
               <div className="max-w-2xl lg:pr-8 pointer-events-auto py-12 flex flex-col items-center lg:items-start text-center lg:text-left mx-auto lg:mx-0">
                 <AnimatedContent delay={0.1}>
-                  <h1 className="text-[clamp(3.5rem,8vw,7rem)] font-black leading-[0.9] mb-8 tracking-tighter">
+                  <h1 className="text-6xl sm:text-7xl lg:text-[clamp(4.5rem,8vw,8.5rem)] font-black leading-relaxed sm:leading-[0.9] mb-8 tracking-tighter">
                     <span className="block text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                       Build. Play.
                     </span>
-                    <span className="block mt-2 bg-gradient-to-br from-primary via-accent to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)]">
+                    <span className="block mt-2 bg-gradient-to-br from-primary via-accent to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)] animate-glitch-flicker">
                       Create.
                     </span>
                   </h1>
                 </AnimatedContent>
 
-                <AnimatedContent delay={0.2}>
-                  <div className="text-base sm:text-lg text-zinc-300 max-w-lg mb-8 leading-relaxed min-h-[4rem] bg-black/30 p-4 rounded-xl border border-white/5 mx-auto lg:mx-0">
-                      <TypingText
-                        text="Crafting immersive games and training future game developers with pure passion."
-                        speed={0.03}
-                        delay={0.5}
-                      />
-                  </div>
-                </AnimatedContent>
-
-                <div className="flex flex-col sm:flex-row items-center lg:items-start gap-5 w-full lg:w-auto justify-center lg:justify-start">
+                <div className="flex flex-col sm:flex-row items-center lg:items-start gap-5 w-full lg:w-auto justify-center lg:justify-start mt-6 sm:mt-0">
                   <CrystalButton
                     href="/games"
                     className="group w-full sm:w-auto"
@@ -277,14 +272,8 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)] pointer-events-none" />
 
           {/* Core Glows */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[400px] bg-primary/10 blur-[60px] rounded-[100%] pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] max-w-[400px] h-[200px] bg-accent/10 blur-[40px] rounded-[100%] pointer-events-none" />
-
-          {/* Scanline Effect */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-b from-transparent via-primary/5 to-transparent opacity-50"
-                 style={{ animation: 'scanline 8s linear infinite' }} />
-          </div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.15)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] max-w-[400px] h-[200px] bg-[radial-gradient(ellipse_at_center,rgba(217,70,239,0.15)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
 
           {/* Giant Background Text */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-center items-center pointer-events-none">
@@ -295,7 +284,7 @@ export default function HomePage() {
 
           <div className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center">
             <AnimatedContent>
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent p-[1px] mb-8 mx-auto shadow-[0_0_30px_rgba(217,70,239,0.3)] animate-float">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent p-[1px] mb-8 mx-auto shadow-[0_0_30px_rgba(217,70,239,0.3)]">
                 <div className="w-full h-full rounded-2xl bg-zinc-950 flex items-center justify-center">
                   <Zap className="w-8 h-8 text-accent" />
                 </div>
