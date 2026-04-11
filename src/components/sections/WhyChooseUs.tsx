@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import {
   Gamepad2,
   Settings,
@@ -14,8 +13,6 @@ import SectionBadge from "./SectionBadge";
 import GradientHeading from "./GradientHeading";
 import FeatureCard from "./FeatureCard";
 import TypingStatus from "./TypingStatus";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const features = [
   {
@@ -74,44 +71,44 @@ export default function WhyChooseUs() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 70%",
-        toggleActions: "play none none none",
-      },
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 70%",
+          toggleActions: "play none none none",
+        },
+      });
+
+      if (subtitleRef.current) {
+        tl.fromTo(
+          subtitleRef.current,
+          { y: 10, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+          0.4
+        );
+      }
+
+      if (gridRef.current) {
+        tl.fromTo(
+          gridRef.current.children,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.05, duration: 0.5, ease: "power2.out" },
+          0.5
+        );
+      }
+
+      if (footerRef.current) {
+        tl.fromTo(
+          footerRef.current,
+          { y: 10, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
+          1.0
+        );
+      }
     });
 
-    if (subtitleRef.current) {
-      tl.fromTo(
-        subtitleRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-        0.4
-      );
-    }
-
-    if (gridRef.current) {
-      tl.fromTo(
-        gridRef.current.children,
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.1, duration: 0.5, ease: "power2.out" },
-        0.5
-      );
-    }
-
-    if (footerRef.current) {
-      tl.fromTo(
-        footerRef.current,
-        { y: 15, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
-        1.0
-      );
-    }
-
-    return () => {
-      tl.kill();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
@@ -122,8 +119,8 @@ export default function WhyChooseUs() {
       {/* Lightweight background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,black,transparent)]" />
-        <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[60px]" />
-        <div className="absolute bottom-1/3 right-1/4 w-[300px] h-[300px] bg-accent/4 rounded-full blur-[50px]" />
+        <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-[radial-gradient(circle,rgba(139,92,246,0.08)_0%,transparent_70%)] rounded-full" />
+        <div className="absolute bottom-1/3 right-1/4 w-[300px] h-[300px] bg-[radial-gradient(circle,rgba(217,70,239,0.06)_0%,transparent_70%)] rounded-full" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">

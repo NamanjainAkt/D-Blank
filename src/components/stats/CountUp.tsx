@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap, ScrollTrigger } from '@/lib/gsap';
 
 interface CountUpProps {
   end: number;
@@ -30,34 +27,34 @@ export function CountUp({
 
     const element = ref.current;
 
-    // Create GSAP ScrollTrigger for counter animation
-    const counter = { value: 0 };
+    // Use gsap.context() for better cleanup
+    const ctx = gsap.context(() => {
+      const counter = { value: 0 };
 
-    ScrollTrigger.create({
-      trigger: element,
-      start: 'top 80%',
-      end: 'bottom 20%',
-      toggleActions: 'play none none reverse',
-      onEnter: () => {
-        setIsLoading(false);
-        gsap.to(counter, {
-          value: end,
-          duration: duration,
-          ease: 'power2.out',
-          onUpdate: () => {
-            setCount(Math.floor(counter.value));
-          },
-        });
-      },
-      onLeaveBack: () => {
-        setCount(0);
-        counter.value = 0;
-      },
-    });
+      ScrollTrigger.create({
+        trigger: element,
+        start: 'top 80%',
+        end: 'bottom 20%',
+        toggleActions: 'play none none reverse',
+        onEnter: () => {
+          setIsLoading(false);
+          gsap.to(counter, {
+            value: end,
+            duration: duration,
+            ease: 'power2.out',
+            onUpdate: () => {
+              setCount(Math.floor(counter.value));
+            },
+          });
+        },
+        onLeaveBack: () => {
+          setCount(0);
+          counter.value = 0;
+        },
+      });
+    }, element);
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+    return () => ctx.revert();
   }, [end, duration]);
 
   // Debug: Force initial render with actual values for immediate visibility

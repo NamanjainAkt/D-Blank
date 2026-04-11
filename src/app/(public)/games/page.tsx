@@ -249,7 +249,7 @@ export default function GamesPage() {
                 className="z-0 mix-blend-screen opacity-50 group-hover:opacity-100 transition-opacity duration-1000" 
               />
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
-              <div className="absolute top-0 right-0 w-96 h-96 bg-accent/20 rounded-full blur-[120px] pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
+              <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle,rgba(217,70,239,0.15)_0%,transparent_70%)] rounded-full pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
               
               <div className="relative z-10 px-6 py-20 md:py-24 text-center flex flex-col items-center">
                 <Badge variant="outline" className="mb-6 px-4 py-1.5 text-xs font-mono border-accent/50 bg-accent/10 text-accent uppercase tracking-widest shadow-[0_0_15px_rgba(192,38,211,0.2)]">

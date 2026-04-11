@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import gsap from 'gsap';
+import { gsap } from '@/lib/gsap';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ChromaGrid, { ChromaItem } from '@/components/ui/ChromaGrid';
@@ -26,30 +26,33 @@ const FoundersSection = () => {
   const gridRef = useRef(null);
 
   useEffect(() => {
-    const tl = gsap.timeline();
-    
-    tl.fromTo(
-      headerRef.current,
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-      }
-    );
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline();
+      
+      tl.fromTo(
+        headerRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+        }
+      );
 
-    tl.fromTo(
-      gridRef.current,
-      { opacity: 0, scale: 0.98 },
-      {
-        opacity: 1,
-        scale: 1,
-        duration: 1,
-        ease: 'power2.out',
-      },
-      '-=0.4'
-    );
+      tl.fromTo(
+        gridRef.current,
+        { opacity: 0, scale: 0.98 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 1,
+          ease: 'power2.out',
+        },
+        '-=0.4'
+      );
+    });
+    return () => ctx.revert();
   }, []);
 
   // Map founders to ChromaItem format

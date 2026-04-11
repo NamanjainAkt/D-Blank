@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 
 import GameplayPreview from "./micro/GameplayPreview";
@@ -10,8 +9,6 @@ import ToolStack from "./micro/ToolStack";
 import OutcomeTimeline from "./micro/OutcomeTimeline";
 import MentorshipFlow from "./micro/MentorshipFlow";
 import PortfolioStack from "./micro/PortfolioStack";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const MicroComponents: Record<string, React.ElementType> = {
   "01": GameplayPreview,
@@ -48,22 +45,26 @@ export default function FeatureCard({
     const card = cardRef.current;
     if (!card) return;
 
-    gsap.fromTo(
-      card,
-      { y: 50, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.7,
-        delay: index * 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: card,
-          start: "top 85%",
-          toggleActions: "play none none none",
-        },
-      }
-    );
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        card,
+        { y: 15, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          delay: index * 0.05,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    });
+
+    return () => ctx.revert();
   }, [index]);
 
   return (

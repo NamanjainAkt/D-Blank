@@ -21,8 +21,8 @@ export default function AboutPage() {
         />
         
         <div className="absolute inset-0 bg-gradient-to-b from-accent/20 via-black to-black" />
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-accent/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(139,92,246,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-[radial-gradient(circle,rgba(217,70,239,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
         
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedContent>
@@ -97,7 +97,7 @@ export default function AboutPage() {
       {/* CALL TO ACTION */}
       <section className="py-32 px-4 bg-black relative overflow-hidden flex flex-col items-center justify-center">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)] pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[400px] bg-primary/10 blur-[120px] rounded-[100%] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.15)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
 
         <div className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center">
           <AnimatedContent>

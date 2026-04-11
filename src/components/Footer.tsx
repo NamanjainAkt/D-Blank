@@ -9,7 +9,7 @@ export function Footer() {
   return (
     <footer className="relative bg-black overflow-hidden pt-24 pb-8 border-t border-zinc-800/50">
       {/* BACKGROUND EFFECTS */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-accent/5 blur-[100px] rounded-[100%] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[radial-gradient(ellipse_at_top,rgba(217,70,239,0.08)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent/30 to-transparent shadow-[0_0_15px_rgba(217,70,239,0.3)]" />
       <NoiseOverlay opacity={10} />
 
@@ -29,12 +29,10 @@ export function Footer() {
             <div className="flex items-center gap-3">
               {/* Instagram */}
               <a href="https://www.instagram.com/d_blanks.games" target="_blank" rel="noopener noreferrer" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-accent/50 hover:bg-accent/10 transition-all duration-300">
-                <div className="absolute inset-0 rounded-xl bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Instagram className="w-4 h-4 text-zinc-400 group-hover:text-accent relative z-10 transition-colors" />
               </a>
               {/* YouTube */}
               <a href="https://youtube.com/@aashu01in?si=3YMh3iXi0uqgMiG6" target="_blank" rel="noopener noreferrer" className="group relative w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-accent/50 hover:bg-accent/10 transition-all duration-300">
-                <div className="absolute inset-0 rounded-xl bg-accent/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Youtube className="w-4 h-4 text-zinc-400 group-hover:text-accent relative z-10 transition-colors" />
               </a>
             </div>

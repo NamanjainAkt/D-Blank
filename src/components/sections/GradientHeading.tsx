@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import SplitText from "./SplitText";
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface GradientHeadingProps {
   prefix?: string;
@@ -28,34 +25,39 @@ export default function GradientHeading({
     if (!highlightRef.current) return;
 
     const el = highlightRef.current;
-    gsap.set(el, { opacity: 0, y: 30, filter: "blur(8px)" });
+    
+    const ctx = gsap.context(() => {
+      gsap.set(el, { opacity: 0, y: 30, filter: "blur(8px)" });
 
-    ScrollTrigger.create({
-      trigger: el,
-      start: "top 95%",
-      onEnter: () => {
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 95%",
+        onEnter: () => {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.9,
+            ease: "power3.out",
+          });
+        },
+      });
+
+      // Fallback: if element is already in view, animate immediately
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.95) {
         gsap.to(el, {
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
           duration: 0.9,
+          delay: 0.5,
           ease: "power3.out",
         });
-      },
+      }
     });
 
-    // Fallback: if element is already in view, animate immediately
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight * 0.95) {
-      gsap.to(el, {
-        opacity: 1,
-        y: 0,
-        filter: "blur(0px)",
-        duration: 0.9,
-        delay: 0.5,
-        ease: "power3.out",
-      });
-    }
+    return () => ctx.revert();
   }, []);
 
   return (

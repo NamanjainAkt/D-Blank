@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import gsap from 'gsap';
+import { gsap } from '@/lib/gsap';
 import { TestimonialsColumn } from '@/components/ui/TestimonialsColumn';
 import { testimonials } from '@/lib/placeholder-data';
 
@@ -30,17 +30,20 @@ const TestimonialsSection = () => {
   const headerRef = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(
-      headerRef.current,
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        delay: 0.2,
-        ease: 'power3.out',
-      }
-    );
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        headerRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.2,
+          ease: 'power3.out',
+        }
+      );
+    });
+    return () => ctx.revert();
   }, []);
 
   // Prepare columns (staggered display for visual variation)

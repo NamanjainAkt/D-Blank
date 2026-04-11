@@ -11,6 +11,18 @@ export const BRAND = {
   maulRed: 0xff2020,     // bright red for glow
 };
 
+// Material registry to avoid redundant clones
+const materialRegistry = new Map<string, any>();
+
+function getOrCreateMaterial(THREE: any, key: string, config: any) {
+  if (materialRegistry.has(key)) {
+    return materialRegistry.get(key);
+  }
+  const material = new THREE.MeshStandardMaterial(config);
+  materialRegistry.set(key, material);
+  return material;
+}
+
 export function applyBrandMaterials(
   model: any,
   THREE: any,
@@ -21,52 +33,58 @@ export function applyBrandMaterials(
 
     const matName = (child.material.name || '').toLowerCase();
     const meshName = (child.name || '').toLowerCase();
-    child.material = child.material.clone();
-    const m = child.material;
-
+    
     // ─── EYES ───
     if (
       meshName.includes('eye') ||
       matName.includes('aistandard6') ||
       matName.includes('aistandardsurface6')
     ) {
-      m.color = new THREE.Color(BRAND.fuchsia);
-      m.emissive = new THREE.Color(BRAND.fuchsia);
-      m.emissiveIntensity = 3.0;
-      if (m.roughness !== undefined) m.roughness = 0.0;
-      if (m.metalness !== undefined) m.metalness = 0.5;
+      child.material = getOrCreateMaterial(THREE, 'eye', {
+        color: BRAND.fuchsia,
+        emissive: BRAND.fuchsia,
+        emissiveIntensity: 3.0,
+        roughness: 0.0,
+        metalness: 0.5
+      });
       return;
     }
 
     // ─── VADER VISOR (GLASS) ───
     if (matName.includes('glass')) {
-      m.color = new THREE.Color(0x0a0015);
-      m.emissive = new THREE.Color(BRAND.fuchsia);
-      m.emissiveIntensity = 0.5;
-      if (m.roughness !== undefined) m.roughness = 0.05;
-      if (m.metalness !== undefined) m.metalness = 1.0;
-      if (m.transparent !== undefined) m.transparent = true;
-      if (m.opacity !== undefined) m.opacity = 0.85;
+      child.material = getOrCreateMaterial(THREE, 'glass', {
+        color: 0x0a0015,
+        emissive: BRAND.fuchsia,
+        emissiveIntensity: 0.5,
+        roughness: 0.05,
+        metalness: 1.0,
+        transparent: true,
+        opacity: 0.85
+      });
       return;
     }
 
     // ─── GLOW / WEAPON ───
     if (matName.includes('glow') || matName.includes('weapon')) {
-      m.color = new THREE.Color(BRAND.fuchsia);
-      m.emissive = new THREE.Color(BRAND.fuchsia);
-      m.emissiveIntensity = 2.5;
-      if (m.roughness !== undefined) m.roughness = 0.1;
-      if (m.metalness !== undefined) m.metalness = 0.6;
+      child.material = getOrCreateMaterial(THREE, 'glow', {
+        color: BRAND.fuchsia,
+        emissive: BRAND.fuchsia,
+        emissiveIntensity: 2.5,
+        roughness: 0.1,
+        metalness: 0.6
+      });
       return;
     }
 
     // ─── HORNS (Maul) — dark with subtle red glow ───
     if (meshName.includes('horn')) {
-      m.color = new THREE.Color(0x0a0a0a);
-      m.emissive = new THREE.Color(0x300505);
-      m.emissiveIntensity = 0.4;
-      if (m.roughness !== undefined) m.roughness = 0.4;
-      if (m.metalness !== undefined) m.metalness = 0.3;
+      child.material = getOrCreateMaterial(THREE, 'horn', {
+        color: 0x0a0a0a,
+        emissive: 0x300505,
+        emissiveIntensity: 0.4,
+        roughness: 0.4,
+        metalness: 0.3
+      });
       return;
     }
 
@@ -76,11 +94,13 @@ export function applyBrandMaterials(
       matName.includes('utility') ||
       matName.includes('plastic')
     ) {
-      m.color = new THREE.Color(BRAND.surface);
-      m.emissive = new THREE.Color(0x030308);
-      m.emissiveIntensity = 0.15;
-      if (m.roughness !== undefined) m.roughness = 0.3;
-      if (m.metalness !== undefined) m.metalness = 0.85;
+      child.material = getOrCreateMaterial(THREE, 'metal', {
+        color: BRAND.surface,
+        emissive: 0x030308,
+        emissiveIntensity: 0.15,
+        roughness: 0.3,
+        metalness: 0.85
+      });
       return;
     }
 
@@ -89,11 +109,13 @@ export function applyBrandMaterials(
       characterType === 'maul' &&
       (matName.includes('head') || matName.includes('aistandard'))
     ) {
-      m.color = new THREE.Color(BRAND.maulSkin);
-      m.emissive = new THREE.Color(BRAND.maulRed);
-      m.emissiveIntensity = 0.6;
-      if (m.roughness !== undefined) m.roughness = 0.55;
-      if (m.metalness !== undefined) m.metalness = 0.05;
+      child.material = getOrCreateMaterial(THREE, 'maulSkin', {
+        color: BRAND.maulSkin,
+        emissive: BRAND.maulRed,
+        emissiveIntensity: 0.6,
+        roughness: 0.55,
+        metalness: 0.05
+      });
       return;
     }
 
@@ -116,19 +138,23 @@ export function applyBrandMaterials(
       meshName.includes('kata') ||
       meshName.includes('mune')
     ) {
-      m.color = new THREE.Color(BRAND.base);
-      m.emissive = new THREE.Color(0x030308);
-      m.emissiveIntensity = 0.1;
-      if (m.roughness !== undefined) m.roughness = 0.8;
-      if (m.metalness !== undefined) m.metalness = 0.15;
+      child.material = getOrCreateMaterial(THREE, 'cloth', {
+        color: BRAND.base,
+        emissive: 0x030308,
+        emissiveIntensity: 0.1,
+        roughness: 0.8,
+        metalness: 0.15
+      });
       return;
     }
 
     // ─── FALLBACK ───
-    m.color = new THREE.Color(BRAND.surface);
-    m.emissive = new THREE.Color(0x030308);
-    m.emissiveIntensity = 0.1;
-    if (m.roughness !== undefined) m.roughness = 0.7;
-    if (m.metalness !== undefined) m.metalness = 0.2;
+    child.material = getOrCreateMaterial(THREE, 'fallback', {
+      color: BRAND.surface,
+      emissive: 0x030308,
+      emissiveIntensity: 0.1,
+      roughness: 0.7,
+      metalness: 0.2
+    });
   });
 }

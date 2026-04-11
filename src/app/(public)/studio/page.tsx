@@ -223,7 +223,7 @@ export default function StudioPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <AnimatedContent className="text-center p-16 rounded-[3rem] bg-gradient-to-b from-zinc-900/50 to-black/50 border border-white/5 backdrop-blur-xl relative overflow-hidden group/card shadow-[0_0_100px_rgba(0,0,0,1)]">
             {/* Focal Point Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-1000" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(139,92,246,0.15)_0%,transparent_70%)] rounded-full pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity duration-1000" />
             
             <div className="relative z-10">
               <Badge variant="outline" className="mb-8 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.4em] border-accent/40 bg-accent/5 text-accent">Initiation Portal</Badge>

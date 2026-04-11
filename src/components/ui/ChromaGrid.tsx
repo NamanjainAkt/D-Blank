@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
+import { gsap } from '@/lib/gsap';
 
 export interface ChromaItem {
   image: string;
@@ -42,12 +42,17 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
-    setX.current = gsap.quickSetter(el, '--x', 'px') as SetterFn;
-    setY.current = gsap.quickSetter(el, '--y', 'px') as SetterFn;
-    const { width, height } = el.getBoundingClientRect();
-    pos.current = { x: width / 2, y: height / 2 };
-    setX.current(pos.current.x);
-    setY.current(pos.current.y);
+
+    const ctx = gsap.context(() => {
+      setX.current = gsap.quickSetter(el, '--x', 'px') as SetterFn;
+      setY.current = gsap.quickSetter(el, '--y', 'px') as SetterFn;
+      const { width, height } = el.getBoundingClientRect();
+      pos.current = { x: width / 2, y: height / 2 };
+      setX.current(pos.current.x);
+      setY.current(pos.current.y);
+    });
+
+    return () => ctx.revert();
   }, []);
 
   const moveTo = (x: number, y: number) => {

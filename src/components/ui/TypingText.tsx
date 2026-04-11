@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import { gsap } from '@/lib/gsap';
 
 interface TypingTextProps {
   text: string;
@@ -17,35 +17,33 @@ export function TypingText({ text, className = '', delay = 0, speed = 0.05 }: Ty
   useEffect(() => {
     if (!textRef.current || !cursorRef.current) return;
 
-    const chars = text.split('');
-    let currentText = '';
-    const tl = gsap.timeline({ delay });
+    const ctx = gsap.context(() => {
+      const obj = { length: 0 };
+      const tl = gsap.timeline({ delay });
 
-    // Typing animation
-    chars.forEach((char, index) => {
-      tl.to({}, {
-        duration: speed,
-        onComplete: () => {
-          currentText += char;
+      // Efficient typing animation using onUpdate
+      tl.to(obj, {
+        length: text.length,
+        duration: text.length * speed,
+        ease: 'none',
+        onUpdate: () => {
           if (textRef.current) {
-            textRef.current.textContent = currentText;
+            textRef.current.textContent = text.substring(0, Math.ceil(obj.length));
           }
         }
       });
+
+      // Cursor blink
+      gsap.to(cursorRef.current, {
+        opacity: 0,
+        duration: 0.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut'
+      });
     });
 
-    // Cursor blink after typing
-    tl.to(cursorRef.current, {
-      opacity: 0,
-      duration: 0.5,
-      repeat: -1,
-      yoyo: true,
-      ease: 'power2.inOut'
-    }, '-=0.5');
-
-    return () => {
-      tl.kill();
-    };
+    return () => ctx.revert();
   }, [text, delay, speed]);
 
   return (

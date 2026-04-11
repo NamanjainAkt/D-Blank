@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 interface SplitTextProps {
   text: string;
@@ -15,29 +15,33 @@ export default function SplitText({ text, className = "", delay = 0 }: SplitText
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const chars = containerRef.current.querySelectorAll(".char");
-    
-    gsap.fromTo(
-      chars,
-      { 
-        y: 40, 
-        opacity: 0, 
-        filter: "blur(10px)" 
-      },
-      {
-        y: 0,
-        opacity: 1,
-        filter: "blur(0px)",
-        stagger: 0.05,
-        duration: 0.8,
-        delay: delay,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 85%",
+    const ctx = gsap.context(() => {
+      const chars = containerRef.current!.querySelectorAll(".char");
+      
+      gsap.fromTo(
+        chars,
+        { 
+          y: 40, 
+          opacity: 0, 
+          filter: "blur(10px)" 
         },
-      }
-    );
+        {
+          y: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+          stagger: 0.05,
+          duration: 0.8,
+          delay: delay,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 85%",
+          },
+        }
+      );
+    });
+
+    return () => ctx.revert();
   }, [text, delay]);
 
   return (

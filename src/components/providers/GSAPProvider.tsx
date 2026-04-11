@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, type ReactNode } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollTrigger } from '@/lib/gsap';
 
 interface GSAPProviderProps {
   children: ReactNode;
@@ -10,8 +9,7 @@ interface GSAPProviderProps {
 
 export default function GSAPProvider({ children }: GSAPProviderProps) {
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
+    // Initial cleanup on mount to ensure no orphaned triggers
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };

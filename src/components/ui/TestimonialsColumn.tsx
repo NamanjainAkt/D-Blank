@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import gsap from 'gsap';
+import { gsap } from '@/lib/gsap';
 import { Quote } from 'lucide-react';
 
 interface Testimonial {
@@ -31,19 +31,19 @@ export const TestimonialsColumn = ({
     const el = containerRef.current;
     if (!el) return;
 
-    // Calculate the height of one full set of testimonials
-    const totalHeight = el.scrollHeight / 2;
+    const ctx = gsap.context(() => {
+      // Calculate the height of one full set of testimonials
+      const totalHeight = el.scrollHeight / 2;
 
-    const tl = gsap.to(el, {
-      y: -totalHeight,
-      duration: duration,
-      ease: 'none',
-      repeat: -1,
+      gsap.to(el, {
+        y: -totalHeight,
+        duration: duration,
+        ease: 'none',
+        repeat: -1,
+      });
     });
 
-    return () => {
-      tl.kill();
-    };
+    return () => ctx.revert();
   }, [duration, testimonials]);
 
   return (

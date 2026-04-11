@@ -234,31 +234,38 @@ export default function HeroModels({ onLoaded }: HeroModelsProps) {
 
       function onResize() {
         if (!container || disposed) return;
-        camera.aspect = container.clientWidth / container.clientHeight;
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        
+        // Prevent 0-dimension camera crashes
+        if (width <= 0 || height <= 0) return;
+        
+        camera.aspect = width / height;
         camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setSize(width, height);
       }
       window.addEventListener('resize', onResize);
+
+      // Trigger initial resize
+      onResize();
 
       return () => {
         window.removeEventListener('resize', onResize);
         cancelAnimationFrame(animId);
         renderer.dispose();
-        if (container.contains(renderer.domElement)) {
+        if (container && container.contains(renderer.domElement)) {
           container.removeChild(renderer.domElement);
         }
       };
     }
 
-    let cleanup: (() => void) | undefined;
-    init().then((fn) => {
-      cleanup = fn;
-    });
+    let cleanupPromise: Promise<((() => void) | undefined)> | null = null;
+    cleanupPromise = init();
 
     return () => {
       disposed = true;
       cancelAnimationFrame(animId);
-      cleanup?.();
+      cleanupPromise?.then(fn => fn?.());
     };
   }, [onLoaded]);
 
