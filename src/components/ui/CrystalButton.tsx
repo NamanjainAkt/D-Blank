@@ -384,6 +384,10 @@ const StyledWrapper = styled.div`
     perspective: 40px;
     cursor: pointer;
     user-select: none;
+    
+    @media (max-width: 768px) {
+      perspective: none;
+    }
   }
 
   .area > svg {
@@ -391,6 +395,10 @@ const StyledWrapper = styled.div`
     pointer-events: none;
     left: 50%;
     transform: translateX(-50%);
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
   .area input {
     opacity: 0;
@@ -405,6 +413,10 @@ const StyledWrapper = styled.div`
     z-index: 10;
     transition: opacity 0.5s ease;
     opacity: 0;
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   .particle {
@@ -415,6 +427,10 @@ const StyledWrapper = styled.div`
     top: var(--y);
     rotate: var(--a);
     filter: blur(2px);
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   .particle::before {
@@ -464,6 +480,10 @@ const StyledWrapper = styled.div`
     mix-blend-mode: overlay;
     mask-image: radial-gradient(ellipse at 50%, black 40%, transparent 70%);
 
+    @media (max-width: 768px) {
+      display: none;
+    }
+
     &::after {
       content: "";
       position: absolute;
@@ -479,6 +499,10 @@ const StyledWrapper = styled.div`
   .svg-turbulence {
     position: absolute;
     pointer-events: none;
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
   .electric {
     border-radius: var(--radius);
@@ -495,6 +519,10 @@ const StyledWrapper = styled.div`
     z-index: 10;
     mix-blend-mode: overlay;
     transform: scale(1.1);
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   .glass {
@@ -505,6 +533,10 @@ const StyledWrapper = styled.div`
     overflow: hidden;
     border-radius: var(--radius);
     transition: all 0.5s ease;
+    
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
 
   .glass::before,

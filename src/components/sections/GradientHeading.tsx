@@ -37,7 +37,7 @@ export default function GradientHeading({
             opacity: 1,
             y: 0,
             filter: "blur(0px)",
-            duration: 0.9,
+            duration: window.innerWidth < 768 ? 0.4 : 0.9,
             ease: "power3.out",
           });
         },
@@ -50,7 +50,7 @@ export default function GradientHeading({
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
-          duration: 0.9,
+          duration: window.innerWidth < 768 ? 0.4 : 0.9,
           delay: 0.5,
           ease: "power3.out",
         });

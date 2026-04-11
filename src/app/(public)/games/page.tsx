@@ -161,16 +161,16 @@ export default function GamesPage() {
               <div className="flex flex-col md:flex-row md:items-center justify-between bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 gap-4">
                 
                 {/* Classification (Genres) */}
-                <div className="flex items-center gap-4 flex-wrap flex-1 border-b md:border-b-0 md:border-r border-zinc-800 pb-4 md:pb-0 md:pr-4">
-                  <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-zinc-500 min-w-[120px]">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1 border-b md:border-b-0 md:border-r border-zinc-800 pb-4 md:pb-0 md:pr-4">
+                  <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500 min-w-[120px]">
                     <Filter className="w-3 h-3 text-primary" /> Classification
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {genres.map((genre) => (
                       <button
                         key={genre}
                         onClick={() => setSelectedGenre(genre)}
-                        className={`px-4 py-1.5 rounded-sm text-[10px] font-mono uppercase tracking-widest transition-all ${
+                        className={`px-3 sm:px-4 py-1.5 rounded-none text-[9px] sm:text-[10px] font-mono uppercase tracking-widest transition-all ${
                           selectedGenre === genre 
                             ? "bg-primary text-white shadow-[0_0_15px_rgba(124,58,237,0.4)]" 
                             : "bg-black/50 text-zinc-400 hover:bg-primary/20 hover:text-primary"
@@ -183,16 +183,16 @@ export default function GamesPage() {
                 </div>
 
                 {/* Uplink Hub (Platforms) */}
-                <div className="flex items-center gap-4 flex-wrap">
-                  <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-wrap">
+                  <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500">
                     <Monitor className="w-3 h-3 text-accent" /> Uplink Hub
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 sm:gap-2">
                     {platforms.map((platform) => (
                       <button
                         key={platform}
                         onClick={() => setSelectedPlatform(platform)}
-                        className={`px-4 py-1.5 rounded-sm text-[10px] font-mono uppercase tracking-widest transition-all ${
+                        className={`px-3 sm:px-4 py-1.5 rounded-none text-[9px] sm:text-[10px] font-mono uppercase tracking-widest transition-all ${
                           selectedPlatform === platform 
                             ? "bg-accent/20 border border-accent/50 text-accent shadow-[0_0_15px_rgba(192,38,211,0.3)]" 
                             : "bg-black/50 border border-transparent text-zinc-400 hover:border-accent/30 hover:text-zinc-300"
@@ -215,9 +215,9 @@ export default function GamesPage() {
               <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-500">Decrypting Archive...</span>
             </div>
           ) : games.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8">
               {games.map((game, index) => (
-                <AnimatedContent key={game._id} delay={index * 0.05}>
+                <AnimatedContent key={game._id} delay={index * 0.05} className="h-full">
                   <GameCard game={game} />
                 </AnimatedContent>
               ))}

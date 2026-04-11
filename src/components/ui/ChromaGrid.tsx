@@ -108,7 +108,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
         <article
           key={i}
           onClick={() => handleCardClick(c.url)}
-          className="group relative flex flex-col w-full sm:max-w-[340px] aspect-[3/4] rounded-[2.5rem] overflow-hidden border border-white/10 hover:border-primary/40 transition-all duration-500 cursor-pointer mx-auto bg-zinc-900/60 backdrop-blur-sm"
+          className="group relative flex flex-col w-full sm:max-w-[340px] aspect-[3/4] rounded-[2.5rem] overflow-hidden border border-white/10 hover:border-primary/40 transition-all duration-500 cursor-pointer mx-auto bg-zinc-900/60 sm:backdrop-blur-sm"
         >
           {/* Full-bleed background image */}
           <img

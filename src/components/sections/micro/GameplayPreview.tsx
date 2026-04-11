@@ -25,47 +25,62 @@ export default function GameplayPreview() {
     const path = pathRef.current;
     if (!player || !glow || !path) return;
 
-    // Animate path draw
-    const pathLength = path.getTotalLength();
-    gsap.set(path, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
+    let tl: gsap.core.Timeline;
 
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.5 });
+    const ctx = gsap.context(() => {
+      // Animate path draw
+      const pathLength = path.getTotalLength();
+      gsap.set(path, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
 
-    // Draw path + move player simultaneously
-    const totalDur = 3.5;
-    tl.to(path, { strokeDashoffset: 0, duration: totalDur, ease: "power1.inOut" }, 0);
+      tl = gsap.timeline({ 
+        repeat: -1, 
+        repeatDelay: 1.5,
+        scrollTrigger: {
+          trigger: path,
+          start: "top 110%",
+          end: "bottom -10%",
+          toggleActions: "play pause resume pause",
+        }
+      });
 
-    waypoints.forEach((point, i) => {
-      if (i === 0) return;
-      const segDur = totalDur / (waypoints.length - 1);
+      // Draw path + move player simultaneously
+      const totalDur = 3.5;
+      tl.to(path, { strokeDashoffset: 0, duration: totalDur, ease: "power1.inOut" }, 0);
+
+      waypoints.forEach((point, i) => {
+        if (i === 0) return;
+        const segDur = totalDur / (waypoints.length - 1);
+        tl.to([player, glow], {
+          attr: { cx: point.x, cy: point.y },
+          duration: segDur,
+          ease: "power1.inOut",
+        }, segDur * i);
+      });
+
+      // Hold at end
+      tl.to({}, { duration: 1.5 });
+
+      // Reset path
+      tl.to(path, { strokeDashoffset: pathLength, duration: 0.5, ease: "power2.in" });
       tl.to([player, glow], {
-        attr: { cx: point.x, cy: point.y },
-        duration: segDur,
-        ease: "power1.inOut",
-      }, segDur * i);
+        attr: { cx: waypoints[0].x, cy: waypoints[0].y },
+        duration: 0.3,
+        ease: "power2.in",
+      }, "-=0.3");
+
+      // Continuous glow pulse
+      gsap.to(glow, {
+        attr: { r: 16 },
+        opacity: 0,
+        duration: 1.2,
+        repeat: -1,
+        ease: "power2.out",
+      });
     });
 
-    // Hold at end
-    tl.to({}, { duration: 1.5 });
-
-    // Reset path
-    tl.to(path, { strokeDashoffset: pathLength, duration: 0.5, ease: "power2.in" });
-    tl.to([player, glow], {
-      attr: { cx: waypoints[0].x, cy: waypoints[0].y },
-      duration: 0.3,
-      ease: "power2.in",
-    }, "-=0.3");
-
-    // Continuous glow pulse
-    gsap.to(glow, {
-      attr: { r: 16 },
-      opacity: 0,
-      duration: 1.2,
-      repeat: -1,
-      ease: "power2.out",
-    });
-
-    return () => { tl.kill(); };
+    return () => { 
+      ctx.revert();
+    };
   }, []);
 
   // Build path d string

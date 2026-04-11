@@ -50,7 +50,9 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
 
     // Handle reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
+    const isMobile = window.innerWidth < 768;
+
+    if (prefersReducedMotion || (isMobile && threshold < 0.2)) {
       gsap.set(el, { opacity: 1, x: 0, y: 0, scale: 1, visibility: 'visible' });
       return;
     }

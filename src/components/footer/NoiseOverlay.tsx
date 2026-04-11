@@ -1,6 +1,15 @@
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export function NoiseOverlay({ opacity = 8 }: { opacity?: number }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
+  if (isMobile) return null;
+
   return (
     <div
       className={cn(

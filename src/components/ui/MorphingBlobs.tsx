@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 interface MorphingBlobsProps {
   className?: string;
   colors?: [string, string];
@@ -14,6 +16,14 @@ export function MorphingBlobs({
   className,
   colors = defaultColors,
 }: MorphingBlobsProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
+  if (isMobile) return null;
+
   const blobs = [
     {
       size: 500,

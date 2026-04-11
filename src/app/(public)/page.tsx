@@ -42,6 +42,13 @@ export default function HomePage() {
     setModelsReady(true);
   }, []);
 
+  // Set modelsReady to true immediately on mobile as they aren't rendered
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      setModelsReady(true);
+    }
+  }, []);
+
   // Auto-dismiss loader after models load (with min display time) or timeout
   useEffect(() => {
     const minTime = setTimeout(() => {
@@ -139,9 +146,17 @@ export default function HomePage() {
           <MobileHeroHUD />
 
           {/* Layered background / Overlays */}
-          <video className="absolute inset-0 w-full h-full object-cover sm:hidden" src="https://res.cloudinary.com/dj17ecslh/video/upload/v1775921016/scifi_gjhvck.mp4" muted autoPlay loop playsInline />
+          <video 
+            className="absolute inset-0 w-full h-full object-cover lg:hidden" 
+            src="https://res.cloudinary.com/dj17ecslh/video/upload/q_auto,f_auto,w_720/v1775921016/scifi_gjhvck.mp4" 
+            muted 
+            autoPlay 
+            loop 
+            playsInline 
+            onCanPlay={(e) => e.currentTarget.play()}
+          />
 <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-black/40 to-black pointer-events-none" />
-          <div className="absolute top-1/4 sm:top-1/3 -left-[10%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[radial-gradient(circle,rgba(139,92,246,0.2)_0%,transparent_70%)] rounded-full pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="absolute top-1/4 sm:top-1/3 -left-[10%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[radial-gradient(circle,rgba(139,92,246,0.2)_0%,transparent_70%)] rounded-full pointer-events-none hidden sm:block animate-pulse" style={{ animationDuration: '4s' }} />
 
           {/* Top edge glow */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent pointer-events-none" />
@@ -218,14 +233,14 @@ export default function HomePage() {
               </div>
             </AnimatedContent>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {gamesLoading ? (
                 Array(3).fill(0).map((_, i) => (
-                  <div key={i} className="aspect-video bg-white/5 rounded-xl animate-pulse" />
+                  <div key={i} className="aspect-[16/10] bg-white/5 rounded-[20px] animate-pulse" />
                 ))
               ) : featuredGames.length > 0 ? (
                 featuredGames.map((game) => (
-                  <AnimatedContent key={game._id}>
+                  <AnimatedContent key={game._id} className="h-full">
                     <GameCard game={game} />
                   </AnimatedContent>
                 ))

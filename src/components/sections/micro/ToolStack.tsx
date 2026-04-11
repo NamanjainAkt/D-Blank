@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import {
   UnityIcon,
   UnrealEngineIcon,
@@ -38,23 +38,29 @@ export default function ToolStack() {
     const marquee = marqueeRef.current;
     const container = containerRef.current;
 
-    const tl = gsap.to(marquee, {
-      x: "-50%",
-      duration: 20,
-      ease: "none",
-      repeat: -1,
+    const ctx = gsap.context(() => {
+      const tl = gsap.to(marquee, {
+        x: "-50%",
+        duration: 20,
+        ease: "none",
+        repeat: -1,
+        scrollTrigger: {
+          trigger: container,
+          start: "top 110%",
+          end: "bottom -10%",
+          toggleActions: "play pause resume pause",
+        }
+      });
+
+      const onMouseEnter = () => gsap.to(tl, { timeScale: 0.2, duration: 0.4 });
+      const onMouseLeave = () => gsap.to(tl, { timeScale: 1, duration: 0.4 });
+
+      container.addEventListener("mouseenter", onMouseEnter);
+      container.addEventListener("mouseleave", onMouseLeave);
     });
 
-    const onMouseEnter = () => gsap.to(tl, { timeScale: 0.2, duration: 0.4 });
-    const onMouseLeave = () => gsap.to(tl, { timeScale: 1, duration: 0.4 });
-
-    container.addEventListener("mouseenter", onMouseEnter);
-    container.addEventListener("mouseleave", onMouseLeave);
-
     return () => {
-      tl.kill();
-      container.removeEventListener("mouseenter", onMouseEnter);
-      container.removeEventListener("mouseleave", onMouseLeave);
+      ctx.revert();
     };
   }, []);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { BookOpen, Eye, RefreshCw } from "lucide-react";
 
 const steps = [
@@ -25,72 +25,82 @@ export default function MentorshipFlow() {
 
     if (!line || !progress || !dot) return;
 
-    const tl = gsap.timeline({ repeat: -1 });
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ 
+        repeat: -1,
+        scrollTrigger: {
+          trigger: line,
+          start: "top 110%",
+          end: "bottom -10%",
+          toggleActions: "play pause resume pause",
+        }
+      });
 
-    // Animate progress line
-    tl.fromTo(
-      progress,
-      { scaleX: 0 },
-      { scaleX: 1, duration: 1.2, ease: "power2.inOut" }
-    );
-
-    // Animate dot through each step
-    steps.forEach((_, i) => {
-      const node = nodeRefs.current[i];
-      const icon = iconRefs.current[i];
-
-      if (!node) return;
-
-      // Get position of node relative to container
-      const nodeLeft = (i / (steps.length - 1)) * 100;
-
-      // Move dot to node
-      tl.to(
-        dot,
-        {
-          left: `${nodeLeft}%`,
-          scale: 1.4,
-          duration: 0.6,
-          ease: "power2.out",
-        },
-        i * 0.8
+      // Animate progress line
+      tl.fromTo(
+        progress,
+        { scaleX: 0 },
+        { scaleX: 1, duration: 1.2, ease: "power2.inOut" }
       );
 
-      // Pulse node
-      if (icon) {
-        tl.to(icon, {
-          scale: 1.2,
-          duration: 0.3,
-          ease: "back.out(2)",
-        });
-        tl.to(icon, {
-          scale: 1,
-          duration: 0.3,
-          ease: "power2.in",
-        });
-      }
+      // Animate dot through each step
+      steps.forEach((_, i) => {
+        const node = nodeRefs.current[i];
+        const icon = iconRefs.current[i];
 
-      // Hold at node
-      tl.to({}, { duration: 0.2 });
+        if (!node) return;
+
+        // Get position of node relative to container
+        const nodeLeft = (i / (steps.length - 1)) * 100;
+
+        // Move dot to node
+        tl.to(
+          dot,
+          {
+            left: `${nodeLeft}%`,
+            scale: 1.4,
+            duration: 0.6,
+            ease: "power2.out",
+          },
+          i * 0.8
+        );
+
+        // Pulse node
+        if (icon) {
+          tl.to(icon, {
+            scale: 1.2,
+            duration: 0.3,
+            ease: "back.out(2)",
+          });
+          tl.to(icon, {
+            scale: 1,
+            duration: 0.3,
+            ease: "power2.in",
+          });
+        }
+
+        // Hold at node
+        tl.to({}, { duration: 0.2 });
+      });
+
+      // Hold at end
+      tl.to({}, { duration: 0.8 });
+
+      // Reset
+      tl.to(dot, {
+        left: "0%",
+        scale: 1,
+        duration: 0.5,
+        ease: "power2.inOut",
+      });
+
+      tl.to(progress, { scaleX: 0, duration: 0.3, ease: "power2.in" });
+
+      tl.to({}, { duration: 0.5 });
     });
-
-    // Hold at end
-    tl.to({}, { duration: 0.8 });
-
-    // Reset
-    tl.to(dot, {
-      left: "0%",
-      scale: 1,
-      duration: 0.5,
-      ease: "power2.inOut",
-    });
-
-    tl.to(progress, { scaleX: 0, duration: 0.3, ease: "power2.in" });
-
-    tl.to({}, { duration: 0.5 });
 
     return () => {
-      tl.kill();
+      ctx.revert();
     };
   }, []);
 

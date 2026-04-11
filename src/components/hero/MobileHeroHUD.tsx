@@ -35,28 +35,30 @@ export const MobileHeroHUD = () => {
         <span className="text-[8px] font-mono text-zinc-500 mt-2 uppercase tracking-[0.3em]">Sector_7G</span>
       </div>
 
-      {/* Subtle Floating Squares (Very Light) */}
-      {[...Array(3)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-primary/20"
-          initial={{
-            x: Math.random() * 100 + "%",
-            y: "110%",
-            opacity: 0
-          }}
-          animate={{
-            y: "-10%",
-            opacity: [0, 0.3, 0]
-          }}
-          transition={{
-            duration: 15 + i * 5,
-            repeat: Infinity,
-            delay: i * 4,
-            ease: "linear"
-          }}
-        />
-      ))}
+      {/* Subtle Floating Squares (Disabled on very small/slow devices if needed, but keeping for now) */}
+      <div className="hidden sm:block">
+        {[...Array(3)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-primary/20"
+            initial={{
+              x: Math.random() * 100 + "%",
+              y: "110%",
+              opacity: 0
+            }}
+            animate={{
+              y: "-10%",
+              opacity: [0, 0.3, 0]
+            }}
+            transition={{
+              duration: 15 + i * 5,
+              repeat: Infinity,
+              delay: i * 4,
+              ease: "linear"
+            }}
+          />
+        ))}
+      </div>
 
       {/* Animated Mobile Scroll Indicator */}
       <motion.div 

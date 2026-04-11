@@ -22,17 +22,19 @@ export default function SectionBadge({
     tl.fromTo(
       badgeRef.current,
       { opacity: 0, y: 10, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }
+      { opacity: 1, y: 0, scale: 1, duration: window.innerWidth < 768 ? 0.3 : 0.6, ease: "power2.out" }
     );
 
-    gsap.to(dotRef.current, {
-      scale: 1.5,
-      opacity: 0.5,
-      duration: 1.5,
-      repeat: -1,
-      yoyo: true,
-      ease: "power1.inOut",
-    });
+    if (window.innerWidth >= 768) {
+      gsap.to(dotRef.current, {
+        scale: 1.5,
+        opacity: 0.5,
+        duration: 1.5,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut",
+      });
+    }
 
     tl.play();
 
