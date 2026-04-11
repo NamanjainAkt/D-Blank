@@ -89,7 +89,7 @@ export default function RootLayout({
         <link 
           rel="preload" 
           as="video" 
-          href="https://res.cloudinary.com/dj17ecslh/video/upload/q_auto,f_auto,w_720/v1775921016/scifi_gjhvck.mp4" 
+          href="https://res.cloudinary.com/dj17ecslh/video/upload/q_auto/f_auto/v1775926544/magichand_y3m0q5.mp4" 
           media="(max-width: 1023px)"
         />
       </head>

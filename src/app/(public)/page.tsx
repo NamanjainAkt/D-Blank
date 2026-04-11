@@ -149,7 +149,7 @@ export default function HomePage() {
           {/* Layered background / Overlays */}
           <CachedVideo 
             className="absolute inset-0 w-full h-full object-cover lg:hidden" 
-            src="https://res.cloudinary.com/dj17ecslh/video/upload/q_auto,f_auto,w_720/v1775921016/scifi_gjhvck.mp4" 
+            src="https://res.cloudinary.com/dj17ecslh/video/upload/q_auto/f_auto/v1775926544/magichand_y3m0q5.mp4" 
             muted 
             autoPlay 
             loop 
