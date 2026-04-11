@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 const steps = [
   { name: "Idea", color: "#B026FF", completed: false },
@@ -11,6 +11,7 @@ const steps = [
 ];
 
 export default function OutcomeTimeline() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const dotsRef = useRef<(HTMLDivElement | null)[]>([]);
   const labelsRef = useRef<(HTMLSpanElement | null)[]>([]);
@@ -18,64 +19,75 @@ export default function OutcomeTimeline() {
   useEffect(() => {
     if (!lineRef.current) return;
 
-    // Reset
-    gsap.set(lineRef.current, { scaleX: 0 });
-    dotsRef.current.forEach((dot) => {
-      if (dot) gsap.set(dot, { scale: 0, opacity: 0 });
-    });
-    labelsRef.current.forEach((label) => {
-      if (label) gsap.set(label, { opacity: 0, y: 8 });
-    });
-
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 2 });
-
-    steps.forEach((_, i) => {
-      const progress = (i + 1) / steps.length;
-
-      // Grow the progress line
-      tl.to(lineRef.current, {
-        scaleX: progress,
-        duration: 0.6,
-        ease: "power2.inOut",
+    const ctx = gsap.context(() => {
+      // Reset
+      gsap.set(lineRef.current, { scaleX: 0 });
+      dotsRef.current.forEach((dot) => {
+        if (dot) gsap.set(dot, { scale: 0, opacity: 0 });
+      });
+      labelsRef.current.forEach((label) => {
+        if (label) gsap.set(label, { opacity: 0, y: 8 });
       });
 
-      // Pop in the dot
-      if (dotsRef.current[i]) {
-        tl.to(dotsRef.current[i], {
-          scale: 1,
-          opacity: 1,
-          duration: 0.3,
-          ease: "back.out(2)",
-        }, "-=0.2");
-      }
+      const tl = gsap.timeline({ 
+        repeat: -1, 
+        repeatDelay: 2,
+        scrollTrigger: {
+          trigger: lineRef.current,
+          start: "top 110%",
+          end: "bottom -10%",
+          toggleActions: "play pause resume pause",
+        }
+      });
 
-      // Fade in label
-      if (labelsRef.current[i]) {
-        tl.to(labelsRef.current[i], {
-          opacity: 1,
-          y: 0,
-          duration: 0.3,
-          ease: "power2.out",
-        }, "-=0.2");
-      }
+      steps.forEach((_, i) => {
+        const progress = (i + 1) / steps.length;
 
-      // Pause at each step
-      tl.to({}, { duration: 0.4 });
+        // Grow the progress line
+        tl.to(lineRef.current, {
+          scaleX: progress,
+          duration: 0.6,
+          ease: "power2.inOut",
+        });
+
+        // Pop in the dot
+        if (dotsRef.current[i]) {
+          tl.to(dotsRef.current[i], {
+            scale: 1,
+            opacity: 1,
+            duration: 0.3,
+            ease: "back.out(2)",
+          }, "-=0.2");
+        }
+
+        // Fade in label
+        if (labelsRef.current[i]) {
+          tl.to(labelsRef.current[i], {
+            opacity: 1,
+            y: 0,
+            duration: 0.3,
+            ease: "power2.out",
+          }, "-=0.2");
+        }
+
+        // Pause at each step
+        tl.to({}, { duration: 0.4 });
+      });
+
+      // Hold at the end
+      tl.to({}, { duration: 1.5 });
+
+      // Reset all for next loop
+      tl.to(lineRef.current, { scaleX: 0, duration: 0.4, ease: "power2.in" });
+      dotsRef.current.forEach((dot) => {
+        if (dot) tl.to(dot, { scale: 0, opacity: 0, duration: 0.2 }, "-=0.3");
+      });
+      labelsRef.current.forEach((label) => {
+        if (label) tl.to(label, { opacity: 0, y: 8, duration: 0.2 }, "-=0.3");
+      });
     });
 
-    // Hold at the end
-    tl.to({}, { duration: 1.5 });
-
-    // Reset all for next loop
-    tl.to(lineRef.current, { scaleX: 0, duration: 0.4, ease: "power2.in" });
-    dotsRef.current.forEach((dot) => {
-      if (dot) tl.to(dot, { scale: 0, opacity: 0, duration: 0.2 }, "-=0.3");
-    });
-    labelsRef.current.forEach((label) => {
-      if (label) tl.to(label, { opacity: 0, y: 8, duration: 0.2 }, "-=0.3");
-    });
-
-    return () => { tl.kill(); };
+    return () => ctx.revert();
   }, []);
 
   return (

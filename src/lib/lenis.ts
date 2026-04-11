@@ -8,6 +8,10 @@ let lenisInstance: Lenis | null = null;
 export const getLenis = () => {
   if (typeof window === 'undefined') return null;
 
+  // Disable on mobile/touch devices for smoother performance
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  if (isTouch || window.innerWidth < 1024) return null;
+
   if (!lenisInstance) {
     lenisInstance = new Lenis({
       duration: 1.6,

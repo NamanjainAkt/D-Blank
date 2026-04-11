@@ -85,6 +85,13 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.jpeg" sizes="any" />
         <meta name="google-site-verification" content="73MvbbYUl5QmkZTvGo6kZx4FLUE6vMAcOqjfuv1XX-U" />
+        {/* Preload hero video for mobile */}
+        <link 
+          rel="preload" 
+          as="video" 
+          href="https://res.cloudinary.com/dj17ecslh/video/upload/q_auto,f_auto,w_720/v1775921016/scifi_gjhvck.mp4" 
+          media="(max-width: 1023px)"
+        />
       </head>
       <body className={`${orbitron.variable} ${spaceGrotesk.variable} ${jetbrains.variable} font-body bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased`}>
         <SessionProvider>

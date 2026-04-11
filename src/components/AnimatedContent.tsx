@@ -57,6 +57,11 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       return;
     }
 
+    // Performance tuning for mobile
+    if (isMobile) {
+      gsap.ticker.fps(30);
+    }
+
     const ctx = gsap.context(() => {
       let scrollerTarget: Element | string | null = container || document.getElementById('snap-main-container') || null;
 
@@ -65,12 +70,14 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       }
 
       const axis = direction === 'horizontal' ? 'x' : 'y';
-      const offset = reverse ? -distance : distance;
+      // Reduced movement on mobile for better performance
+      const baseDistance = isMobile ? Math.min(distance, 20) : distance;
+      const offset = reverse ? -baseDistance : baseDistance;
       const startPct = (1 - threshold) * 100;
 
       gsap.set(el, {
         [axis]: offset,
-        scale,
+        scale: isMobile ? 1 : scale,
         opacity: animateOpacity ? initialOpacity : 1,
         visibility: 'visible'
       });

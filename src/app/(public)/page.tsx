@@ -27,6 +27,7 @@ import { GameCard } from "@/components/GameCard";
 import dynamic from "next/dynamic";
 import { useState, useEffect, useCallback } from "react";
 import { MobileHeroHUD } from "@/components/hero/MobileHeroHUD";
+import { CachedVideo } from "@/components/ui/CachedVideo";
 
 const HeroModels = dynamic(() => import("@/components/HeroModels"), {
   ssr: false,
@@ -146,7 +147,7 @@ export default function HomePage() {
           <MobileHeroHUD />
 
           {/* Layered background / Overlays */}
-          <video 
+          <CachedVideo 
             className="absolute inset-0 w-full h-full object-cover lg:hidden" 
             src="https://res.cloudinary.com/dj17ecslh/video/upload/q_auto,f_auto,w_720/v1775921016/scifi_gjhvck.mp4" 
             muted 

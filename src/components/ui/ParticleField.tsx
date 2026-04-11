@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 
 interface Particle {
   id: number;
@@ -24,9 +24,18 @@ export function ParticleField({
   className = '',
   color = 'rgba(16, 185, 129, 0.3)'
 }: ParticleFieldProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
+  // Dramatically reduce particle count on mobile or disable if needed
+  const adjustedCount = isMobile ? Math.min(particleCount, 8) : particleCount;
+
   const particles = useMemo<Particle[]>(() => {
     const arr: Particle[] = [];
-    for (let i = 0; i < particleCount; i++) {
+    for (let i = 0; i < adjustedCount; i++) {
       arr.push({
         id: i,
         x: Math.random() * 100,
@@ -39,14 +48,16 @@ export function ParticleField({
       });
     }
     return arr;
-  }, [particleCount]);
+  }, [adjustedCount]);
+
+  if (isMobile && adjustedCount === 0) return null;
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
       <style>{`
         @keyframes particle-float {
-          0%, 100% { transform: translate(0, 0); opacity: var(--p-opacity); }
-          50% { transform: translate(var(--p-drift), -100px); opacity: calc(var(--p-opacity) * 0.3); }
+          0%, 100% { transform: translate3d(0, 0, 0); opacity: var(--p-opacity); }
+          50% { transform: translate3d(var(--p-drift), -100px, 0); opacity: calc(var(--p-opacity) * 0.3); }
         }
       `}</style>
       {particles.map((p) => (
@@ -63,6 +74,7 @@ export function ParticleField({
             ['--p-drift' as string]: `${p.drift}px`,
             animation: `particle-float ${p.duration}s ${p.delay}s linear infinite`,
             opacity: p.opacity,
+            willChange: 'transform, opacity',
           }}
         />
       ))}

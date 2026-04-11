@@ -14,10 +14,14 @@ export function HoverScale({
   scale = 1.05,
   className = ''
 }: HoverScaleProps) {
+  // Check for touch device at runtime
+  const isTouch = typeof window !== 'undefined' && 
+    ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
   return (
     <motion.div
       className={className}
-      whileHover={{ scale }}
+      whileHover={isTouch ? {} : { scale }}
       transition={{
         type: "spring",
         stiffness: 300,

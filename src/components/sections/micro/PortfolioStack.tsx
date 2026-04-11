@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { Gamepad2, Sword, Ghost } from "lucide-react";
 
 const projects = [
@@ -11,6 +11,7 @@ const projects = [
 ];
 
 export default function PortfolioStack() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const card0 = useRef<HTMLDivElement>(null);
   const card1 = useRef<HTMLDivElement>(null);
   const card2 = useRef<HTMLDivElement>(null);
@@ -21,34 +22,45 @@ export default function PortfolioStack() {
     const c2 = card2.current;
     if (!c0 || !c1 || !c2) return;
 
-    // Initial stacked state
-    gsap.set(c0, { x: 0, y: 0, rotate: 0, scale: 1, zIndex: 3, opacity: 1 });
-    gsap.set(c1, { x: 3, y: -8, rotate: -1.5, scale: 0.96, zIndex: 2, opacity: 0.85 });
-    gsap.set(c2, { x: 6, y: -16, rotate: -3, scale: 0.92, zIndex: 1, opacity: 0.7 });
+    const ctx = gsap.context(() => {
+      // Initial stacked state
+      gsap.set(c0, { x: 0, y: 0, rotate: 0, scale: 1, zIndex: 3, opacity: 1 });
+      gsap.set(c1, { x: 3, y: -8, rotate: -1.5, scale: 0.96, zIndex: 2, opacity: 0.85 });
+      gsap.set(c2, { x: 6, y: -16, rotate: -3, scale: 0.92, zIndex: 1, opacity: 0.7 });
 
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.5 });
+      const tl = gsap.timeline({ 
+        repeat: -1, 
+        repeatDelay: 0.5,
+        scrollTrigger: {
+          trigger: c0,
+          start: "top 110%",
+          end: "bottom -10%",
+          toggleActions: "play pause resume pause",
+        }
+      });
 
-    // Gentle float
-    tl.to(c0, { y: -10, duration: 1, ease: "sine.inOut" });
-    tl.to(c0, { y: 0, duration: 1, ease: "sine.inOut" });
+      // Gentle float
+      tl.to(c0, { y: -10, duration: 1, ease: "sine.inOut" });
+      tl.to(c0, { y: 0, duration: 1, ease: "sine.inOut" });
 
-    // Fan out all three cards explicitly
-    tl.to(c0, { x: -40, y: 0, rotate: -6, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.2)" }, "fan");
-    tl.to(c1, { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, zIndex: 3, duration: 0.5, ease: "back.out(1.2)" }, "fan+=0.06");
-    tl.to(c2, { x: 40, y: 0, rotate: 6, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.2)" }, "fan+=0.12");
+      // Fan out all three cards explicitly
+      tl.to(c0, { x: -40, y: 0, rotate: -6, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.2)" }, "fan");
+      tl.to(c1, { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, zIndex: 3, duration: 0.5, ease: "back.out(1.2)" }, "fan+=0.06");
+      tl.to(c2, { x: 40, y: 0, rotate: 6, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.2)" }, "fan+=0.12");
 
-    // Hold fanned out
-    tl.to({}, { duration: 2.5 });
+      // Hold fanned out
+      tl.to({}, { duration: 2.5 });
 
-    // Stack back
-    tl.to(c0, { x: 0, y: 0, rotate: 0, scale: 1, zIndex: 3, opacity: 1, duration: 0.4, ease: "power2.inOut" }, "stack");
-    tl.to(c1, { x: 3, y: -8, rotate: -1.5, scale: 0.96, zIndex: 2, opacity: 0.85, duration: 0.4, ease: "power2.inOut" }, "stack+=0.04");
-    tl.to(c2, { x: 6, y: -16, rotate: -3, scale: 0.92, zIndex: 1, opacity: 0.7, duration: 0.4, ease: "power2.inOut" }, "stack+=0.08");
+      // Stack back
+      tl.to(c0, { x: 0, y: 0, rotate: 0, scale: 1, zIndex: 3, opacity: 1, duration: 0.4, ease: "power2.inOut" }, "stack");
+      tl.to(c1, { x: 3, y: -8, rotate: -1.5, scale: 0.96, zIndex: 2, opacity: 0.85, duration: 0.4, ease: "power2.inOut" }, "stack+=0.04");
+      tl.to(c2, { x: 6, y: -16, rotate: -3, scale: 0.92, zIndex: 1, opacity: 0.7, duration: 0.4, ease: "power2.inOut" }, "stack+=0.08");
 
-    // Hold stacked
-    tl.to({}, { duration: 1.5 });
+      // Hold stacked
+      tl.to({}, { duration: 1.5 });
+    });
 
-    return () => { tl.kill(); };
+    return () => ctx.revert();
   }, []);
 
   const refs = [card0, card1, card2];

@@ -406,14 +406,50 @@ html {
   }
 }
 
-.animate-glitch-flicker {
-  animation: glitch-flicker 5s infinite step-end;
+/* ====== MOBILE OPTIMIZATIONS ====== */
+@media (max-width: 768px) {
+  /* Disable heavy background animations */
+  .animate-aurora,
+  .animate-pulseglow,
+  .animate-morph-blob,
+  .animate-parallax-float,
+  .animate-float,
+  .animate-ring,
+  .animate-shimmer {
+    animation: none !important;
+  }
+
+  /* Reduce filter usage */
+  * {
+    --tw-blur: none !important;
+    --tw-drop-shadow: none !important;
+  }
+  
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(0, 0, 0, 0.8) !important;
+  }
+
+  /* Force simple transitions */
+  * {
+    transition-duration: 0.15s !important;
+  }
+
+  /* Performance: Content visibility */
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 500px;
+  }
 }
 
-@keyframes glitch-flicker {
-  0%, 90%, 100% { opacity: 1; transform: translate(0); filter: hue-rotate(0deg); }
-  91% { opacity: 0.8; transform: translate(2px, -1px); filter: hue-rotate(90deg); }
-  92% { opacity: 1; transform: translate(-2px, 1px); filter: hue-rotate(-90deg); }
-  93% { opacity: 0.9; transform: translate(1px, 2px); filter: hue-rotate(45deg); }
-  94% { opacity: 1; transform: translate(0); filter: hue-rotate(0deg); }
+/* Force GPU for all fixed/absolute layers that animate */
+.fixed, .absolute {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }

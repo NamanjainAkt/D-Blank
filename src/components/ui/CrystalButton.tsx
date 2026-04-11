@@ -960,8 +960,19 @@ const StyledWrapper = styled.div`
   }
 
   @media (max-width: 768px) {
-    .liquid {
-      display: none;
+    .liquid, .outline, .particles, .rainbow, .electric, .svg-turbulence {
+      display: none !important;
+    }
+    .text span > span {
+      animation: none !important;
+    }
+    .button {
+      box-shadow: 0 4px 15px rgba(57, 20, 115, 0.4);
+      height: 64px;
+      width: 240px;
+    }
+    .wrap {
+      transform: none !important;
     }
   }
 `;
