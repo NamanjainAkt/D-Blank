@@ -4,10 +4,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 
-  // Global defaults for ScrollTrigger
   ScrollTrigger.config({
-    autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load,resize', // List of events that trigger a refresh
+    autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load,resize',
   });
+
+  const isMobile = window.innerWidth < 768 || 'ontouchstart' in window;
+  if (isMobile) {
+    gsap.ticker.fps(30);
+  }
 }
 
 export { gsap, ScrollTrigger };

@@ -3,6 +3,7 @@ import { Orbitron, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LenisProvider } from "@/components/providers/LenisProvider";
+import { MotionProvider } from "@/components/providers/MotionProvider";
 import { MagneticCursor } from "@/components/ui/MagneticCursor";
 import "./globals.css";
 
@@ -18,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 const jetbrains = JetBrains_Mono({ 
   subsets: ["latin"],
-  variable: "--font-jetbrains",
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
@@ -85,7 +86,6 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.jpeg" sizes="any" />
         <meta name="google-site-verification" content="73MvbbYUl5QmkZTvGo6kZx4FLUE6vMAcOqjfuv1XX-U" />
-        {/* Preload hero video for mobile */}
         <link 
           rel="preload" 
           as="video" 
@@ -97,8 +97,10 @@ export default function RootLayout({
         <SessionProvider>
           <ThemeProvider>
             <LenisProvider>
-              <MagneticCursor />
-              {children}
+              <MotionProvider>
+                <MagneticCursor />
+                {children}
+              </MotionProvider>
             </LenisProvider>
           </ThemeProvider>
         </SessionProvider>

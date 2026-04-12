@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from '@/components/providers/MotionProvider';
 import { Clock } from 'lucide-react';
 
 interface Course {
@@ -26,7 +26,7 @@ export function CourseGrid({ courses, className = '' }: CourseGridProps) {
   return (
     <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}>
       {courses.map((course, index) => (
-        <motion.div
+        <m.div
           key={course.id}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -74,18 +74,18 @@ export function CourseGrid({ courses, className = '' }: CourseGridProps) {
             {/* Stats */}
             <div className="flex items-center justify-between text-[11px] text-white/40 font-mono uppercase tracking-wider mt-auto pt-6 border-t border-white/5">
               <span className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 text-laser-cyan" /> {course.duration}</span>
-              <span className="font-black text-laser-cyan">₹{course.price.toLocaleString()}</span>
+              <span className="font-black text-laser-cyan">&#8364;{course.price.toLocaleString()}</span>
             </div>
           </div>
 
           {/* CTA */}
-          <motion.button
+          <m.button
             whileHover={{ backgroundColor: 'rgb(176 38 255 / 0.15)' }}
             className="w-full py-4 text-xs font-bold font-display uppercase tracking-[0.15em] border-t border-white/10 text-white hover:text-laser-cyan transition-all"
           >
-            Enroll Now →
-          </motion.button>
-        </motion.div>
+            Enroll Now &#8594;
+          </m.button>
+        </m.div>
       ))}
     </div>
   );

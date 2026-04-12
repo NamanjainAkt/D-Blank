@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from '@/components/providers/MotionProvider';
 
 interface ProfileCardProps {
   name: string;
@@ -20,7 +20,7 @@ export function ProfileCard({
   className = '',
 }: ProfileCardProps) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -59,7 +59,7 @@ export function ProfileCard({
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

@@ -453,3 +453,38 @@ html {
   backface-visibility: hidden;
   perspective: 1000px;
 }
+
+/* ====== CSS CONTAINMENT FOR ANIMATED CONTAINERS ====== */
+/* Prevents layout/paint recalculation of children during animations */
+.animated-container {
+  contain: layout style;
+  isolation: isolate;
+}
+
+/* Apply to grid containers with card animations */
+.grid-animated {
+  contain: layout style;
+}
+
+/* Hero sections */
+.hero-section {
+  contain: layout style;
+}
+
+/* Below-fold sections can use auto for better performance */
+.below-fold-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 500px;
+}
+
+/* Performance: Pause animations when reduced motion preferred */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

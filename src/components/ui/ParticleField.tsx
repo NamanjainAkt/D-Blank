@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface Particle {
   id: number;
@@ -25,35 +25,44 @@ export function ParticleField({
   color = 'rgba(16, 185, 129, 0.3)'
 }: ParticleFieldProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
+    
+    // Pause animations when tab is not visible
+    const handleVisibility = () => {
+      if (!containerRef.current) return;
+      const particles = containerRef.current.querySelectorAll('[data-particle]');
+      particles.forEach((p) => {
+        (p as HTMLElement).style.animationPlayState = document.hidden ? 'paused' : 'running';
+      });
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
 
-  // Dramatically reduce particle count on mobile or disable if needed
   const adjustedCount = isMobile ? Math.min(particleCount, 8) : particleCount;
 
-  const particles = useMemo<Particle[]>(() => {
-    const arr: Particle[] = [];
-    for (let i = 0; i < adjustedCount; i++) {
-      arr.push({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 3 + 1,
-        opacity: Math.random() * 0.5 + 0.1,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 5,
-        drift: Math.random() * 50 - 25,
-      });
-    }
-    return arr;
-  }, [adjustedCount]);
+  const particles: Particle[] = [];
+  for (let i = 0; i < adjustedCount; i++) {
+    particles.push({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 3 + 1,
+      opacity: Math.random() * 0.5 + 0.1,
+      duration: Math.random() * 10 + 10,
+      delay: Math.random() * 5,
+      drift: Math.random() * 50 - 25,
+    });
+  }
 
   if (isMobile && adjustedCount === 0) return null;
 
   return (
-    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+    <div ref={containerRef} className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
       <style>{`
         @keyframes particle-float {
           0%, 100% { transform: translate3d(0, 0, 0); opacity: var(--p-opacity); }
@@ -63,6 +72,7 @@ export function ParticleField({
       {particles.map((p) => (
         <div
           key={p.id}
+          data-particle
           className="absolute rounded-full"
           style={{
             left: `${p.x}%`,
@@ -73,7 +83,6 @@ export function ParticleField({
             ['--p-opacity' as string]: p.opacity,
             ['--p-drift' as string]: `${p.drift}px`,
             animation: `particle-float ${p.duration}s ${p.delay}s linear infinite`,
-            opacity: p.opacity,
             willChange: 'transform, opacity',
           }}
         />

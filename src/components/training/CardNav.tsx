@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from '@/components/providers/MotionProvider';
 import { renderIcon } from '@/components/ui/Icons';
 
 interface Category {
@@ -25,7 +25,7 @@ export function CardNav({
   return (
     <div className={`flex flex-wrap gap-3 ${className}`}>
       {categories.map((category) => (
-        <motion.button
+        <m.button
           key={category.id}
           onClick={() => onCategoryChange(category.id)}
           whileHover={{ scale: 1.02, y: -2 }}
@@ -37,7 +37,7 @@ export function CardNav({
           }`}
         >
           {activeCategory === category.id && (
-            <motion.div
+            <m.div
               layoutId="categoryCard"
               className="absolute inset-0 bg-laser-cyan"
               transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
@@ -47,7 +47,7 @@ export function CardNav({
             {renderIcon(category.icon as Parameters<typeof renderIcon>[0], { className: 'w-4 h-4' })}
             <span>{category.label}</span>
           </span>
-        </motion.button>
+        </m.button>
       ))}
     </div>
   );

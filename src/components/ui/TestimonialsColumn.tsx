@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef } from 'react';
 import { gsap } from '@/lib/gsap';
-import { Quote } from 'lucide-react';
 
 interface Testimonial {
   id: number | string;
@@ -32,15 +31,33 @@ export const TestimonialsColumn = ({
     if (!el) return;
 
     const ctx = gsap.context(() => {
-      // Calculate the height of one full set of testimonials
       const totalHeight = el.scrollHeight / 2;
 
-      gsap.to(el, {
+      const tween = gsap.to(el, {
         y: -totalHeight,
         duration: duration,
         ease: 'none',
         repeat: -1,
       });
+
+      // Pause animation when not visible (performance optimization)
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            tween.play();
+          } else {
+            tween.pause();
+          }
+        },
+        { threshold: 0 }
+      );
+      
+      observer.observe(el);
+
+      return () => {
+        observer.disconnect();
+        tween.kill();
+      };
     });
 
     return () => ctx.revert();
@@ -57,7 +74,9 @@ export const TestimonialsColumn = ({
             {/* Top gradient line */}
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             
-            <Quote className="w-8 h-8 text-primary/20 mb-2 rotate-180" />
+            <svg className="w-8 h-8 text-primary/20 mb-2 rotate-180" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+            </svg>
 
             <p className="text-zinc-300 text-xs leading-relaxed mb-4 italic">
               "{testimonial.content}"

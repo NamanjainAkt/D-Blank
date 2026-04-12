@@ -13,6 +13,8 @@ interface TypingTextProps {
 export function TypingText({ text, className = '', delay = 0, speed = 0.05 }: TypingTextProps) {
   const textRef = useRef<HTMLSpanElement>(null);
   const cursorRef = useRef<HTMLSpanElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tlRef = useRef<any>(null);
 
   useEffect(() => {
     if (!textRef.current || !cursorRef.current) return;
@@ -21,7 +23,6 @@ export function TypingText({ text, className = '', delay = 0, speed = 0.05 }: Ty
       const obj = { length: 0 };
       const tl = gsap.timeline({ delay });
 
-      // Efficient typing animation using onUpdate
       tl.to(obj, {
         length: text.length,
         duration: text.length * speed,
@@ -33,7 +34,6 @@ export function TypingText({ text, className = '', delay = 0, speed = 0.05 }: Ty
         }
       });
 
-      // Cursor blink
       gsap.to(cursorRef.current, {
         opacity: 0,
         duration: 0.5,
@@ -41,9 +41,29 @@ export function TypingText({ text, className = '', delay = 0, speed = 0.05 }: Ty
         yoyo: true,
         ease: 'power2.inOut'
       });
+
+      tlRef.current = tl;
     });
 
-    return () => ctx.revert();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          tlRef.current?.pause();
+        } else {
+          tlRef.current?.resume();
+        }
+      },
+      { threshold: 0 }
+    );
+
+    if (textRef.current) {
+      observer.observe(textRef.current);
+    }
+
+    return () => {
+      ctx.revert();
+      observer.disconnect();
+    };
   }, [text, delay, speed]);
 
   return (
