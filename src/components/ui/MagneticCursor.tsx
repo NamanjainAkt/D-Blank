@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
+
+const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
 
 export function MagneticCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -17,55 +18,109 @@ export function MagneticCursor() {
     cursor.style.opacity = '1';
     trail.style.opacity = '1';
 
-    const xTo = gsap.quickTo(cursor, 'x', { duration: 0.35, ease: 'power3.out' });
-    const yTo = gsap.quickTo(cursor, 'y', { duration: 0.35, ease: 'power3.out' });
-    const trailXTo = gsap.quickTo(trail, 'x', { duration: 0.5, ease: 'power3.out' });
-    const trailYTo = gsap.quickTo(trail, 'y', { duration: 0.5, ease: 'power3.out' });
+    let mouseX = 0;
+    let mouseY = 0;
+
+    let cursorX = 0;
+    let cursorY = 0;
+    let trailX = 0;
+    let trailY = 0;
+
+    let cursorScale = 1;
+    let trailScale = 1;
+    let cursorTargetScale = 1;
+    let trailTargetScale = 1;
 
     let activeMagnetic: HTMLElement | null = null;
+    const magneticStates = new Map<HTMLElement, { x: number; y: number; targetX: number; targetY: number }>();
+
+    let animationFrameId: number;
+    let isInitialized = false;
+
+    const render = () => {
+      cursorX = lerp(cursorX, mouseX - 7, 0.15);
+      cursorY = lerp(cursorY, mouseY - 7, 0.15);
+      trailX = lerp(trailX, mouseX - 3, 0.1);
+      trailY = lerp(trailY, mouseY - 3, 0.1);
+
+      cursorScale = lerp(cursorScale, cursorTargetScale, 0.15);
+      trailScale = lerp(trailScale, trailTargetScale, 0.15);
+
+      cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) scale(${cursorScale})`;
+      trail.style.transform = `translate3d(${trailX}px, ${trailY}px, 0) scale(${trailScale})`;
+
+      magneticStates.forEach((state, el) => {
+        state.x = lerp(state.x, state.targetX, 0.15);
+        state.y = lerp(state.y, state.targetY, 0.15);
+        el.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
+
+        if (state.targetX === 0 && state.targetY === 0 && Math.abs(state.x) < 0.1 && Math.abs(state.y) < 0.1) {
+          el.style.transform = 'translate3d(0px, 0px, 0)';
+          magneticStates.delete(el);
+        }
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
 
     const handleMouseMove = (e: MouseEvent) => {
-      const { clientX, clientY } = e;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
 
-      xTo(clientX - 7);
-      yTo(clientY - 7);
-      trailXTo(clientX - 3);
-      trailYTo(clientY - 3);
+      if (!isInitialized) {
+        cursorX = mouseX - 7;
+        cursorY = mouseY - 7;
+        trailX = mouseX - 3;
+        trailY = mouseY - 3;
+        isInitialized = true;
+      }
 
       if (activeMagnetic) {
+        const state = magneticStates.get(activeMagnetic);
+        const currentX = state ? state.x : 0;
+        const currentY = state ? state.y : 0;
+
         const rect = activeMagnetic.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const deltaX = clientX - centerX;
-        const deltaY = clientY - centerY;
+        const centerX = rect.left - currentX + rect.width / 2;
+        const centerY = rect.top - currentY + rect.height / 2;
+
+        const deltaX = mouseX - centerX;
+        const deltaY = mouseY - centerY;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         const maxDistance = Math.max(rect.width, rect.height);
 
         if (distance < maxDistance) {
           const strength = 8;
-          const moveX = (deltaX / maxDistance) * strength;
-          const moveY = (deltaY / maxDistance) * strength;
-          gsap.to(activeMagnetic, {
-            x: moveX,
-            y: moveY,
-            duration: 0.3,
-            ease: 'power2.out',
-          });
+          const targetX = (deltaX / maxDistance) * strength;
+          const targetY = (deltaY / maxDistance) * strength;
+
+          if (!state) {
+            magneticStates.set(activeMagnetic, { x: 0, y: 0, targetX, targetY });
+          } else {
+            state.targetX = targetX;
+            state.targetY = targetY;
+          }
         }
       }
     };
 
     const handleMouseEnterMagnetic = (e: Event) => {
       activeMagnetic = e.currentTarget as HTMLElement;
-      gsap.to(cursor, { scale: 2, duration: 0.3, ease: 'power2.out' });
-      gsap.to(trail, { scale: 1.5, duration: 0.3, ease: 'power2.out' });
+      cursorTargetScale = 2;
+      trailTargetScale = 1.5;
     };
 
     const handleMouseLeaveMagnetic = (e: Event) => {
       const target = e.currentTarget as HTMLElement;
-      gsap.to(target, { x: 0, y: 0, duration: 0.3, ease: 'power2.out' });
-      gsap.to(cursor, { scale: 1, duration: 0.3, ease: 'power2.out' });
-      gsap.to(trail, { scale: 1, duration: 0.3, ease: 'power2.out' });
+      const state = magneticStates.get(target);
+      if (state) {
+        state.targetX = 0;
+        state.targetY = 0;
+      }
+      cursorTargetScale = 1;
+      trailTargetScale = 1;
       activeMagnetic = null;
     };
 
@@ -83,6 +138,7 @@ export function MagneticCursor() {
         el.removeEventListener('mouseenter', handleMouseEnterMagnetic);
         el.removeEventListener('mouseleave', handleMouseLeaveMagnetic);
       });
+      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 

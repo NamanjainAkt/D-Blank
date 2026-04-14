@@ -1,7 +1,5 @@
 'use client';
 
-import { m } from '@/components/providers/MotionProvider';
-
 interface ProfileCardProps {
   name: string;
   role: string;
@@ -20,12 +18,8 @@ export function ProfileCard({
   className = '',
 }: ProfileCardProps) {
   return (
-    <m.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      viewport={{ once: true }}
-      className={`relative p-6 rounded-none bg-white/[0.02] border border-white/10 hover:border-neon-purple/50 hover:bg-white/[0.04] transition-all duration-300 group cursor-pointer ${className}`}
+    <div
+      className={`relative p-6 rounded-none bg-white/[0.02] border border-white/10 hover:border-neon-purple/50 hover:bg-white/[0.04] transition-all duration-300 group cursor-pointer animate-in fade-in slide-in-from-bottom-5 ${className}`}
     >
       {/* Glow effect on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -59,7 +53,7 @@ export function ProfileCard({
           </div>
         )}
       </div>
-    </m.div>
+    </div>
   );
 }
 

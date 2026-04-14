@@ -11,7 +11,7 @@
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 100%;
-    --primary: 262 83% 58%;
+    --primary: 271 91% 65%;
     --primary-foreground: 0 0% 100%;
     --secondary: 262 83% 30%;
     --secondary-foreground: 0 0% 100%;
@@ -23,7 +23,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 262 83% 58%;
+    --ring: 271 91% 65%;
     --radius: 0.75rem;
   }
 
@@ -44,7 +44,7 @@
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
     /* Neon Palette (Synced to Tailwind Violet/Fuchsia/Cyan) */
-    --neon-purple: #7c3aed; /* Violet-600 */
+    --neon-purple: #a855f7; /* Violet-500 */
     --cyber-pink: #c026d3; /* Fuchsia-600 */
     --laser-cyan: #06b6d4; /* Cyan-500 */
     --acid-green: #10b981; /* Emerald-500 */
@@ -62,7 +62,7 @@
     --admin-text: #ffffff;
     --admin-text-muted: #71717a;
     --admin-hover: rgba(255,255,255,0.05);
-    --admin-active: rgba(176,38,255,0.15);
+    --admin-active: rgba(168,85,247,0.15);
 
     /* Sidebar States */
     --sidebar-bg: var(--admin-bg);
@@ -110,7 +110,7 @@
     --text-muted: #A0A0A0;
 
     /* Grid */
-    --grid-color: rgba(176,38,255,0.05);
+    --grid-color: rgba(168,85,247,0.05);
   }
 }
 
@@ -159,7 +159,7 @@ h1, h2, h3, h4, .font-display {
   background: var(--neon-purple);
   color: #fff;
   border-color: var(--neon-purple);
-  box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
 }
 .btn-cyber:hover {
   background: var(--cyber-pink);
@@ -187,7 +187,7 @@ h1, h2, h3, h4, .font-display {
 .btn-outline:hover {
   background: var(--neon-purple);
   color: #fff;
-  box-shadow: 0 0 20px rgba(176, 38, 255, 0.4);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
   transform: translateY(-2px);
 }
 
@@ -214,7 +214,7 @@ h1, h2, h3, h4, .font-display {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(176,38,255,0.1), transparent);
+  background: linear-gradient(45deg, transparent, rgba(168,85,247,0.1), transparent);
   transform: rotate(45deg);
   transition: 0.5s;
 }
@@ -249,7 +249,7 @@ html {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(176, 38, 255, 0.2);
+  background: rgba(168, 85, 247, 0.2);
 }
 
 /* Firefox */

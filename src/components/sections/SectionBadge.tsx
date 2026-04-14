@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { useEffect, useRef, useState } from "react";
 
 interface SectionBadgeProps {
   label: string;
@@ -13,45 +12,40 @@ export default function SectionBadge({
   pulseColor = "bg-primary",
 }: SectionBadgeProps) {
   const badgeRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!badgeRef.current || !dotRef.current) return;
-
-    const tl = gsap.timeline({ paused: true });
-    tl.fromTo(
-      badgeRef.current,
-      { opacity: 0, y: 10, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: window.innerWidth < 768 ? 0.3 : 0.6, ease: "power2.out" }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          if (badgeRef.current) {
+            observer.unobserve(badgeRef.current);
+          }
+        }
+      },
+      { threshold: 0.1 }
     );
 
-    if (window.innerWidth >= 768) {
-      gsap.to(dotRef.current, {
-        scale: 1.5,
-        opacity: 0.5,
-        duration: 1.5,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut",
-      });
+    if (badgeRef.current) {
+      observer.observe(badgeRef.current);
     }
 
-    tl.play();
-
     return () => {
-      tl.kill();
+      observer.disconnect();
     };
   }, []);
 
   return (
     <div
       ref={badgeRef}
-      className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm opacity-0"
+      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-700 ease-out ${
+        isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-10 scale-95"
+      }`}
     >
       <div className="relative flex items-center justify-center">
         <div
-          ref={dotRef}
-          className={`absolute w-1.5 h-1.5 rounded-full ${pulseColor} opacity-30`}
+          className={`absolute w-1.5 h-1.5 rounded-full ${pulseColor} opacity-30 md:animate-ping`}
         />
         <div className={`w-1.5 h-1.5 rounded-full ${pulseColor}`} />
       </div>

@@ -16,8 +16,6 @@ const studentSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-studentSchema.index({ email: 1 });
-studentSchema.index({ phone: 1 });
 
 // Sync logic: Update all enrollments if student name/email changes
 studentSchema.post('save', async function(doc) {

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { useEffect, useRef, useState } from "react";
 
 const waypoints = [
   { x: 40, y: 120 },
@@ -14,7 +13,29 @@ const waypoints = [
   { x: 360, y: 80 },
 ];
 
+function useIntersectionObserver(options: IntersectionObserverInit = {}) {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting);
+    }, options);
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return [ref, isIntersecting] as const;
+}
+
 export default function GameplayPreview() {
+  const [containerRef, isVisible] = useIntersectionObserver({ threshold: 0.2 });
   const playerRef = useRef<SVGCircleElement>(null);
   const glowRef = useRef<SVGCircleElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
@@ -25,69 +46,116 @@ export default function GameplayPreview() {
     const path = pathRef.current;
     if (!player || !glow || !path) return;
 
-    let tl: gsap.core.Timeline;
+    if (!isVisible) return;
 
-    const ctx = gsap.context(() => {
-      // Animate path draw
-      const pathLength = path.getTotalLength();
-      gsap.set(path, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
+    let startTime: number | null = null;
+    let animationFrameId: number;
 
-      tl = gsap.timeline({ 
-        repeat: -1, 
-        repeatDelay: 1.5,
-        scrollTrigger: {
-          trigger: path,
-          start: "top 110%",
-          end: "bottom -10%",
-          toggleActions: "play pause resume pause",
+    const pathLength = path.getTotalLength() || 1000;
+    path.style.strokeDasharray = `${pathLength}`;
+    path.style.strokeDashoffset = `${pathLength}`;
+
+    const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+    const easeInCubic = (t: number) => t * t * t;
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = (timestamp - startTime) % 7000;
+
+      // 1. Path drawing
+      if (elapsed <= 3500) {
+        const progress = Math.min(elapsed / 3500, 1);
+        const eased = easeInOutQuad(progress);
+        path.style.strokeDashoffset = `${pathLength * (1 - eased)}`;
+      } else if (elapsed > 3500 && elapsed <= 5000) {
+        path.style.strokeDashoffset = "0";
+      } else if (elapsed > 5000 && elapsed <= 5500) {
+        const progress = Math.min((elapsed - 5000) / 500, 1);
+        const eased = easeInCubic(progress);
+        path.style.strokeDashoffset = `${pathLength * eased}`;
+      } else {
+        path.style.strokeDashoffset = `${pathLength}`;
+      }
+
+      // 2. Player moving
+      if (elapsed <= 3500) {
+        const segmentDuration = 3500 / 7;
+        let segmentIndex = Math.floor(elapsed / segmentDuration);
+        let segmentProgress = (elapsed % segmentDuration) / segmentDuration;
+        
+        if (segmentIndex >= 7) {
+          segmentIndex = 6;
+          segmentProgress = 1.0;
         }
-      });
 
-      // Draw path + move player simultaneously
-      const totalDur = 3.5;
-      tl.to(path, { strokeDashoffset: 0, duration: totalDur, ease: "power1.inOut" }, 0);
+        const eased = easeInOutQuad(segmentProgress);
+        const startPoint = waypoints[segmentIndex];
+        const endPoint = waypoints[segmentIndex + 1];
 
-      waypoints.forEach((point, i) => {
-        if (i === 0) return;
-        const segDur = totalDur / (waypoints.length - 1);
-        tl.to([player, glow], {
-          attr: { cx: point.x, cy: point.y },
-          duration: segDur,
-          ease: "power1.inOut",
-        }, segDur * i);
-      });
+        const x = startPoint.x + (endPoint.x - startPoint.x) * eased;
+        const y = startPoint.y + (endPoint.y - startPoint.y) * eased;
 
-      // Hold at end
-      tl.to({}, { duration: 1.5 });
+        player.setAttribute("cx", `${x}`);
+        player.setAttribute("cy", `${y}`);
+        glow.setAttribute("cx", `${x}`);
+        glow.setAttribute("cy", `${y}`);
+      } else if (elapsed > 3500 && elapsed <= 5200) {
+        const endPoint = waypoints[waypoints.length - 1];
+        player.setAttribute("cx", `${endPoint.x}`);
+        player.setAttribute("cy", `${endPoint.y}`);
+        glow.setAttribute("cx", `${endPoint.x}`);
+        glow.setAttribute("cy", `${endPoint.y}`);
+      } else if (elapsed > 5200 && elapsed <= 5500) {
+        const progress = Math.min((elapsed - 5200) / 300, 1);
+        const eased = easeInCubic(progress);
+        const startPoint = waypoints[waypoints.length - 1];
+        const endPoint = waypoints[0];
 
-      // Reset path
-      tl.to(path, { strokeDashoffset: pathLength, duration: 0.5, ease: "power2.in" });
-      tl.to([player, glow], {
-        attr: { cx: waypoints[0].x, cy: waypoints[0].y },
-        duration: 0.3,
-        ease: "power2.in",
-      }, "-=0.3");
+        const x = startPoint.x + (endPoint.x - startPoint.x) * eased;
+        const y = startPoint.y + (endPoint.y - startPoint.y) * eased;
 
-      // Continuous glow pulse
-      gsap.to(glow, {
-        attr: { r: 16 },
-        opacity: 0,
-        duration: 1.2,
-        repeat: -1,
-        ease: "power2.out",
-      });
-    });
+        player.setAttribute("cx", `${x}`);
+        player.setAttribute("cy", `${y}`);
+        glow.setAttribute("cx", `${x}`);
+        glow.setAttribute("cy", `${y}`);
+      } else {
+        const startPoint = waypoints[0];
+        player.setAttribute("cx", `${startPoint.x}`);
+        player.setAttribute("cy", `${startPoint.y}`);
+        glow.setAttribute("cx", `${startPoint.x}`);
+        glow.setAttribute("cy", `${startPoint.y}`);
+      }
 
-    return () => { 
-      ctx.revert();
+      // 3. Glow pulsing
+      const pulseElapsed = (timestamp - startTime) % 1200;
+      const pulseProgress = pulseElapsed / 1200;
+      const pulseEased = easeOutCubic(pulseProgress);
+      const r = 8 + 8 * pulseEased;
+      const opacity = 0.5 * (1 - pulseEased);
+
+      glow.setAttribute("r", `${r}`);
+      glow.setAttribute("opacity", `${opacity}`);
+
+      animationFrameId = requestAnimationFrame(animate);
     };
-  }, []);
 
-  // Build path d string
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isVisible]);
+
   const pathD = waypoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
 
   return (
-    <div className="relative w-full flex items-center justify-center min-h-[130px]">
+    <div
+      ref={containerRef}
+      className={`relative w-full flex items-center justify-center min-h-[130px] transition-all duration-700 ease-out ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+      }`}
+    >
       <svg viewBox="0 0 400 200" className="w-full max-w-[320px] opacity-60 group-hover:opacity-90 transition-opacity duration-500">
         <defs>
           <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">

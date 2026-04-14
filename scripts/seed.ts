@@ -157,10 +157,17 @@ async function seed() {
     console.log(`Created ${sampleCourses.length} courses`);
 
     // Create admin user
-    const adminPassword = 'Dblanks@2024';
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+      console.error('❌ Error: ADMIN_EMAIL and ADMIN_PASSWORD must be set in environment variables.');
+      process.exit(1);
+    }
+
     const passwordHash = await bcrypt.hash(adminPassword, 12);
     await Admin.create({
-      email: 'admin@dblanks.in',
+      email: adminEmail,
       passwordHash,
       name: 'Admin',
     });
@@ -208,8 +215,8 @@ async function seed() {
     console.log('\n✅ Seed completed successfully!');
     console.log(`   - Courses: ${sampleCourses.length}`);
     console.log(`   - Enrollments: ${distributedEnrollments.length}`);
-    console.log(`   - Admin: admin@dblanks.in`);
-    console.log(`   - Password: ${adminPassword}`);
+    console.log(`   - Admin Email: ${adminEmail}`);
+    console.log(`   - Admin Account created successfully!`);
 
     process.exit(0);
   } catch (error) {

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import React from "react";
 import {
   Gamepad2,
   Settings,
@@ -13,6 +12,7 @@ import SectionBadge from "./SectionBadge";
 import GradientHeading from "./GradientHeading";
 import FeatureCard from "./FeatureCard";
 import TypingStatus from "./TypingStatus";
+import AnimatedContent from "@/components/AnimatedContent";
 
 const features = [
   {
@@ -63,57 +63,8 @@ const features = [
 ];
 
 export default function WhyChooseUs() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 70%",
-          toggleActions: "play none none none",
-        },
-      });
-
-      if (subtitleRef.current) {
-        tl.fromTo(
-          subtitleRef.current,
-          { y: 10, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-          0.4
-        );
-      }
-
-      if (gridRef.current) {
-        tl.fromTo(
-          gridRef.current.children,
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.05, duration: 0.5, ease: "power2.out" },
-          0.5
-        );
-      }
-
-      if (footerRef.current) {
-        tl.fromTo(
-          footerRef.current,
-          { y: 10, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
-          1.0
-        );
-      }
-    });
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <section
-      ref={containerRef}
       className="relative min-h-screen py-32 px-4 overflow-hidden bg-black"
     >
       {/* Lightweight background */}
@@ -126,26 +77,26 @@ export default function WhyChooseUs() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="mb-6">
+          <AnimatedContent distance={20} className="mb-6">
             <SectionBadge label="Why D-Blanks" />
-          </div>
+          </AnimatedContent>
 
           <GradientHeading highlight="Real Game Developers" />
 
-          <p
-            ref={subtitleRef}
-            className="text-zinc-400 max-w-2xl mx-auto text-lg leading-relaxed mt-6 opacity-0"
+          <AnimatedContent 
+            distance={10} 
+            delay={0.4}
+            className="mt-6"
           >
-            We build games and train developers using real industry workflows,
-            tools, and production pipelines.
-          </p>
+            <p className="text-zinc-400 max-w-2xl mx-auto text-lg leading-relaxed">
+              We build games and train developers using real industry workflows,
+              tools, and production pipelines.
+            </p>
+          </AnimatedContent>
         </div>
 
         {/* Bento Grid */}
-        <div
-          ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {features.map((feature, i) => (
             <FeatureCard
               key={feature.id}
@@ -156,12 +107,16 @@ export default function WhyChooseUs() {
         </div>
 
         {/* Footer */}
-        <div ref={footerRef} className="mt-20 flex justify-center opacity-0">
+        <AnimatedContent 
+          distance={20} 
+          delay={0.8}
+          className="mt-20 flex justify-center"
+        >
           <div className="group relative px-6 py-4 rounded-xl border border-white/5 bg-zinc-900/30 overflow-hidden min-w-[320px]">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             <TypingStatus />
           </div>
-        </div>
+        </AnimatedContent>
       </div>
     </section>
   );

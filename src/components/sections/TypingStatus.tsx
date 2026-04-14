@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { gsap } from "gsap";
+import { useEffect, useState } from "react";
 
 const statuses = [
   "Building first-gen game titles...",
@@ -13,7 +12,6 @@ const statuses = [
 export default function TypingStatus() {
   const [text, setText] = useState("");
   const [statusIndex, setStatusIndex] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let currentStatus = statuses[statusIndex];
@@ -41,7 +39,6 @@ export default function TypingStatus() {
         if (charIndex === 0) {
           isDeleting = false;
           setStatusIndex((prev) => (prev + 1) % statuses.length);
-          timeout = setTimeout(type, 500);
         } else {
           timeout = setTimeout(type, 30);
         }
@@ -54,7 +51,7 @@ export default function TypingStatus() {
   }, [statusIndex]);
 
   return (
-    <div ref={containerRef} className="flex items-center gap-3">
+    <div className="flex items-center gap-3">
       <div className="relative flex items-center justify-center">
         <div className="absolute w-2 h-2 rounded-full bg-primary/30 animate-ping" />
         <div className="w-2 h-2 rounded-full bg-primary" />

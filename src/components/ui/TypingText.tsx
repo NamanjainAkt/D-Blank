@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { gsap } from '@/lib/gsap';
+import { useEffect, useState, useRef } from 'react';
 
 interface TypingTextProps {
   text: string;
@@ -10,66 +9,52 @@ interface TypingTextProps {
   speed?: number;
 }
 
-export function TypingText({ text, className = '', delay = 0, speed = 0.05 }: TypingTextProps) {
-  const textRef = useRef<HTMLSpanElement>(null);
-  const cursorRef = useRef<HTMLSpanElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tlRef = useRef<any>(null);
+export function TypingText({ text, className = '', delay = 0, speed = 50 }: TypingTextProps) {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (!textRef.current || !cursorRef.current) return;
-
-    const ctx = gsap.context(() => {
-      const obj = { length: 0 };
-      const tl = gsap.timeline({ delay });
-
-      tl.to(obj, {
-        length: text.length,
-        duration: text.length * speed,
-        ease: 'none',
-        onUpdate: () => {
-          if (textRef.current) {
-            textRef.current.textContent = text.substring(0, Math.ceil(obj.length));
-          }
-        }
-      });
-
-      gsap.to(cursorRef.current, {
-        opacity: 0,
-        duration: 0.5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power2.inOut'
-      });
-
-      tlRef.current = tl;
-    });
-
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) {
-          tlRef.current?.pause();
-        } else {
-          tlRef.current?.resume();
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
         }
       },
-      { threshold: 0 }
+      { threshold: 0.1 }
     );
 
-    if (textRef.current) {
-      observer.observe(textRef.current);
-    }
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let timeout: NodeJS.Timeout;
+    let currentIndex = 0;
+
+    const type = () => {
+      if (currentIndex <= text.length) {
+        setDisplayedText(text.substring(0, currentIndex));
+        currentIndex++;
+        timeout = setTimeout(type, speed);
+      }
+    };
+
+    const startTimeout = setTimeout(type, delay * 1000);
 
     return () => {
-      ctx.revert();
-      observer.disconnect();
+      clearTimeout(startTimeout);
+      clearTimeout(timeout);
     };
-  }, [text, delay, speed]);
+  }, [text, delay, speed, isVisible]);
 
   return (
-    <span className={`inline-block ${className}`}>
-      <span ref={textRef}></span>
-      <span ref={cursorRef} className="text-emerald-400">|</span>
+    <span ref={containerRef} className={`inline-block ${className}`}>
+      <span>{displayedText}</span>
+      <span className="text-emerald-400 animate-pulse">|</span>
     </span>
   );
 }

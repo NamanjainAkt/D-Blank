@@ -19,6 +19,24 @@ export default function HeroModels({ onLoaded }: HeroModelsProps) {
 
     let animId: number;
     let disposed = false;
+    let cleanup: (() => void) | undefined;
+
+    const startInit = () => {
+      const runInit = async () => {
+        const cleanupFn = await init();
+        if (disposed && cleanupFn) {
+          cleanupFn();
+        } else {
+          cleanup = cleanupFn;
+        }
+      };
+
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(() => runInit());
+      } else {
+        setTimeout(runInit, 500);
+      }
+    };
 
     async function init() {
       if (!container || disposed) return;
@@ -259,13 +277,12 @@ export default function HeroModels({ onLoaded }: HeroModelsProps) {
       };
     }
 
-    let cleanupPromise: Promise<((() => void) | undefined)> | null = null;
-    cleanupPromise = init();
+    startInit();
 
     return () => {
       disposed = true;
-      cancelAnimationFrame(animId);
-      cleanupPromise?.then(fn => fn?.());
+      if (animId) cancelAnimationFrame(animId);
+      if (cleanup) cleanup();
     };
   }, [onLoaded]);
 

@@ -49,9 +49,9 @@ CLOUDINARY_CLOUD_NAME=your_cloud
 CLOUDINARY_API_KEY=your_key
 CLOUDINARY_API_SECRET=your_secret
 
-# Admin Account
+# Admin Account (Required for seeding)
 ADMIN_EMAIL=admin@vocalearn.in
-ADMIN_PASSWORD=your_secure_password
+ADMIN_PASSWORD=your_secure_password_here
 ```
 
 ### 3. Seed Database
@@ -75,8 +75,10 @@ Visit http://localhost:3000
 ## Admin Access
 
 - URL: http://localhost:3000/admin/login
-- Email: admin@vocalearn.in (or your custom ADMIN_EMAIL)
-- Password: admin123 (or your custom ADMIN_PASSWORD)
+- Email: your custom ADMIN_EMAIL
+- Password: your custom ADMIN_PASSWORD (defined in .env.local before seeding)
+
+**Note:** The seed script now requires these environment variables to be set. The previous default password has been removed for security.
 
 ## Service Setup Guides
 

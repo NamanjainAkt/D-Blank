@@ -4,19 +4,21 @@ import React, { useEffect, useRef, useState } from 'react';
 
 interface CachedVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string;
+  priority?: boolean;
 }
 
 /**
  * A video component with lazy loading and mobile optimizations.
  * Uses IntersectionObserver to defer loading until in viewport.
  */
-export function CachedVideo({ src, className, ...props }: CachedVideoProps) {
+export function CachedVideo({ src, className, priority = false, ...props }: CachedVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoUrl, setVideoUrl] = useState<string>(src);
-  const [shouldLoad, setShouldLoad] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(priority);
 
   // Lazy load video only when in viewport
   useEffect(() => {
+    if (priority) return;
     if (!('IntersectionObserver' in window)) {
       setShouldLoad(true);
       return;

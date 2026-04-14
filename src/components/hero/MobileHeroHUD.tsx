@@ -1,7 +1,5 @@
 'use client';
 
-import { m } from '@/components/providers/MotionProvider';
-
 export const MobileHeroHUD = () => {
   return (
     <div className="absolute inset-0 pointer-events-none lg:hidden overflow-hidden">
@@ -33,42 +31,22 @@ export const MobileHeroHUD = () => {
       {/* Subtle Floating Squares (Disabled on mobile for performance) */}
       <div className="hidden">
         {[...Array(3)].map((_, i) => (
-          <m.div
+          <div
             key={i}
-            className="absolute w-1 h-1 bg-primary/20"
-            initial={{
-              x: Math.random() * 100 + "%",
-              y: "110%",
-              opacity: 0
-            }}
-            animate={{
-              y: "-10%",
-              opacity: [0, 0.3, 0]
-            }}
-            transition={{
-              duration: 15 + i * 5,
-              repeat: Infinity,
-              delay: i * 4,
-              ease: "linear"
-            }}
+            className="absolute w-1 h-1 bg-primary/20 animate-pulse"
           />
         ))}
       </div>
 
       {/* Animated Mobile Scroll Indicator */}
-      <m.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      <div 
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-1000 delay-1000"
       >
         <span className="text-[9px] font-display text-zinc-500 uppercase tracking-[0.4em] mb-1">Explore</span>
-        <m.div 
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-[1px] h-10 bg-gradient-to-b from-primary/60 to-transparent"
+        <div 
+          className="w-[1px] h-10 bg-gradient-to-b from-primary/60 to-transparent animate-bounce"
         />
-      </m.div>
+      </div>
     </div>
   );
 };

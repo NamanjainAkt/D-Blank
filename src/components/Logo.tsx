@@ -38,6 +38,7 @@ export function Logo({ className, size = 'md' }: LogoProps) {
             src="/favicon.jpeg"
             alt="D-Blanks"
             fill
+            sizes="40px"
             className="object-cover p-0.5"
             priority
           />

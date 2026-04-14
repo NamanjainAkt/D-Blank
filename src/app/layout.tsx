@@ -3,7 +3,6 @@ import { Orbitron, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { SessionProvider } from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LenisProvider } from "@/components/providers/LenisProvider";
-import { MotionProvider } from "@/components/providers/MotionProvider";
 import { MagneticCursor } from "@/components/ui/MagneticCursor";
 import "./globals.css";
 
@@ -97,10 +96,8 @@ export default function RootLayout({
         <SessionProvider>
           <ThemeProvider>
             <LenisProvider>
-              <MotionProvider>
-                <MagneticCursor />
-                {children}
-              </MotionProvider>
+              <MagneticCursor />
+              {children}
             </LenisProvider>
           </ThemeProvider>
         </SessionProvider>

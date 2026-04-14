@@ -16,13 +16,15 @@ export function MorphingBlobs({
   className,
   colors = defaultColors,
 }: MorphingBlobsProps) {
+  const [hasMounted, setHasMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    setHasMounted(true);
     setIsMobile(window.innerWidth < 768);
   }, []);
 
-  if (isMobile) return null;
+  if (!hasMounted || isMobile) return null;
 
   const blobs = [
     {

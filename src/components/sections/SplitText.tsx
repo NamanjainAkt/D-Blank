@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { useEffect, useRef, useState } from "react";
 
 interface SplitTextProps {
   text: string;
@@ -11,46 +10,39 @@ interface SplitTextProps {
 
 export default function SplitText({ text, className = "", delay = 0 }: SplitTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const el = containerRef.current;
+    if (!el) return;
 
-    const ctx = gsap.context(() => {
-      const chars = containerRef.current!.querySelectorAll(".char");
-      
-      gsap.fromTo(
-        chars,
-        { 
-          y: 40, 
-          opacity: 0, 
-          filter: "blur(10px)" 
-        },
-        {
-          y: 0,
-          opacity: 1,
-          filter: "blur(0px)",
-          stagger: 0.05,
-          duration: 0.8,
-          delay: delay,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 85%",
-          },
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(el);
         }
-      );
-    });
+      },
+      { threshold: 0.1 }
+    );
 
-    return () => ctx.revert();
-  }, [text, delay]);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div ref={containerRef} className={`inline-block ${className}`}>
       {text.split("").map((char, i) => (
         <span
           key={i}
-          className="char inline-block"
-          style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+          className={`char inline-block transition-all duration-700 ease-out`}
+          style={{ 
+            whiteSpace: char === " " ? "pre" : "normal",
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+            filter: isVisible ? 'blur(0px)' : 'blur(4px)',
+            transitionDelay: `${delay + (i * 0.05)}s`
+          }}
         >
           {char}
         </span>

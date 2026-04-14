@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { useEffect, useState, useRef } from "react";
 
 const steps = [
   { name: "Idea", color: "#B026FF", completed: false },
@@ -11,87 +10,34 @@ const steps = [
 ];
 
 export default function OutcomeTimeline() {
+  const [activeStep, setActiveStep] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
-  const dotsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const labelsRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!lineRef.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsVisible(entry.isIntersecting);
+    }, { threshold: 0.1 });
 
-    const ctx = gsap.context(() => {
-      // Reset
-      gsap.set(lineRef.current, { scaleX: 0 });
-      dotsRef.current.forEach((dot) => {
-        if (dot) gsap.set(dot, { scale: 0, opacity: 0 });
-      });
-      labelsRef.current.forEach((label) => {
-        if (label) gsap.set(label, { opacity: 0, y: 8 });
-      });
-
-      const tl = gsap.timeline({ 
-        repeat: -1, 
-        repeatDelay: 2,
-        scrollTrigger: {
-          trigger: lineRef.current,
-          start: "top 110%",
-          end: "bottom -10%",
-          toggleActions: "play pause resume pause",
-        }
-      });
-
-      steps.forEach((_, i) => {
-        const progress = (i + 1) / steps.length;
-
-        // Grow the progress line
-        tl.to(lineRef.current, {
-          scaleX: progress,
-          duration: 0.6,
-          ease: "power2.inOut",
-        });
-
-        // Pop in the dot
-        if (dotsRef.current[i]) {
-          tl.to(dotsRef.current[i], {
-            scale: 1,
-            opacity: 1,
-            duration: 0.3,
-            ease: "back.out(2)",
-          }, "-=0.2");
-        }
-
-        // Fade in label
-        if (labelsRef.current[i]) {
-          tl.to(labelsRef.current[i], {
-            opacity: 1,
-            y: 0,
-            duration: 0.3,
-            ease: "power2.out",
-          }, "-=0.2");
-        }
-
-        // Pause at each step
-        tl.to({}, { duration: 0.4 });
-      });
-
-      // Hold at the end
-      tl.to({}, { duration: 1.5 });
-
-      // Reset all for next loop
-      tl.to(lineRef.current, { scaleX: 0, duration: 0.4, ease: "power2.in" });
-      dotsRef.current.forEach((dot) => {
-        if (dot) tl.to(dot, { scale: 0, opacity: 0, duration: 0.2 }, "-=0.3");
-      });
-      labelsRef.current.forEach((label) => {
-        if (label) tl.to(label, { opacity: 0, y: 8, duration: 0.2 }, "-=0.3");
-      });
-    });
-
-    return () => ctx.revert();
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!isVisible) {
+      setActiveStep(-1);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev >= steps.length ? -1 : prev + 1));
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [isVisible]);
+
   return (
-    <div className="relative w-full flex flex-col items-center justify-center min-h-[100px] py-4">
+    <div ref={containerRef} className="relative w-full flex flex-col items-center justify-center min-h-[100px] py-4">
       {/* Track */}
       <div className="relative w-full max-w-[240px] h-12">
         {/* Background line */}
@@ -99,11 +45,10 @@ export default function OutcomeTimeline() {
 
         {/* Progress line */}
         <div
-          ref={lineRef}
-          className="absolute top-1/2 left-0 right-0 h-[2px] -translate-y-1/2 rounded-full origin-left"
+          className="absolute top-1/2 left-0 right-0 h-[2px] -translate-y-1/2 rounded-full origin-left transition-transform duration-1000 ease-in-out"
           style={{
             background: "linear-gradient(90deg, #B026FF, #818CF8, #34D399, #F472B6)",
-            transform: "scaleX(0)",
+            transform: `scaleX(${activeStep === -1 ? 0 : (activeStep + 1) / steps.length})`,
           }}
         />
 
@@ -115,8 +60,9 @@ export default function OutcomeTimeline() {
             style={{ left: `${((i + 1) / steps.length) * 100}%` }}
           >
             <div
-              ref={(el) => { dotsRef.current[i] = el; }}
-              className="w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center"
+              className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                activeStep >= i ? "scale-100 opacity-100" : "scale-0 opacity-0"
+              }`}
               style={{
                 borderColor: step.color,
                 backgroundColor: `${step.color}20`,
@@ -126,8 +72,9 @@ export default function OutcomeTimeline() {
               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: step.color }} />
             </div>
             <span
-              ref={(el) => { labelsRef.current[i] = el; }}
-              className="absolute top-5 text-[8px] font-mono uppercase tracking-widest text-zinc-400 whitespace-nowrap"
+              className={`absolute top-5 text-[8px] font-mono uppercase tracking-widest text-zinc-400 whitespace-nowrap transition-all duration-500 ${
+                activeStep >= i ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+              }`}
             >
               {step.name}
             </span>

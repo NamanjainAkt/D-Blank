@@ -50,47 +50,47 @@ const config: Config = {
   			carbon: '#1a1a1a',
   			ash: '#222222',
   			slate: '#333333',
-  			'neon-purple': '#7c3aed',
-  			'cyber-pink': '#c026d3',
-  			'laser-cyan': '#06b6d4',
-  			'acid-green': '#10b981',
-  			'neon-yellow': '#FFF700',
-  			emerald: '#10b981',
-  			'emerald-dim': 'rgba(16,185,129,0.12)',
-  			'emerald-glow': 'rgba(16,185,129,0.4)',
-  			'emerald-dark': '#059669',
-  			'emerald-light': '#34d399',
-  			teal: '#14b8a6',
-  			'teal-dim': 'rgba(20,184,166,0.12)',
-  			'teal-glow': 'rgba(20,184,166,0.4)',
-  			'teal-dark': '#0d9488',
-  			'teal-light': '#2dd4bf',
-  			blue: '#3b82f6',
-  			'blue-dim': 'rgba(59,130,246,0.12)',
-  			'blue-glow': 'rgba(59,130,246,0.35)',
-  			amber: '#f59e0b',
-  			'amber-dim': 'rgba(245,158,11,0.12)',
-  			red: '#ef4444',
-  			'red-dim': 'rgba(239,68,68,0.12)',
-			'red-glow': 'rgba(239,68,68,0.35)',
-			glass: {
-				light: 'rgba(255,255,255,0.04)',
-				med: 'rgba(255,255,255,0.06)',
-				heavy: 'rgba(255,255,255,0.09)'
-			},
-			'border-med': 'rgba(255,255,255,0.12)',
-			'border-hi': 'rgba(255,255,255,0.2)'
-  		},
-  		backgroundImage: {
-  			'emerald-gradient': 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
-  			'emerald-dark-gradient': 'linear-gradient(135deg, #059669 0%, #0d9488 100%)',
-  			'cyber-gradient': 'linear-gradient(135deg, #7c3aed 0%, #c026d3 100%)',
-  			'laser-gradient': 'linear-gradient(135deg, #06b6d4 0%, #7c3aed 100%)',
-  			'dark-gradient': 'linear-gradient(135deg, #000000 0%, #050505 50%, #0a1a15 100%)',
-  			'radial-emerald': 'radial-gradient(ellipse at center, rgba(16,185,129,0.15) 0%, transparent 70%)',
-  			'radial-teal': 'radial-gradient(ellipse at center, rgba(20,184,166,0.1) 0%, transparent 70%)',
-  			'radial-cyber': 'radial-gradient(ellipse at center, rgba(124,58,237,0.15) 0%, transparent 70%)'
-  		},
+   			'neon-purple': '#a855f7',
+   			'cyber-pink': '#c026d3',
+   			'laser-cyan': '#06b6d4',
+   			'acid-green': '#10b981',
+   			'neon-yellow': '#FFF700',
+   			emerald: '#10b981',
+   			'emerald-dim': 'rgba(16,185,129,0.12)',
+   			'emerald-glow': 'rgba(16,185,129,0.4)',
+   			'emerald-dark': '#059669',
+   			'emerald-light': '#34d399',
+   			teal: '#14b8a6',
+   			'teal-dim': 'rgba(20,184,166,0.12)',
+   			'teal-glow': 'rgba(20,184,166,0.4)',
+   			'teal-dark': '#0d9488',
+   			'teal-light': '#2dd4bf',
+   			blue: '#3b82f6',
+   			'blue-dim': 'rgba(59,130,246,0.12)',
+   			'blue-glow': 'rgba(59,130,246,0.35)',
+   			amber: '#f59e0b',
+   			'amber-dim': 'rgba(245,158,11,0.12)',
+   			red: '#ef4444',
+   			'red-dim': 'rgba(239,68,68,0.12)',
+   			'red-glow': 'rgba(239,68,68,0.35)',
+   			glass: {
+   				light: 'rgba(255,255,255,0.04)',
+   				med: 'rgba(255,255,255,0.06)',
+   				heavy: 'rgba(255,255,255,0.09)'
+   			},
+   			'border-med': 'rgba(255,255,255,0.12)',
+   			'border-hi': 'rgba(255,255,255,0.2)'
+   		},
+   		backgroundImage: {
+   			'emerald-gradient': 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
+   			'emerald-dark-gradient': 'linear-gradient(135deg, #059669 0%, #0d9488 100%)',
+   			'cyber-gradient': 'linear-gradient(135deg, #a855f7 0%, #c026d3 100%)',
+   			'laser-gradient': 'linear-gradient(135deg, #06b6d4 0%, #a855f7 100%)',
+   			'dark-gradient': 'linear-gradient(135deg, #000000 0%, #050505 50%, #0a1a15 100%)',
+   			'radial-emerald': 'radial-gradient(ellipse at center, rgba(16,185,129,0.15) 0%, transparent 70%)',
+   			'radial-teal': 'radial-gradient(ellipse at center, rgba(20,184,166,0.1) 0%, transparent 70%)',
+   			'radial-cyber': 'radial-gradient(ellipse at center, rgba(168,85,247,0.15) 0%, transparent 70%)'
+   		},
   		spacing: {
   			'8': '8px',
   			'16': '16px',
@@ -171,14 +171,14 @@ const config: Config = {
   					transform: 'translate(0)'
   				}
   			},
-  			neonPulse: {
-  				'from': {
-  					boxShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #7c3aed, 0 0 20px #7c3aed'
-  				},
-  				'to': {
-  					boxShadow: '0 0 10px #fff, 0 0 20px #fff, 0 0 30px #c026d3, 0 0 40px #c026d3'
-  				}
-  			},
+   			neonPulse: {
+   				'from': {
+   					boxShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #a855f7, 0 0 20px #a855f7'
+   				},
+   				'to': {
+   					boxShadow: '0 0 10px #fff, 0 0 20px #fff, 0 0 30px #c026d3, 0 0 40px #c026d3'
+   				}
+   			},
   			fadeUp: {
   				'0%': {
   					opacity: '0',

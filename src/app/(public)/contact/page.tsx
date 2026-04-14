@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 import Footer2 from "@/components/Footer2";
@@ -27,7 +27,6 @@ import { MorphingBlobs } from '@/components/ui/MorphingBlobs';
 import { MagneticCursor } from '@/components/ui/MagneticCursor';
 import AnimatedContent from '@/components/AnimatedContent';
 import GlareHover from '@/components/GlareHover';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export default function ContactPage() {
@@ -37,6 +36,27 @@ export default function ContactPage() {
     subject: '',
     message: '',
   });
+
+  const [isMethodsVisible, setIsMethodsVisible] = useState(false);
+  const methodsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsMethodsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (methodsRef.current) {
+      observer.observe(methodsRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,10 +94,10 @@ export default function ContactPage() {
       {/* Background Atmosphere */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <MorphingBlobs 
-          colors={['rgba(176, 38, 255, 0.12)', 'rgba(56, 189, 248, 0.08)']} 
+          colors={['rgba(168, 85, 247, 0.12)', 'rgba(56, 189, 248, 0.08)']} 
           className="opacity-40"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(176,38,255,0.05),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168, 85, 247, 0.05),transparent_70%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] opacity-20" />
       </div>
 
@@ -104,9 +124,13 @@ export default function ContactPage() {
       {/* Contact Methods - Node Matrix */}
       <section className="pb-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div ref={methodsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {contactMethods.map((method, index) => (
-              <AnimatedContent key={method.title} delay={index * 0.1}>
+              <div 
+                key={method.title}
+                className={`transition-all duration-700 ease-out transform ${isMethodsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
                 <GlareHover
                   background="linear-gradient(135deg, rgba(39, 39, 42, 0.4) 0%, rgba(9, 9, 11, 0.8) 100%)"
                   borderColor="rgba(255, 255, 255, 0.05)"
@@ -129,7 +153,7 @@ export default function ContactPage() {
                     <Terminal className="w-20 h-20" />
                   </div>
                 </GlareHover>
-              </AnimatedContent>
+              </div>
             ))}
           </div>
         </div>

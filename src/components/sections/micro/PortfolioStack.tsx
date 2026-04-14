@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { Gamepad2, Sword, Ghost } from "lucide-react";
 
 const projects = [
@@ -11,68 +9,39 @@ const projects = [
 ];
 
 export default function PortfolioStack() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const card0 = useRef<HTMLDivElement>(null);
-  const card1 = useRef<HTMLDivElement>(null);
-  const card2 = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const c0 = card0.current;
-    const c1 = card1.current;
-    const c2 = card2.current;
-    if (!c0 || !c1 || !c2) return;
-
-    const ctx = gsap.context(() => {
-      // Initial stacked state
-      gsap.set(c0, { x: 0, y: 0, rotate: 0, scale: 1, zIndex: 3, opacity: 1 });
-      gsap.set(c1, { x: 3, y: -8, rotate: -1.5, scale: 0.96, zIndex: 2, opacity: 0.85 });
-      gsap.set(c2, { x: 6, y: -16, rotate: -3, scale: 0.92, zIndex: 1, opacity: 0.7 });
-
-      const tl = gsap.timeline({ 
-        repeat: -1, 
-        repeatDelay: 0.5,
-        scrollTrigger: {
-          trigger: c0,
-          start: "top 110%",
-          end: "bottom -10%",
-          toggleActions: "play pause resume pause",
-        }
-      });
-
-      // Gentle float
-      tl.to(c0, { y: -10, duration: 1, ease: "sine.inOut" });
-      tl.to(c0, { y: 0, duration: 1, ease: "sine.inOut" });
-
-      // Fan out all three cards explicitly
-      tl.to(c0, { x: -40, y: 0, rotate: -6, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.2)" }, "fan");
-      tl.to(c1, { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, zIndex: 3, duration: 0.5, ease: "back.out(1.2)" }, "fan+=0.06");
-      tl.to(c2, { x: 40, y: 0, rotate: 6, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.2)" }, "fan+=0.12");
-
-      // Hold fanned out
-      tl.to({}, { duration: 2.5 });
-
-      // Stack back
-      tl.to(c0, { x: 0, y: 0, rotate: 0, scale: 1, zIndex: 3, opacity: 1, duration: 0.4, ease: "power2.inOut" }, "stack");
-      tl.to(c1, { x: 3, y: -8, rotate: -1.5, scale: 0.96, zIndex: 2, opacity: 0.85, duration: 0.4, ease: "power2.inOut" }, "stack+=0.04");
-      tl.to(c2, { x: 6, y: -16, rotate: -3, scale: 0.92, zIndex: 1, opacity: 0.7, duration: 0.4, ease: "power2.inOut" }, "stack+=0.08");
-
-      // Hold stacked
-      tl.to({}, { duration: 1.5 });
-    });
-
-    return () => ctx.revert();
-  }, []);
-
-  const refs = [card0, card1, card2];
-
   return (
     <div className="relative w-full flex items-center justify-center min-h-[120px] py-2 overflow-visible">
+      <style jsx>{`
+        @keyframes card-0-anim {
+          0%, 100% { transform: translate(0, 0) rotate(0) scale(1); z-index: 3; opacity: 1; }
+          10% { transform: translate(0, -10px) rotate(0) scale(1); }
+          20% { transform: translate(-40px, 0) rotate(-6deg) scale(1); opacity: 1; }
+          70% { transform: translate(-40px, 0) rotate(-6deg) scale(1); opacity: 1; }
+          80% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
+        }
+        @keyframes card-1-anim {
+          0%, 100% { transform: translate(3px, -8px) rotate(-1.5deg) scale(0.96); z-index: 2; opacity: 0.85; }
+          22% { transform: translate(3px, -8px) rotate(-1.5deg) scale(0.96); opacity: 0.85; }
+          32% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; z-index: 4; }
+          70% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; z-index: 4; }
+          82% { transform: translate(3px, -8px) rotate(-1.5deg) scale(0.96); opacity: 0.85; z-index: 2; }
+        }
+        @keyframes card-2-anim {
+          0%, 100% { transform: translate(6px, -16px) rotate(-3deg) scale(0.92); z-index: 1; opacity: 0.7; }
+          24% { transform: translate(6px, -16px) rotate(-3deg) scale(0.92); opacity: 0.7; }
+          34% { transform: translate(40px, 0) rotate(6deg) scale(1); opacity: 1; }
+          70% { transform: translate(40px, 0) rotate(6deg) scale(1); opacity: 1; }
+          84% { transform: translate(6px, -16px) rotate(-3deg) scale(0.92); opacity: 0.7; }
+        }
+        .animate-card-0 { animation: card-0-anim 6s infinite; }
+        .animate-card-1 { animation: card-1-anim 6s infinite; }
+        .animate-card-2 { animation: card-2-anim 6s infinite; }
+      `}</style>
       <div className="relative w-[88px] h-[115px] flex items-center justify-center overflow-visible">
         {projects.map((project, i) => (
           <div
             key={i}
-            ref={refs[i]}
-            className="absolute w-[88px] h-[115px] rounded-lg border border-white/10 bg-zinc-900/90 shadow-xl overflow-hidden flex flex-col will-change-transform"
+            className={`absolute w-[88px] h-[115px] rounded-lg border border-white/10 bg-zinc-900/90 shadow-xl overflow-hidden flex flex-col will-change-transform animate-card-${i}`}
           >
             <div className={`flex-1 bg-gradient-to-br ${project.gradient} flex items-center justify-center relative`}>
               <project.icon size={20} className="text-white/25" />

@@ -38,6 +38,7 @@ export default function HomePage() {
   const [gamesLoading, setGamesLoading] = useState(true);
   const [modelsReady, setModelsReady] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const handleModelsLoaded = useCallback(() => {
     setModelsReady(true);
@@ -45,37 +46,36 @@ export default function HomePage() {
 
   // Set modelsReady to true immediately on mobile as they aren't rendered
   useEffect(() => {
-    if (window.innerWidth < 1024) {
+    const desktop = window.innerWidth >= 1024;
+    setIsDesktop(desktop);
+    if (!desktop) {
       setModelsReady(true);
     }
   }, []);
 
-  // Auto-dismiss loader after models load (with min display time) or timeout
+  // Auto-dismiss loader logic
   useEffect(() => {
-    const minTime = setTimeout(() => {
-      // After 1.5s minimum, check if models are loaded
-      if (modelsReady) {
-        setShowLoader(false);
-      }
-    }, 1500);
+    const isMobile = window.innerWidth < 1024;
+    const minWait = isMobile ? 300 : 800;
+    const maxWait = isMobile ? 2000 : 5000;
 
-    // Hard timeout — dismiss loader after 6s no matter what
-    const maxTime = setTimeout(() => {
+    // Hard timeout — dismiss loader after maxWait no matter what
+    const maxTimer = setTimeout(() => {
       setShowLoader(false);
-    }, 6000);
+    }, maxWait);
+
+    // If models are ready, dismiss after minWait
+    let minTimer: NodeJS.Timeout;
+    if (modelsReady) {
+      minTimer = setTimeout(() => {
+        setShowLoader(false);
+      }, minWait);
+    }
 
     return () => {
-      clearTimeout(minTime);
-      clearTimeout(maxTime);
+      clearTimeout(maxTimer);
+      if (minTimer) clearTimeout(minTimer);
     };
-  }, []);
-
-  // Dismiss when models ready (after min display)
-  useEffect(() => {
-    if (modelsReady) {
-      const timer = setTimeout(() => setShowLoader(false), 300);
-      return () => clearTimeout(timer);
-    }
   }, [modelsReady]);
 
   useEffect(() => {
@@ -153,17 +153,18 @@ export default function HomePage() {
             muted 
             autoPlay 
             loop 
+            priority
             playsInline 
             onCanPlay={(e) => e.currentTarget.play()}
           />
-<div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-black/40 to-black pointer-events-none" />
-          <div className="absolute top-1/4 sm:top-1/3 -left-[10%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[radial-gradient(circle,rgba(139,92,246,0.2)_0%,transparent_70%)] rounded-full pointer-events-none hidden sm:block animate-pulse" style={{ animationDuration: '4s' }} />
+<div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black pointer-events-none" />
+          <div className="absolute top-1/4 sm:top-1/3 -left-[10%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[radial-gradient(circle,rgba(139,92,246,0.2)_0%,transparent_70%)] rounded-full pointer-events-none hidden animate-pulse" style={{ animationDuration: '4s' }} />
 
           {/* Top edge glow */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent pointer-events-none" />
 
           {/* Grid — violet tinted */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.045)_1px,transparent_1px)] bg-[size:32px_32px] sm:bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] sm:bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)] pointer-events-none" />
 
           <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pointer-events-none">
             <div className="lg:grid lg:grid-cols-[1fr_1fr] items-center min-h-[60vh]">
@@ -190,7 +191,7 @@ export default function HomePage() {
 
               {/* Right — 3D Models (desktop only) */}
               <div className="hidden lg:flex items-center justify-center h-[85vh] max-h-[750px] pointer-events-none -mr-8">
-                <HeroModels onLoaded={handleModelsLoaded} />
+                {isDesktop && <HeroModels onLoaded={handleModelsLoaded} />}
               </div>
             </div>
           </div>
@@ -286,18 +287,6 @@ export default function HomePage() {
         <section className="relative py-32 md:py-48 px-4 bg-black overflow-hidden flex flex-col items-center justify-center min-h-[600px] md:min-h-[800px]">
           {/* Animated Grid */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(176,38,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(176,38,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)] pointer-events-none" />
-
-          {/* Core Glows */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.15)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] max-w-[400px] h-[200px] bg-[radial-gradient(ellipse_at_center,rgba(217,70,239,0.15)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
-
-          {/* Giant Background Text */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-center items-center pointer-events-none">
-            <h1 className="text-[clamp(6rem,20vw,20rem)] font-black tracking-tighter bg-gradient-to-b from-white/[0.03] to-transparent bg-clip-text text-transparent select-none font-display">
-              BUILD
-            </h1>
-          </div>
-
           <div className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center">
             <AnimatedContent>
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent p-[1px] mb-8 mx-auto shadow-[0_0_30px_rgba(217,70,239,0.3)]">
@@ -318,17 +307,17 @@ export default function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-12">
-                <Link href="/courses">
-                  <GlowButton variant="primary" className="w-full sm:w-auto min-w-[220px] text-sm py-4 shadow-[0_0_20px_rgba(217,70,239,0.4)]">
+                <GlowButton asChild variant="primary" className="w-full sm:w-auto min-w-[220px] text-sm py-4 shadow-[0_0_20px_rgba(217,70,239,0.4)]">
+                  <Link href="/courses">
                     Start Learning
                     <ArrowRight className="inline-block w-4 h-4 ml-2" />
-                  </GlowButton>
-                </Link>
-                <Link href="/contact">
-                  <GlowButton variant="secondary" className="w-full sm:w-auto min-w-[220px] text-sm py-4 border-zinc-700 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white">
+                  </Link>
+                </GlowButton>
+                <GlowButton asChild variant="secondary" className="w-full sm:w-auto min-w-[220px] text-sm py-4 border-zinc-700 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white">
+                  <Link href="/contact">
                     Contact Us
-                  </GlowButton>
-                </Link>
+                  </Link>
+                </GlowButton>
               </div>
 
               {/* Trust chips */}

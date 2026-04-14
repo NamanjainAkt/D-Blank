@@ -77,10 +77,10 @@ export default function GamesPage() {
       {/* Background Atmosphere */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <MorphingBlobs 
-          colors={['rgba(176, 38, 255, 0.1)', 'rgba(56, 189, 248, 0.08)']} 
+          colors={['rgba(168, 85, 247, 0.1)', 'rgba(56, 189, 248, 0.08)']} 
           className="opacity-40"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(176,38,255,0.05),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168, 85, 247, 0.05),transparent_70%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] opacity-10" />
       </div>
 
@@ -100,7 +100,7 @@ export default function GamesPage() {
 
             <ParticleField 
               particleCount={30} 
-              color="rgba(124, 58, 237, 0.4)" 
+              color="rgba(168, 85, 247, 0.4)" 
               className="z-0" 
             />
             
@@ -125,7 +125,7 @@ export default function GamesPage() {
                   {heroEmbedUrl && (
                     <Button 
                       onClick={() => setShowHeroTrailer(true)}
-                      className="bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest h-14 px-8 w-full sm:w-auto shadow-[0_0_30px_rgba(124,58,237,0.4)] transition-all hover:scale-105"
+                      className="bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest h-14 px-8 w-full sm:w-auto shadow-[0_0_30px_rgba(168, 85, 247, 0.4)] transition-all hover:scale-105"
                     >
                       <Play className="w-5 h-5 mr-3 fill-current" /> Watch Trailer
                     </Button>
@@ -172,7 +172,7 @@ export default function GamesPage() {
                         onClick={() => setSelectedGenre(genre)}
                         className={`px-3 sm:px-4 py-1.5 rounded-none text-[9px] sm:text-[10px] font-mono uppercase tracking-widest transition-all ${
                           selectedGenre === genre 
-                            ? "bg-primary text-white shadow-[0_0_15px_rgba(124,58,237,0.4)]" 
+                            ? "bg-primary text-white shadow-[0_0_15px_rgba(168, 85, 247, 0.4)]" 
                             : "bg-black/50 text-zinc-400 hover:bg-primary/20 hover:text-primary"
                         }`}
                       >
@@ -242,7 +242,7 @@ export default function GamesPage() {
       <section className="py-24 bg-black relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedContent>
-            <div className="relative rounded-3xl border border-primary/20 bg-zinc-900/40 overflow-hidden shadow-[0_0_50px_rgba(124,58,237,0.15)] group">
+            <div className="relative rounded-3xl border border-primary/20 bg-zinc-900/40 overflow-hidden shadow-[0_0_50px_rgba(168, 85, 247, 0.15)] group">
               <ParticleField 
                 particleCount={20} 
                 color="rgba(192, 38, 211, 0.4)" 
@@ -294,7 +294,7 @@ export default function GamesPage() {
       {/* Hero Trailer Modal */}
       {featuredGame && heroEmbedUrl && (
         <Dialog open={showHeroTrailer} onOpenChange={setShowHeroTrailer}>
-          <DialogContent className="max-w-4xl p-0 bg-black border-white/10 overflow-hidden shadow-[0_0_50px_rgba(124,58,237,0.3)]">
+          <DialogContent className="max-w-4xl p-0 bg-black border-white/10 overflow-hidden shadow-[0_0_50px_rgba(168, 85, 247, 0.3)]">
             <DialogHeader className="sr-only">
               <DialogTitle>{featuredGame.title} Trailer</DialogTitle>
             </DialogHeader>

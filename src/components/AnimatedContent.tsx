@@ -1,5 +1,4 @@
-import React, { useRef, useEffect } from 'react';
-import { gsap, ScrollTrigger } from '@/lib/gsap';
+import React, { useRef, useEffect, useState } from 'react';
 
 interface AnimatedContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -28,7 +27,7 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
   direction = 'vertical',
   reverse = false,
   duration = 0.8,
-  ease = 'power3.out',
+  ease = 'ease-out',
   initialOpacity = 0,
   animateOpacity = true,
   scale = 1,
@@ -36,110 +35,80 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
   delay = 0,
   disappearAfter = 0,
   disappearDuration = 0.5,
-  disappearEase = 'power3.in',
+  disappearEase = 'ease-in',
   onComplete,
   onDisappearanceComplete,
   className = '',
   ...props
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    setHasMounted(true);
     const el = ref.current;
     if (!el) return;
 
     // Handle reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.innerWidth < 768;
-
-    if (prefersReducedMotion || (isMobile && threshold < 0.2)) {
-      gsap.set(el, { opacity: 1, x: 0, y: 0, scale: 1, visibility: 'visible' });
+    if (prefersReducedMotion) {
+      setIsVisible(true);
+      setHasAnimated(true);
       return;
     }
 
-    // Performance tuning for mobile
-    if (isMobile) {
-      gsap.ticker.fps(30);
-    }
-
-    const ctx = gsap.context(() => {
-      let scrollerTarget: Element | string | null = container || document.getElementById('snap-main-container') || null;
-
-      if (typeof scrollerTarget === 'string') {
-        scrollerTarget = document.querySelector(scrollerTarget);
-      }
-
-      const axis = direction === 'horizontal' ? 'x' : 'y';
-      // Reduced movement on mobile for better performance
-      const baseDistance = isMobile ? Math.min(distance, 20) : distance;
-      const offset = reverse ? -baseDistance : baseDistance;
-      const startPct = (1 - threshold) * 100;
-
-      gsap.set(el, {
-        [axis]: offset,
-        scale: isMobile ? 1 : scale,
-        opacity: animateOpacity ? initialOpacity : 1,
-        visibility: 'visible'
-      });
-
-      const tl = gsap.timeline({
-        paused: true,
-        delay,
-        onComplete: () => {
-          if (onComplete) onComplete();
-          if (disappearAfter > 0) {
-            gsap.to(el, {
-              [axis]: reverse ? distance : -distance,
-              scale: 0.8,
-              opacity: animateOpacity ? initialOpacity : 0,
-              delay: disappearAfter,
-              duration: disappearDuration,
-              ease: disappearEase,
-              onComplete: () => onDisappearanceComplete?.()
-            });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setIsVisible(true);
+          setHasAnimated(true);
+          if (onComplete) {
+            setTimeout(onComplete, (duration + delay) * 1000);
           }
         }
-      });
+      },
+      { threshold }
+    );
 
-      tl.to(el, {
-        [axis]: 0,
-        scale: 1,
-        opacity: 1,
-        duration,
-        ease
-      });
+    observer.observe(el);
 
-      ScrollTrigger.create({
-        trigger: el,
-        scroller: scrollerTarget || window,
-        start: `top ${startPct}%`,
-        once: true,
-        onEnter: () => tl.play()
-      });
-    });
+    return () => {
+      observer.disconnect();
+    };
+  }, [threshold, hasAnimated, duration, delay, onComplete]);
 
-    return () => ctx.revert();
-  }, [
-    container,
-    distance,
-    direction,
-    reverse,
-    duration,
-    ease,
-    initialOpacity,
-    animateOpacity,
-    scale,
-    threshold,
-    delay,
-    disappearAfter,
-    disappearDuration,
-    disappearEase,
-    onComplete,
-    onDisappearanceComplete
-  ]);
+  const axis = direction === 'horizontal' ? 'X' : 'Y';
+  
+  // Only use mobile specific values after mounting to avoid hydration mismatch
+  const isMobile = hasMounted && window.innerWidth < 768;
+  const baseDistance = isMobile ? Math.min(distance, 20) : distance;
+  const offset = reverse ? -baseDistance : baseDistance;
+  
+  const finalScale = isMobile ? 1 : scale;
+
+  const initialStyles: React.CSSProperties = {
+    opacity: animateOpacity ? initialOpacity : 1,
+    transform: `translate${axis}(${offset}px) scale(${finalScale})`,
+    transition: `all ${duration}s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
+    visibility: isVisible ? 'visible' : 'hidden', // to prevent interaction before entrance
+  };
+
+  const visibleStyles: React.CSSProperties = {
+    opacity: 1,
+    transform: `translate${axis}(0px) scale(1)`,
+    transition: `all ${duration}s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
+    visibility: 'visible',
+  };
 
   return (
-    <div ref={ref} className={`invisible ${className}`} {...props}>
+    <div 
+      ref={ref} 
+      className={className} 
+      style={hasAnimated ? visibleStyles : initialStyles}
+      {...props}
+    >
       {children}
     </div>
   );

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { useRef } from "react";
 import SplitText from "./SplitText";
+import AnimatedContent from "@/components/AnimatedContent";
 
 interface GradientHeadingProps {
   prefix?: string;
@@ -19,47 +19,6 @@ export default function GradientHeading({
   prefixClassName = "",
   highlightClassName = "",
 }: GradientHeadingProps) {
-  const highlightRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    if (!highlightRef.current) return;
-
-    const el = highlightRef.current;
-    
-    const ctx = gsap.context(() => {
-      gsap.set(el, { opacity: 0, y: 30, filter: "blur(8px)" });
-
-      ScrollTrigger.create({
-        trigger: el,
-        start: "top 95%",
-        onEnter: () => {
-          gsap.to(el, {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            duration: window.innerWidth < 768 ? 0.4 : 0.9,
-            ease: "power3.out",
-          });
-        },
-      });
-
-      // Fallback: if element is already in view, animate immediately
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.95) {
-        gsap.to(el, {
-          opacity: 1,
-          y: 0,
-          filter: "blur(0px)",
-          duration: window.innerWidth < 768 ? 0.4 : 0.9,
-          delay: 0.5,
-          ease: "power3.out",
-        });
-      }
-    });
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <h2
       className={`text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter ${className}`}
@@ -72,12 +31,17 @@ export default function GradientHeading({
         />
       )}
       <br className="md:hidden" />
-      <span
-        ref={highlightRef}
-        className={`inline-block bg-gradient-to-br from-primary via-accent to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)] ${highlightClassName}`}
+      <AnimatedContent
+        distance={20}
+        delay={0.3}
+        className="inline-block"
       >
-        {highlight}
-      </span>
+        <span
+          className={`inline-block bg-gradient-to-br from-primary via-accent to-indigo-500 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(176,38,255,0.4)] ${highlightClassName}`}
+        >
+          {highlight}
+        </span>
+      </AnimatedContent>
     </h2>
   );
 }

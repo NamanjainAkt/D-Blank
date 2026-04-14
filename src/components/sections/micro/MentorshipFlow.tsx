@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { useEffect, useState, useRef } from "react";
 import { BookOpen, Eye, RefreshCw } from "lucide-react";
 
 const steps = [
@@ -11,124 +10,51 @@ const steps = [
 ];
 
 export default function MentorshipFlow() {
+  const [activeStep, setActiveStep] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
-  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const line = lineRef.current;
-    const progress = progressRef.current;
-    const dot = dotRef.current;
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsVisible(entry.isIntersecting);
+    }, { threshold: 0.1 });
 
-    if (!line || !progress || !dot) return;
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ 
-        repeat: -1,
-        scrollTrigger: {
-          trigger: line,
-          start: "top 110%",
-          end: "bottom -10%",
-          toggleActions: "play pause resume pause",
-        }
-      });
-
-      // Animate progress line
-      tl.fromTo(
-        progress,
-        { scaleX: 0 },
-        { scaleX: 1, duration: 1.2, ease: "power2.inOut" }
-      );
-
-      // Animate dot through each step
-      steps.forEach((_, i) => {
-        const node = nodeRefs.current[i];
-        const icon = iconRefs.current[i];
-
-        if (!node) return;
-
-        // Get position of node relative to container
-        const nodeLeft = (i / (steps.length - 1)) * 100;
-
-        // Move dot to node
-        tl.to(
-          dot,
-          {
-            left: `${nodeLeft}%`,
-            scale: 1.4,
-            duration: 0.6,
-            ease: "power2.out",
-          },
-          i * 0.8
-        );
-
-        // Pulse node
-        if (icon) {
-          tl.to(icon, {
-            scale: 1.2,
-            duration: 0.3,
-            ease: "back.out(2)",
-          });
-          tl.to(icon, {
-            scale: 1,
-            duration: 0.3,
-            ease: "power2.in",
-          });
-        }
-
-        // Hold at node
-        tl.to({}, { duration: 0.2 });
-      });
-
-      // Hold at end
-      tl.to({}, { duration: 0.8 });
-
-      // Reset
-      tl.to(dot, {
-        left: "0%",
-        scale: 1,
-        duration: 0.5,
-        ease: "power2.inOut",
-      });
-
-      tl.to(progress, { scaleX: 0, duration: 0.3, ease: "power2.in" });
-
-      tl.to({}, { duration: 0.5 });
-    });
-
-    return () => {
-      ctx.revert();
-    };
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % steps.length);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [isVisible]);
 
   return (
     <div
       ref={containerRef}
       className="relative w-full py-4 px-2"
     >
-      {/* Roadmap container */}
       <div className="relative flex items-start justify-between">
         {/* Progress line background */}
-        <div
-          ref={lineRef}
-          className="absolute top-[22px] left-[22px] right-[22px] h-[2px] bg-zinc-800 rounded-full overflow-hidden"
-        >
-          {/* Progress line */}
+        <div className="absolute top-[22px] left-[22px] right-[22px] h-[2px] bg-zinc-800 rounded-full overflow-hidden">
+          {/* Progress line filled based on active step */}
           <div
-            ref={progressRef}
-            className="h-full bg-gradient-to-r from-primary via-accent to-indigo-500 origin-left"
-            style={{ width: "100%" }}
+            className="h-full bg-gradient-to-r from-primary via-accent to-indigo-500 origin-left transition-all duration-1000 ease-in-out"
+            style={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
           />
         </div>
 
         {/* Traveling dot */}
         <div
-          ref={dotRef}
-          className="absolute top-[14px] w-5 h-5 rounded-full bg-white shadow-[0_0_12px_rgba(176,38,255,0.8),0_0_4px_white] z-10 pointer-events-none"
-          style={{ left: "0%", transform: "translateX(-50%)" }}
+          className="absolute top-[14px] w-5 h-5 rounded-full bg-white shadow-[0_0_12px_rgba(176,38,255,0.8),0_0_4px_white] z-10 pointer-events-none transition-all duration-1000 ease-in-out"
+          style={{ 
+            left: `${(activeStep / (steps.length - 1)) * 100}%`, 
+            transform: "translateX(-50%)" 
+          }}
         />
 
         {/* Steps */}
@@ -138,39 +64,39 @@ export default function MentorshipFlow() {
             className="relative flex flex-col items-center z-20"
             style={{ width: `${100 / steps.length}%` }}
           >
-            {/* Node circle */}
-            <div
-              ref={(el) => { nodeRefs.current[i] = el; }}
-              className="relative"
-            >
-              {/* Glow effect */}
+            <div className="relative">
               <div
-                className="absolute inset-0 rounded-full blur-md opacity-0"
+                className={`absolute inset-0 rounded-full blur-md transition-opacity duration-500 ${
+                  activeStep === i ? "opacity-100" : "opacity-0"
+                }`}
                 style={{ backgroundColor: step.color }}
               />
 
-              {/* Node */}
               <div
-                ref={(el) => { iconRefs.current[i] = el; }}
-                className="relative w-11 h-11 rounded-full border-2 flex items-center justify-center bg-zinc-950 backdrop-blur-sm transition-transform duration-300"
+                className={`relative w-11 h-11 rounded-full border-2 flex items-center justify-center bg-zinc-950 backdrop-blur-sm transition-all duration-500 ${
+                  activeStep === i ? "scale-110 border-white/40" : "scale-100"
+                }`}
                 style={{
-                  borderColor: `${step.color}60`,
-                  boxShadow: `0 0 16px ${step.color}30`,
+                  borderColor: activeStep === i ? step.color : `${step.color}40`,
+                  boxShadow: activeStep === i ? `0 0 16px ${step.color}60` : `0 0 8px ${step.color}20`,
                 }}
               >
                 <step.icon
                   size={18}
                   style={{ color: step.color }}
-                  className="drop-shadow-[0_0_6px_currentColor]"
+                  className={`transition-all duration-500 ${
+                    activeStep === i ? "drop-shadow-[0_0_8px_currentColor]" : ""
+                  }`}
                 />
               </div>
             </div>
 
-            {/* Label */}
             <div className="mt-3 text-center">
               <span
-                className="block text-[10px] font-bold uppercase tracking-wider"
-                style={{ color: step.color }}
+                className={`block text-[10px] font-bold uppercase tracking-wider transition-colors duration-500 ${
+                  activeStep === i ? "text-white" : ""
+                }`}
+                style={{ color: activeStep === i ? undefined : step.color }}
               >
                 {step.label}
               </span>
@@ -182,11 +108,8 @@ export default function MentorshipFlow() {
         ))}
       </div>
 
-      {/* Decorative elements */}
       <div className="absolute top-[22px] left-[22px] right-[22px] h-[2px] pointer-events-none">
-        {/* Start dot */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-primary -ml-[2px]" />
-        {/* End dot */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-indigo-500 -mr-[2px]" />
       </div>
     </div>

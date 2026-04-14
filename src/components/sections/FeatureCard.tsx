@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import React from "react";
 import { cn } from "@/lib/utils";
+import AnimatedContent from "@/components/AnimatedContent";
 
 import GameplayPreview from "./micro/GameplayPreview";
 import ToolStack from "./micro/ToolStack";
@@ -37,39 +37,13 @@ export default function FeatureCard({
   className = "",
   index,
 }: FeatureCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null);
   const isLarge = className.includes("col-span-2") || className.includes("col-span-3");
   const MicroComponent = MicroComponents[id];
 
-  useEffect(() => {
-    const card = cardRef.current;
-    if (!card) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        card,
-        { y: 15, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.7,
-          delay: index * 0.05,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: card,
-            start: "top 90%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
-    });
-
-    return () => ctx.revert();
-  }, [index]);
-
   return (
-    <div
-      ref={cardRef}
+    <AnimatedContent
+      delay={index * 0.1}
+      distance={20}
       className={cn(
         "group relative rounded-xl border border-white/[0.08] bg-zinc-900/50 transition-colors duration-300 hover:border-white/[0.15] hover:bg-zinc-900/70",
         isLarge ? "p-8" : "p-6",
@@ -141,6 +115,6 @@ export default function FeatureCard({
           </div>
         )}
       </div>
-    </div>
+    </AnimatedContent>
   );
 }

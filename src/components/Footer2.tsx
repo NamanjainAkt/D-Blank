@@ -9,10 +9,6 @@ export default function Footer2() {
       {/* ANIMATED BACKGROUND GRID */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(217,70,239,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(217,70,239,0.04)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_100%,black,transparent)] pointer-events-none" />
 
-      {/* CORE GLOW */}
-      <div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[120%] max-w-[1200px] h-[400px] bg-[radial-gradient(ellipse_at_bottom,rgba(217,70,239,0.35)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[60%] max-w-[600px] h-[200px] bg-[radial-gradient(ellipse_at_bottom,rgba(139,92,246,0.4)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
-
       {/* TEXT WRAPPER for layering */}
       <div className="relative w-full flex justify-center items-center px-4 sm:px-8 mt-auto mb-[-8%] md:mb-[-10%]">
         
@@ -20,7 +16,7 @@ export default function Footer2() {
 <h1 className="relative text-[clamp(2.5rem,10vw,8rem)] font-black tracking-tighter
   bg-gradient-to-b from-accent via-accent to-primary
   bg-clip-text text-transparent opacity-95 whitespace-nowrap pointer-events-none font-display select-none
-  drop-shadow-[0_0_15px_rgba(217,70,239,0.5)]">
+  drop-shadow-[0_0_5px_rgba(217,70,239,0.5)]">
           D-BLANKS
         </h1>
       </div>

@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { gsap } from '@/lib/gsap';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Testimonial {
   id: number | string;
@@ -25,47 +24,39 @@ export const TestimonialsColumn = ({
   avatarColors,
 }: TestimonialsColumnProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    const ctx = gsap.context(() => {
-      const totalHeight = el.scrollHeight / 2;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    
+    observer.observe(el);
 
-      const tween = gsap.to(el, {
-        y: -totalHeight,
-        duration: duration,
-        ease: 'none',
-        repeat: -1,
-      });
-
-      // Pause animation when not visible (performance optimization)
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            tween.play();
-          } else {
-            tween.pause();
-          }
-        },
-        { threshold: 0 }
-      );
-      
-      observer.observe(el);
-
-      return () => {
-        observer.disconnect();
-        tween.kill();
-      };
-    });
-
-    return () => ctx.revert();
-  }, [duration, testimonials]);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div className={`overflow-hidden ${className}`}>
-      <div ref={containerRef} className="flex flex-col gap-5 pb-5">
+      <div 
+        ref={containerRef} 
+        className="flex flex-col gap-5 pb-5 will-change-transform"
+        style={{
+          animation: `scrollUp ${duration}s linear infinite`,
+          animationPlayState: (!isVisible || isHovered) ? 'paused' : 'running'
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         {[...testimonials, ...testimonials].map((testimonial, index) => (
           <div
             key={`${testimonial.id}-${index}`}
@@ -100,6 +91,12 @@ export const TestimonialsColumn = ({
           </div>
         ))}
       </div>
+      <style>{`
+        @keyframes scrollUp {
+          from { transform: translateY(0); }
+          to { transform: translateY(calc(-50% - 10px)); }
+        }
+      `}</style>
     </div>
   );
 };

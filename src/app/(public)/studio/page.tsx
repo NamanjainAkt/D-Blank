@@ -24,9 +24,29 @@ import { MagneticCursor } from '@/components/ui/MagneticCursor';
 import ChromaGrid, { ChromaItem } from '@/components/ui/ChromaGrid';
 import AnimatedContent from '@/components/AnimatedContent';
 import { founders, teamMembers } from '@/lib/placeholder-data';
-import { motion } from 'framer-motion';
 
 export default function StudioPage() {
+  const [isCrewVisible, setIsCrewVisible] = React.useState(false);
+  const crewRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsCrewVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (crewRef.current) {
+      observer.observe(crewRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   // Map founders to ChromaItem format for the Visionaries section
   const visionaryItems: ChromaItem[] = founders.map(founder => ({
     image: founder.image,
@@ -42,10 +62,10 @@ export default function StudioPage() {
       {/* Background Atmosphere */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <MorphingBlobs 
-          colors={['rgba(176, 38, 255, 0.08)', 'rgba(217, 70, 239, 0.08)']} 
+          colors={['rgba(168, 85, 247, 0.08)', 'rgba(217, 70, 239, 0.08)']} 
           className="opacity-50"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(176,38,255,0.05),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(168, 85, 247, 0.05),transparent_70%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
       </div>
 
@@ -53,7 +73,7 @@ export default function StudioPage() {
       <section className="relative pt-40 pb-32 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <AnimatedContent>
-            <Badge variant="outline" className="mb-8 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.3em] border-primary/40 bg-primary/5 text-primary shadow-[0_0_15px_rgba(176,38,255,0.2)]">
+            <Badge variant="outline" className="mb-8 px-4 py-1.5 text-[10px] font-mono uppercase tracking-[0.3em] border-primary/40 bg-primary/5 text-primary shadow-[0_0_15px_rgba(168, 85, 247, 0.2)]">
               About Us
             </Badge>
             <h1 className="text-4xl md:text-6xl lg:text-8xl font-black tracking-tighter mb-8 uppercase italic leading-[0.95] px-4">
@@ -121,10 +141,10 @@ export default function StudioPage() {
         {/* Background Atmosphere */}
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
           <MorphingBlobs 
-            colors={['rgba(176, 38, 255, 0.08)', 'rgba(217, 70, 239, 0.08)']} 
+            colors={['rgba(168, 85, 247, 0.08)', 'rgba(217, 70, 239, 0.08)']} 
             className="opacity-50"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(176,38,255,0.05),transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(168, 85, 247, 0.05),transparent_70%)]" />
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -158,12 +178,12 @@ export default function StudioPage() {
             </div>
           </AnimatedContent>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div ref={crewRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {teamMembers.map((member, i) => (
-              <AnimatedContent key={member.id} delay={i * 0.05}>
-                <motion.div 
-                  whileHover={{ y: -5 }}
-                  className="group relative h-full flex flex-col p-6 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-primary/40 transition-all duration-500 overflow-hidden"
+                <div 
+                  key={member.id}
+                  className={`group relative h-full flex flex-col p-6 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-primary/40 hover:-translate-y-[5px] transition-all duration-700 ease-out overflow-hidden transform ${isCrewVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                  style={{ transitionDelay: `${i * 100}ms` }}
                 >
                   {/* Hover Accent Glow */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -205,8 +225,7 @@ export default function StudioPage() {
                       <circle cx="90" cy="90" r="2" className="fill-primary" />
                     </svg>
                   </div>
-                </motion.div>
-              </AnimatedContent>
+                </div>
             ))}
           </div>
         </div>
@@ -216,7 +235,7 @@ export default function StudioPage() {
       <section className="py-40 relative group overflow-hidden">
         <ParticleField 
           particleCount={50} 
-          color="rgba(176, 38, 255, 0.2)" 
+          color="rgba(168, 85, 247, 0.2)" 
           className="absolute inset-0 opacity-40"
         />
         

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { gsap, ScrollTrigger } from '@/lib/gsap';
 
 interface CountUpProps {
   end: number;
@@ -13,81 +12,57 @@ interface CountUpProps {
 
 export function CountUp({
   end,
-  duration = 2,
+  duration = 2000, // Duration in ms
   suffix = '',
   prefix = '',
   className = '',
 }: CountUpProps) {
   const [count, setCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (!ref.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-    const element = ref.current;
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
 
-    // Use gsap.context() for better cleanup
-    const ctx = gsap.context(() => {
-      const counter = { value: 0 };
-
-      ScrollTrigger.create({
-        trigger: element,
-        start: 'top 80%',
-        end: 'bottom 20%',
-        toggleActions: 'play none none reverse',
-        onEnter: () => {
-          setIsLoading(false);
-          gsap.to(counter, {
-            value: end,
-            duration: duration,
-            ease: 'power2.out',
-            onUpdate: () => {
-              setCount(Math.floor(counter.value));
-            },
-          });
-        },
-        onLeaveBack: () => {
-          setCount(0);
-          counter.value = 0;
-        },
-      });
-    }, element);
-
-    return () => ctx.revert();
-  }, [end, duration]);
-
-  // Debug: Force initial render with actual values for immediate visibility
   useEffect(() => {
-    if (ref.current) {
-      // Check if element is already visible on mount
-      const rect = ref.current.getBoundingClientRect();
-      const isVisible = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
+    if (!isVisible) return;
 
-      if (isVisible) {
-        // Start animation immediately if visible
-        setIsLoading(false);
-        const counter = { value: 0 };
-        gsap.to(counter, {
-          value: end,
-          duration: duration,
-          ease: 'power2.out',
-          onUpdate: () => {
-            setCount(Math.floor(counter.value));
-          },
-        });
+    let startTime: number | null = null;
+    let frame: number;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      
+      // Easing: outCubic
+      const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOutCubic * end));
+
+      if (progress < 1) {
+        frame = requestAnimationFrame(animate);
       }
-    }
-  }, [end, duration]);
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [isVisible, end, duration]);
 
   return (
     <span ref={ref} className={className}>
       {prefix}
-      {isLoading ? (
-        <span className="inline-block w-16 h-8 bg-white/10 animate-pulse rounded"></span>
-      ) : (
-        count.toLocaleString()
-      )}
+      {count.toLocaleString()}
       {suffix}
     </span>
   );

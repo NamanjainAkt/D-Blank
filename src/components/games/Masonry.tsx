@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { GameImage } from '@/components/ui/GameImage';
 
@@ -20,58 +19,37 @@ interface MasonryProps {
 
 function MasonryCard({ item, index, genreColor }: { item: MasonryItem; index: number; genreColor: string }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!cardRef.current || !overlayRef.current || !buttonRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          if (cardRef.current) {
+            observer.unobserve(cardRef.current);
+          }
+        }
+      },
+      { threshold: 0.1, rootMargin: '50px' }
+    );
 
-    const card = cardRef.current;
-    const overlay = overlayRef.current;
-    const button = buttonRef.current;
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
 
-    // Initial animation
-    gsap.fromTo(card, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, delay: index * 0.1, ease: 'power2.out' });
-
-    // Hover animations
-    const handleMouseEnter = () => {
-      gsap.to(card, {
-        y: -8,
-        scale: 1.02,
-        duration: 0.3,
-        ease: 'power2.out',
-        boxShadow: '0 20px 40px rgba(176, 38, 255, 0.2)'
-      });
-
-      gsap.to(overlay, { opacity: 1, duration: 0.3 });
-      gsap.fromTo(button, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, delay: 0.1 });
-    };
-
-    const handleMouseLeave = () => {
-      gsap.to(card, {
-        y: 0,
-        scale: 1,
-        duration: 0.3,
-        ease: 'power2.out',
-        boxShadow: '0 0 0 rgba(176, 38, 255, 0)'
-      });
-
-      gsap.to(overlay, { opacity: 0, duration: 0.3 });
-      gsap.to(button, { y: 20, opacity: 0, duration: 0.2 });
-    };
-
-    card.addEventListener('mouseenter', handleMouseEnter);
-    card.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      card.removeEventListener('mouseenter', handleMouseEnter);
-      card.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [index]);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div ref={cardRef} className="break-inside-avoid mb-4 opacity-0">
-      <div className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-neon-purple/30 transition-all duration-300">
+    <div
+      ref={cardRef}
+      className={`break-inside-avoid mb-4 transition-all duration-700 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+      }`}
+      style={{ transitionDelay: `${index * 100}ms` }}
+    >
+      <div className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-neon-purple/30 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(176,38,255,0.2)] transition-all duration-300 ease-out">
         {/* Game Image */}
         <div className="relative aspect-[4/3] overflow-hidden">
           <GameImage
@@ -92,10 +70,9 @@ function MasonryCard({ item, index, genreColor }: { item: MasonryItem; index: nu
           )}
 
           {/* Hover overlay */}
-          <div ref={overlayRef} className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 z-10 flex items-end p-4">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex items-end p-4 pointer-events-none group-hover:pointer-events-auto">
             <button
-              ref={buttonRef}
-              className="btn btn-laser w-full text-sm opacity-0 translate-y-5"
+              className="btn btn-laser w-full text-sm opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 group-hover:duration-500 delay-0 group-hover:delay-100"
             >
               Play Now
             </button>

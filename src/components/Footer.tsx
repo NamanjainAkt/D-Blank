@@ -8,9 +8,7 @@ export function Footer() {
 
   return (
     <footer className="relative bg-black overflow-hidden pt-24 pb-8 border-t border-zinc-800/50">
-      {/* BACKGROUND EFFECTS */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[radial-gradient(ellipse_at_top,rgba(217,70,239,0.08)_0%,transparent_70%)] rounded-[100%] pointer-events-none" />
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent/30 to-transparent shadow-[0_0_15px_rgba(217,70,239,0.3)]" />
+
       <NoiseOverlay opacity={10} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

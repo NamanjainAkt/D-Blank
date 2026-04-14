@@ -1,7 +1,6 @@
 'use client';
-
-import React, { useRef, useEffect } from 'react';
-import { gsap } from '@/lib/gsap';
+// Force rebuild
+import React, { useRef, useState } from 'react';
 
 export interface ChromaItem {
   image: string;
@@ -20,68 +19,29 @@ export interface ChromaGridProps {
   radius?: number;
   damping?: number;
   fadeOut?: number;
-  ease?: string;
 }
-
-type SetterFn = (v: number | string) => void;
 
 const ChromaGrid: React.FC<ChromaGridProps> = ({
   items,
   className = '',
   radius = 300,
-  damping = 0.45,
-  fadeOut = 0.6,
-  ease = 'power3.out'
 }) => {
   const rootRef = useRef<HTMLDivElement>(null);
-  const fadeRef = useRef<HTMLDivElement>(null);
-  const setX = useRef<SetterFn | null>(null);
-  const setY = useRef<SetterFn | null>(null);
-  const pos = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-
-    const ctx = gsap.context(() => {
-      setX.current = gsap.quickSetter(el, '--x', 'px') as SetterFn;
-      setY.current = gsap.quickSetter(el, '--y', 'px') as SetterFn;
-      const { width, height } = el.getBoundingClientRect();
-      pos.current = { x: width / 2, y: height / 2 };
-      setX.current(pos.current.x);
-      setY.current(pos.current.y);
-    });
-
-    return () => ctx.revert();
-  }, []);
-
-  const moveTo = (x: number, y: number) => {
-    gsap.to(pos.current, {
-      x,
-      y,
-      duration: damping,
-      ease,
-      onUpdate: () => {
-        setX.current?.(pos.current.x);
-        setY.current?.(pos.current.y);
-      },
-      overwrite: true
-    });
-  };
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
 
   const handleMove = (e: React.PointerEvent) => {
     if (!rootRef.current) return;
     const r = rootRef.current.getBoundingClientRect();
-    moveTo(e.clientX - r.left, e.clientY - r.top);
-    gsap.to(fadeRef.current, { opacity: 0, duration: 0.25, overwrite: true });
+    setCoords({
+      x: e.clientX - r.left,
+      y: e.clientY - r.top
+    });
+    setIsHovering(true);
   };
 
   const handleLeave = () => {
-    gsap.to(fadeRef.current, {
-      opacity: 1,
-      duration: fadeOut,
-      overwrite: true
-    });
+    setIsHovering(false);
   };
 
   const handleCardClick = (url?: string) => {
@@ -95,12 +55,13 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
       ref={rootRef}
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
-      className={`relative w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 ${className}`}
+      className={`relative w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 ${className} transition-all duration-300`}
       style={
         {
           '--r': `${radius}px`,
-          '--x': '50%',
-          '--y': '50%'
+          '--x': `${coords.x}px`,
+          '--y': `${coords.y}px`,
+          '--o': isHovering ? '1' : '0'
         } as React.CSSProperties
       }
     >

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 import Footer2 from "@/components/Footer2";
@@ -19,12 +19,31 @@ import { MagneticCursor } from '@/components/ui/MagneticCursor';
 import AnimatedContent from '@/components/AnimatedContent';
 import { courseCategories } from '@/lib/placeholder-data';
 import { formatCurrency, cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [isVisible, setIsVisible] = useState(false);
+  const observerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [loading, courses]);
 
   const fetchCourses = useCallback(async () => {
     try {
@@ -51,10 +70,10 @@ export default function CoursesPage() {
       {/* Background Atmosphere */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <MorphingBlobs 
-          colors={['rgba(176, 38, 255, 0.1)', 'rgba(217, 70, 239, 0.1)']} 
+          colors={['rgba(168, 85, 247, 0.1)', 'rgba(217, 70, 239, 0.1)']} 
           className="opacity-40"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(176,38,255,0.05),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(168, 85, 247, 0.05),transparent_70%)]" />
       </div>
 
       {/* Browse Courses Section */}
@@ -87,12 +106,12 @@ export default function CoursesPage() {
               <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-zinc-600 animate-pulse">Loading courses...</span>
             </div>
           ) : courses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div ref={observerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {courses.map((course, index) => (
-                <AnimatedContent key={course._id} delay={index * 0.1}>
-                  <motion.div 
-                    whileHover={{ y: -10 }}
-                    className="group relative h-full flex flex-col rounded-[2.5rem] bg-zinc-900/40 border border-white/5 hover:border-primary/40 transition-all duration-700 overflow-hidden"
+                  <div 
+                    key={course._id}
+                    className={`group relative h-full flex flex-col rounded-[2.5rem] bg-zinc-900/40 border border-white/5 hover:border-primary/40 hover:-translate-y-[10px] transition-all duration-700 ease-out overflow-hidden transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                    style={{ transitionDelay: `${index * 100}ms` }}
                   >
                     {/* Thumbnail */}
                     <div className="relative aspect-[16/10] overflow-hidden">
@@ -153,8 +172,7 @@ export default function CoursesPage() {
                         </Link>
                       </div>
                     </div>
-                  </motion.div>
-                </AnimatedContent>
+                  </div>
               ))}
             </div>
           ) : (

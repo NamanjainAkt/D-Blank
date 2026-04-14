@@ -1,7 +1,5 @@
 'use client';
 
-import { m } from '@/components/providers/MotionProvider';
-
 interface Step {
   title: string;
   description: string;
@@ -19,11 +17,9 @@ export function Stepper({ steps, currentStep = 0, className = '' }: StepperProps
     <div className={`relative ${className}`}>
       {/* Progress line */}
       <div className="absolute top-6 left-0 right-0 h-0.5 bg-white/10">
-        <m.div
-          className="h-full bg-laser-cyan shadow-[0_0_10px_var(--laser-cyan)]"
-          initial={{ width: 0 }}
-          animate={{ width: `${((currentStep) / (steps.length - 1)) * 100}%` }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
+        <div
+          className="h-full bg-laser-cyan shadow-[0_0_10px_var(--laser-cyan)] transition-all duration-500 ease-in-out"
+          style={{ width: `${((currentStep) / (steps.length - 1)) * 100}%` }}
         />
       </div>
 
@@ -35,10 +31,9 @@ export function Stepper({ steps, currentStep = 0, className = '' }: StepperProps
           return (
             <div key={index} className="flex flex-col items-center relative">
               {/* Step circle */}
-              <m.div
-                initial={false}
-                animate={{
-                  scale: isActive ? 1.15 : 1,
+              <div
+                style={{
+                  transform: `scale(${isActive ? 1.15 : 1})`,
                   backgroundColor: isCompleted
                     ? '#B026FF'
                     : isActive
@@ -50,7 +45,7 @@ export function Stepper({ steps, currentStep = 0, className = '' }: StepperProps
                     ? '#00F0FF'
                     : 'rgba(255,255,255,0.1)',
                 }}
-                className="relative z-10 w-14 h-14 rounded-none border-2 flex items-center justify-center text-lg font-bold transition-colors font-display shadow-lg"
+                className="relative z-10 w-14 h-14 rounded-none border-2 flex items-center justify-center text-lg font-bold transition-all duration-300 font-display shadow-lg"
               >
                 {isCompleted ? (
                   <span className="text-white">&#10003;</span>
@@ -59,7 +54,7 @@ export function Stepper({ steps, currentStep = 0, className = '' }: StepperProps
                     {index + 1}
                   </span>
                 )}
-              </m.div>
+              </div>
 
               {/* Step content */}
               <div className="absolute top-18 w-32 text-center mt-4">

@@ -5,8 +5,13 @@ import { Admin } from '@/models/Admin';
 async function seedAdmin() {
   await dbConnect();
 
-  const email = process.env.ADMIN_EMAIL || 'admin@dblanks.in';
-  const password = process.env.ADMIN_PASSWORD || 'Dblanks@2024';
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    console.error('❌ Error: ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required.');
+    process.exit(1);
+  }
 
   const existingAdmin = await Admin.findOne({ email });
 
@@ -26,7 +31,7 @@ async function seedAdmin() {
 
   console.log('Admin created successfully!');
   console.log('Email:', email);
-  console.log('Password:', password);
+  console.log('⚠️  Password created using ADMIN_PASSWORD environment variable.');
   console.log('⚠️  Please change the password after first login!');
 }
 

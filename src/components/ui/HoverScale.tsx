@@ -1,6 +1,5 @@
 'use client';
 
-import { m } from '@/components/providers/MotionProvider';
 import { ReactNode } from 'react';
 
 interface HoverScaleProps {
@@ -18,16 +17,10 @@ export function HoverScale({
     ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   return (
-    <m.div
-      className={className}
-      whileHover={isTouch ? {} : { scale }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 20
-      }}
+    <div
+      className={`transition-transform duration-300 hover:scale-[${scale}] ${className}`}
     >
       {children}
-    </m.div>
+    </div>
   );
 }

@@ -24,10 +24,12 @@ export function ParticleField({
   className = '',
   color = 'rgba(16, 185, 129, 0.3)'
 }: ParticleFieldProps) {
+  const [hasMounted, setHasMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setHasMounted(true);
     setIsMobile(window.innerWidth < 768);
     
     // Pause animations when tab is not visible
@@ -39,13 +41,18 @@ export function ParticleField({
       });
     };
     
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
+    document.onvisibilitychange = handleVisibility;
+    return () => { document.onvisibilitychange = null; };
   }, []);
 
+  if (!hasMounted) return null;
+
   const adjustedCount = isMobile ? Math.min(particleCount, 8) : particleCount;
+  if (isMobile && adjustedCount === 0) return null;
 
   const particles: Particle[] = [];
+  // Use a simple seeded pseudo-random if consistency is needed, 
+  // but since we only render after mount, it's fine.
   for (let i = 0; i < adjustedCount; i++) {
     particles.push({
       id: i,
@@ -58,8 +65,6 @@ export function ParticleField({
       drift: Math.random() * 50 - 25,
     });
   }
-
-  if (isMobile && adjustedCount === 0) return null;
 
   return (
     <div ref={containerRef} className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>

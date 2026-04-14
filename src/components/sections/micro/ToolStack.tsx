@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
 import {
   UnityIcon,
   UnrealEngineIcon,
@@ -29,46 +27,22 @@ const tools = [
 ];
 
 export default function ToolStack() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const marqueeRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!marqueeRef.current || !containerRef.current) return;
-
-    const marquee = marqueeRef.current;
-    const container = containerRef.current;
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.to(marquee, {
-        x: "-50%",
-        duration: 20,
-        ease: "none",
-        repeat: -1,
-        scrollTrigger: {
-          trigger: container,
-          start: "top 110%",
-          end: "bottom -10%",
-          toggleActions: "play pause resume pause",
-        }
-      });
-
-      const onMouseEnter = () => gsap.to(tl, { timeScale: 0.2, duration: 0.4 });
-      const onMouseLeave = () => gsap.to(tl, { timeScale: 1, duration: 0.4 });
-
-      container.addEventListener("mouseenter", onMouseEnter);
-      container.addEventListener("mouseleave", onMouseLeave);
-    });
-
-    return () => {
-      ctx.revert();
-    };
-  }, []);
-
   return (
-    <div ref={containerRef} className="relative w-full flex items-center overflow-hidden cursor-pointer py-2">
+    <div className="relative w-full flex items-center overflow-hidden cursor-pointer py-2">
+      <style jsx>{`
+        @keyframes marquee-half {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee-half {
+          animation: marquee-half 20s linear infinite;
+        }
+        .animate-marquee-half:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
       <div
-        ref={marqueeRef}
-        className="flex gap-2.5 items-center whitespace-nowrap"
+        className="flex gap-2.5 items-center whitespace-nowrap animate-marquee-half"
       >
         {[...tools, ...tools].map((tool, i) => (
           <div

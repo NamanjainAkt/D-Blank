@@ -1,6 +1,5 @@
 'use client';
 
-import { m } from '@/components/providers/MotionProvider';
 import { Clock } from 'lucide-react';
 
 interface Course {
@@ -26,13 +25,10 @@ export function CourseGrid({ courses, className = '' }: CourseGridProps) {
   return (
     <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}>
       {courses.map((course, index) => (
-        <m.div
+        <div
           key={course.id}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: index * 0.1 }}
-          viewport={{ once: true }}
-          className="group relative overflow-hidden bg-white/[0.02] border border-white/10 hover:border-neon-purple/50 hover:bg-white/[0.04] transition-all duration-300 flex flex-col cursor-pointer"
+          style={{ animationDelay: `${index * 100}ms` }}
+          className="group relative overflow-hidden bg-white/[0.02] border border-white/10 hover:border-neon-purple/50 hover:bg-white/[0.04] transition-all duration-300 flex flex-col cursor-pointer animate-in fade-in slide-in-from-bottom-5"
         >
           {/* Gradient overlay on hover */}
           <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -79,13 +75,12 @@ export function CourseGrid({ courses, className = '' }: CourseGridProps) {
           </div>
 
           {/* CTA */}
-          <m.button
-            whileHover={{ backgroundColor: 'rgb(176 38 255 / 0.15)' }}
-            className="w-full py-4 text-xs font-bold font-display uppercase tracking-[0.15em] border-t border-white/10 text-white hover:text-laser-cyan transition-all"
+          <button
+            className="w-full py-4 text-xs font-bold font-display uppercase tracking-[0.15em] border-t border-white/10 text-white hover:text-laser-cyan hover:bg-neon-purple/15 transition-all"
           >
             Enroll Now &#8594;
-          </m.button>
-        </m.div>
+          </button>
+        </div>
       ))}
     </div>
   );
