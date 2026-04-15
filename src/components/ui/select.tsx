@@ -116,7 +116,6 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttrib
     React.useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         if (triggerRef.current && !triggerRef.current.contains(event.target as Node)) {
-          // Check if clicking inside content
           let target = event.target as HTMLElement | null;
           let isInsideMenu = false;
           while (target) {
@@ -127,7 +126,6 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttrib
             target = target.parentElement;
           }
           if (isInsideMenu) return;
-
           context.setOpen(false)
         }
       }
@@ -169,7 +167,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttrib
         onClick={handleClick}
         disabled={context.disabled || props.disabled}
         className={cn(
-          "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+          "flex h-10 w-full items-center justify-between whitespace-nowrap rounded-md border border-white/10 bg-black px-3 py-2 text-sm text-white shadow-sm placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-laser-cyan disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
         {...props}
@@ -218,13 +216,13 @@ const SelectContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
           if (e.target === e.currentTarget) onAnimationEnd()
         }}
         className={cn(
-          "absolute top-full z-50 mt-1 max-h-96 min-w-[8rem] w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+          "absolute top-full z-50 mt-1 max-h-96 min-w-[8rem] w-full overflow-hidden rounded-md border border-white/10 bg-black shadow-lg",
           className
         )}
         data-state={context.open ? "open" : "closed"}
         {...props}
       >
-        <div className={cn("p-1 max-h-80 overflow-y-auto w-full")}>{children}</div>
+        <div className={cn("p-1 max-h-80 overflow-y-auto w-full custom-scrollbar")}>{children}</div>
       </div>
     )
   }
@@ -260,8 +258,8 @@ const SelectItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
           context.setOpen(false)
         }}
         className={cn(
-          "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-          isSelected && "bg-accent text-accent-foreground",
+          "relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-3 pr-8 text-sm text-white hover:bg-white/10 hover:text-laser-cyan data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+          isSelected && "bg-laser-cyan/10 text-laser-cyan",
           className
         )}
         {...props}
