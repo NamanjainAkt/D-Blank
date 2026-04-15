@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { courseId, studentData, paymentMethod } = body;
+    const { courseId, studentData, paymentMethod, paymentReferenceId, paymentReceiptUrl } = body;
 
     if (!courseId.match(/^[0-9a-fA-F]{24}$/)) {
       return NextResponse.json({ error: 'Invalid course ID' }, { status: 400 });
@@ -71,6 +71,8 @@ export async function POST(request: Request) {
       enrollmentStatus: 'pending',
       paymentAmount: course.price,
       paymentMethod: paymentMethod || 'UPI',
+      paymentReferenceId, // For manual payment
+      paymentReceiptUrl, // For manual payment
     };
 
     let enrollment;

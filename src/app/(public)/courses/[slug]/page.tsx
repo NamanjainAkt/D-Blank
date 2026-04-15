@@ -19,9 +19,10 @@ import {
   ArrowRight,
   ChevronRight,
   MessageCircle,
-  Mail,
+  Mail, 
   Video,
-  Code
+  Code,
+  Smartphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -82,7 +83,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
   );
 
   const embedUrl = getYoutubeEmbedUrl(course.promoVideoUrl);
-  const seatsLeft = course.totalSeats - course.enrolledCount;
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -116,10 +116,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-primary" />
                   <span className="text-xs font-mono text-zinc-300 uppercase tracking-widest">{course.duration}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-mono text-zinc-300 uppercase tracking-widest">{course.enrolledCount} Active Operators</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Video className="w-4 h-4 text-primary" />
@@ -271,15 +267,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                         <span className="text-zinc-500 flex items-center gap-2"><Clock className="w-3.5 h-3.5" /> Timing</span>
                         <span className="text-zinc-200 text-right">{course.schedule}</span>
                       </div>
-                      <div className="space-y-2 pt-2">
-                        <div className="flex justify-between text-[10px] font-mono uppercase">
-                          <span className="text-accent">{seatsLeft} Slots Available</span>
-                          <span className="text-zinc-600">{Math.round((course.enrolledCount / course.totalSeats) * 100)}% Saturation</span>
-                        </div>
-                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-accent shadow-[0_0_8px_#d946ef]" style={{ width: `${(course.enrolledCount / course.totalSeats) * 100}%` }} />
-                        </div>
-                      </div>
                     </div>
 
                     <Link href={`/enroll/${course._id}`} className="block">
@@ -311,9 +298,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 {/* Support Terminal */}
                 <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-xl space-y-4">
                   <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Support Terminal</div>
-                  <div className="space-y-2">
-                    <a href={`mailto:${course.supportEmail || 'support@dblanks.site'}`} className="flex items-center gap-3 text-xs font-mono text-zinc-300 hover:text-cyan-400 transition-colors uppercase">
-                      <Mail className="w-4 h-4" /> {course.supportEmail || 'support@dblanks.site'}
+                  <div className="space-y-3">
+                    <a href="mailto:arshgupta723@gmail.com" className="flex items-center gap-3 text-xs font-mono text-zinc-300 hover:text-cyan-400 transition-colors uppercase">
+                      <Mail className="w-4 h-4 text-primary" /> arshgupta723@gmail.com
+                    </a>
+                    <a href="tel:+919340576811" className="flex items-center gap-3 text-xs font-mono text-zinc-300 hover:text-cyan-400 transition-colors uppercase">
+                      <Smartphone className="w-4 h-4 text-primary" /> +91 9340576811
                     </a>
                   </div>
                 </div>

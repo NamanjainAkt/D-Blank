@@ -11,10 +11,13 @@ const enrollmentSchema = new Schema({
   
   paymentStatus: {
     type: String,
-    enum: ['pending', 'paid', 'failed', 'refunded'],
+    enum: ['pending', 'paid', 'failed', 'refunded', 'rejected'],
     default: 'pending'
   },
-  paymentId: { type: String },
+  paymentId: { type: String }, // Razorpay/Gateway payment ID (if any)
+  paymentReferenceId: { type: String }, // Manual Transaction/UTR ID
+  paymentReceiptUrl: { type: String }, // URL of the uploaded receipt
+  adminNote: { type: String }, // Admin note for rejection or status
   paymentAmount: { type: Number },
   paymentDate: { type: Date },
   paymentMethod: { type: String }, // 'UPI', 'Card', 'NetBanking', etc.

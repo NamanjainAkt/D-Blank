@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 import { formatCurrency, cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -49,9 +50,12 @@ interface Student {
     meetLink: string;
   };
   courseName: string;
-  paymentStatus: 'paid' | 'pending' | 'failed';
+  paymentStatus: 'paid' | 'pending' | 'failed' | 'rejected';
   paymentAmount: number;
   paymentId: string;
+  paymentReferenceId: string;
+  paymentReceiptUrl: string;
+  adminNote: string;
   paymentDate: string;
   enrollmentStatus: string;
   confirmationEmailSent: boolean;
@@ -155,6 +159,39 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
     } catch (err) {
       console.error('Error updating status:', err);
       setError('Failed to update enrollment status');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const updatePaymentStatus = async (status: 'paid' | 'rejected', note?: string) => {
+    if (!student) return;
+    setUpdating(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/admin/enrollments/${student._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          paymentStatus: status,
+          adminNote: note,
+          enrollmentStatus: status === 'paid' ? 'confirmed' : 'pending'
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update payment status');
+      
+      setStudent({ 
+        ...student, 
+        paymentStatus: status, 
+        adminNote: note || '',
+        enrollmentStatus: status === 'paid' ? 'confirmed' : 'pending'
+      });
+      showSuccess(`Payment ${status === 'paid' ? 'approved' : 'rejected'}`);
+    } catch (err) {
+      console.error('Error updating payment:', err);
+      setError('Failed to update payment status');
     } finally {
       setUpdating(false);
     }
@@ -321,26 +358,73 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             </div>
           </SectionCard>
 
-          {/* Course Information */}
-          <SectionCard title="Module Assignment" icon={BookOpen}>
+          {/* Payment Evidence */}
+          <SectionCard title="Payment Evidence" icon={CreditCard}>
             <div className="space-y-8">
-              <InfoField label="Assigned Module" value={student.courseId?.title || student.courseName || 'Unknown'} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <InfoField label="Expected Runtime" value={student.courseId?.duration || 'N/A'} />
-                <InfoField label="Operational Cycle" value={student.courseId?.schedule || 'N/A'} />
+                <InfoField label="Transaction Reference ID" value={student.paymentReferenceId || 'Not Provided'} mono />
+                <InfoField label="Admin Note" value={student.adminNote || 'No notes added'} />
               </div>
-              {student.courseId?.meetLink && (
-              <InfoField label="Direct Uplink (Meet)" value={
-                <a 
-                  href={student.courseId.meetLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-laser-cyan hover:underline inline-flex items-center gap-1.5 transition-colors group"
-                >
-                  {student.courseId.meetLink}
-                  <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
-                </a>
-              } />
+
+              {student.paymentReceiptUrl && (
+                <div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-3">Verification Image</div>
+                  <div className="relative aspect-video w-full max-w-md border border-white/5 bg-black overflow-hidden group">
+                    <Image 
+                      src={student.paymentReceiptUrl} 
+                      alt="Payment Receipt" 
+                      fill 
+                      className="object-contain"
+                    />
+                    <a 
+                      href={student.paymentReceiptUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"
+                    >
+                      <ExternalLink className="w-4 h-4 text-laser-cyan" />
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-white">Open in New Tab</span>
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {student.paymentStatus === 'pending' && (
+                <div className="flex flex-wrap gap-4 pt-4 border-t border-white/5">
+                  <Button
+                    onClick={() => updatePaymentStatus('paid')}
+                    disabled={updating}
+                    className="bg-emerald-500 text-black hover:bg-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-9 px-6"
+                  >
+                    {updating ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Check className="w-3 h-3 mr-2" />}
+                    Approve Payment
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const note = prompt('Reason for rejection?');
+                      if (note) updatePaymentStatus('rejected', note);
+                    }}
+                    disabled={updating}
+                    className="border-red-500/20 text-red-400 hover:bg-red-500/10 text-[10px] font-mono uppercase tracking-widest h-9 px-6"
+                  >
+                    Reject Payment
+                  </Button>
+                </div>
+              )}
+
+              {student.paymentStatus === 'rejected' && (
+                <div className="p-3 bg-red-500/5 border border-red-500/20 rounded-sm">
+                  <div className="text-[9px] font-mono uppercase tracking-widest text-red-400 mb-1">Rejection Reason</div>
+                  <div className="text-xs text-red-300">{student.adminNote || 'No reason specified'}</div>
+                  <Button
+                    variant="link"
+                    onClick={() => updatePaymentStatus('paid')}
+                    className="text-[9px] font-mono uppercase tracking-widest text-emerald-400 p-0 h-auto mt-2"
+                  >
+                    Re-verify & Approve
+                  </Button>
+                </div>
               )}
             </div>
           </SectionCard>
@@ -359,7 +443,8 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                     "text-[10px] font-mono uppercase tracking-widest border px-3 py-1",
                     student.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]' :
                     student.paymentStatus === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.1)]' :
-                    'bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]'
+                    student.paymentStatus === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]' :
+                    'bg-zinc-500/10 text-zinc-400 border-zinc-500/30'
                   )}
                 >
                   {student.paymentStatus}

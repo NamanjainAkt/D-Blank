@@ -10,21 +10,6 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course }: CourseCardProps) {
-  const seatsLeft = course.totalSeats - course.enrolledCount;
-  const seatsPercentage = (course.enrolledCount / course.totalSeats) * 100;
-  
-  const getSeatsColor = () => {
-    if (seatsPercentage >= 90) return 'var(--red)';
-    if (seatsPercentage >= 60) return 'var(--amber)';
-    return 'var(--emerald)';
-  };
-
-  const getBarColor = () => {
-    if (seatsPercentage >= 90) return 'var(--red)';
-    if (seatsPercentage >= 60) return 'var(--amber)';
-    return 'var(--emerald)';
-  };
-
   const getCategoryColor = (category: string) => {
     switch(category) {
       case 'IT & Software': return 'bg-[var(--emerald-dim)] text-[var(--emerald)] border-[var(--emerald-dim)]';
@@ -69,18 +54,6 @@ export function CourseCard({ course }: CourseCardProps) {
           <span className={`absolute top-4 left-4 px-3 py-1.5 text-[10px] font-mono tracking-wider uppercase rounded-lg border backdrop-blur-sm ${getCategoryColor(course.category)}`}>
             {course.category}
           </span>
-
-          {/* Seats Badge - Top right */}
-          {seatsLeft <= 20 && (
-            <span className="absolute top-4 right-4 px-3 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg backdrop-blur-sm"
-              style={{ 
-                backgroundColor: seatsPercentage >= 90 ? 'var(--red-dim)' : 'var(--amber-dim)',
-                color: seatsPercentage >= 90 ? 'var(--red)' : 'var(--amber)',
-                border: `1px solid ${seatsPercentage >= 90 ? 'var(--red-dim)' : 'var(--amber-dim)'}`
-              }}>
-              {seatsLeft} seats left
-            </span>
-          )}
         </div>
 
         {/* Body */}
@@ -111,24 +84,6 @@ export function CourseCard({ course }: CourseCardProps) {
             </span>
             <span className="w-1 h-1 rounded-full bg-[var(--text-muted)]" />
             <span>{course.schedule}</span>
-            <span className="w-1 h-1 rounded-full bg-[var(--text-muted)]" />
-            <span className="text-[var(--emerald)]">{course.enrolledCount} enrolled</span>
-          </div>
-
-          {/* Seats Progress */}
-          <div className="mb-5">
-            <div className="flex justify-between text-[10px] mb-2">
-              <span className="text-[var(--text-muted)] font-mono uppercase tracking-wider">Seat availability</span>
-              <span className="font-mono font-semibold" style={{ color: getSeatsColor() }}>
-                {seatsLeft} left
-              </span>
-            </div>
-            <div className="h-1 bg-[var(--glass-light)] rounded-full overflow-hidden">
-              <div 
-                className="h-full rounded-full transition-all duration-1000 ease-out"
-                style={{ width: `${Math.min(seatsPercentage, 100)}%`, backgroundColor: getBarColor() }}
-              />
-            </div>
           </div>
 
           {/* Footer - Enhanced pricing */}

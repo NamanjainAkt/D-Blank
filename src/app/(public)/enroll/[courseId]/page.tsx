@@ -23,6 +23,12 @@ import {
   Hash,
   MessageCircle,
   Megaphone,
+  CreditCard,
+  Upload,
+  QrCode,
+  X,
+  Smartphone,
+  Info
 } from 'lucide-react';
 
 interface Course {
@@ -43,7 +49,8 @@ const years = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Graduated'];
 const stepConfig = [
   { label: 'Identity', icon: User, description: 'Personal Information' },
   { label: 'Academic', icon: GraduationCap, description: 'College Details' },
-  { label: 'Confirm', icon: ClipboardCheck, description: 'Review & Pay' },
+  { label: 'Review', icon: ClipboardCheck, description: 'Review Details' },
+  { label: 'Payment', icon: CreditCard, description: 'Scan & Pay' },
 ];
 
 const validationMessages: Record<string, string> = {
@@ -56,6 +63,7 @@ const validationMessages: Record<string, string> = {
   semester: 'Please select your current semester',
   rollNumber: 'University roll number is required',
   city: 'Please enter your city',
+  paymentReferenceId: 'Transaction Reference ID is required to verify payment',
 };
 
 function InputField({ label, icon: Icon, value, onChange, placeholder, error, type = 'text', required = false }: {
@@ -119,6 +127,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -132,9 +141,12 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
     rollNumber: '',
     city: '',
     referrer: '',
+    paymentReferenceId: '',
+    paymentReceiptUrl: '',
   });
 
   const [formErrors, setErrors] = useState<Partial<Record<string, string>>>({});
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
   useEffect(() => {
     async function fetchCourse() {
@@ -160,7 +172,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
       if (!formData.email.trim()) errs.email = validationMessages.email;
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errs.email = 'Please enter a valid email address';
       if (!formData.phone.trim()) errs.phone = validationMessages.phone;
-      else if (!/^[\d+\-\s()]{10,15}$/.test(formData.phone.replace(/\s/g, ''))) errs.phone = 'Please enter a valid phone number';
+      else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\s/g, ''))) errs.phone = 'Please enter a valid 10-digit phone number';
     } else if (currentStep === 2) {
       if (!formData.collegeName.trim()) errs.collegeName = validationMessages.collegeName;
       if (!formData.branch.trim()) errs.branch = validationMessages.branch;
@@ -168,6 +180,8 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
       if (!formData.semester) errs.semester = validationMessages.semester;
       if (!formData.rollNumber.trim()) errs.rollNumber = validationMessages.rollNumber;
       if (!formData.city.trim()) errs.city = validationMessages.city;
+    } else if (currentStep === 4) {
+      if (!formData.paymentReferenceId.trim()) errs.paymentReferenceId = validationMessages.paymentReferenceId;
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -176,7 +190,36 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
   const handleNext = () => { if (validateStep(step)) setStep(step + 1); };
   const handleBack = () => setStep(step - 1);
 
+  const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingReceipt(true);
+    setError('');
+
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+
+    try {
+      const res = await fetch('/api/enroll/upload', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+
+      setFormData({ ...formData, paymentReceiptUrl: data.url });
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload receipt.');
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
+
   const handleSubmit = async () => {
+    if (!validateStep(4)) return;
+    
     setSubmitting(true);
     setError('');
     try {
@@ -186,37 +229,17 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
         body: JSON.stringify({
           courseId: course?._id,
           studentData: formData,
-          paymentMethod: 'UPI'
+          paymentMethod: 'UPI',
+          paymentReferenceId: formData.paymentReferenceId,
+          paymentReceiptUrl: formData.paymentReceiptUrl,
         }),
       });
 
       const enrollData = await enrollRes.json();
-      if (!enrollRes.ok) throw new Error(enrollData.error || 'Failed to authorize');
+      if (!enrollRes.ok) throw new Error(enrollData.error || 'Enrollment failed');
 
-      const enrollmentId = enrollData.enrollmentId;
-
-      if (process.env.NEXT_PUBLIC_BYPASS_PAYMENT === 'true') {
-        const payRes = await fetch('/api/payment/dummy', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enrollmentId }),
-        });
-        const payData = await payRes.json();
-        if (payRes.ok) {
-          router.push(`/payment/success?enrollmentId=${enrollmentId}&transactionId=${payData.transactionId}`);
-        } else {
-          throw new Error(payData.error || 'Transaction failed');
-        }
-      } else {
-        const initiateRes = await fetch('/api/payment/initiate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enrollmentId, amount: course?.price }),
-        });
-        const initiateData = await initiateRes.json();
-        if (initiateData.paymentUrl) window.location.href = initiateData.paymentUrl;
-        else throw new Error('Payment gateway uplink failed');
-      }
+      setSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
       setError(err.message || 'System error occurred.');
     } finally {
@@ -239,6 +262,57 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
     </div>
   );
 
+  if (success) {
+    return (
+      <main className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center space-y-8 animate-fade-up">
+          <div className="flex justify-center">
+            <div className="w-20 h-20 bg-emerald/10 border border-emerald/30 rounded-full flex items-center justify-center relative">
+              <CheckCircle2 className="w-10 h-10 text-emerald animate-scale-in" />
+              <div className="absolute inset-0 rounded-full border-2 border-emerald animate-ping opacity-20" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h1 className="text-3xl font-display font-bold text-white tracking-tight">Request Submitted</h1>
+            <p className="text-white/40 text-sm leading-relaxed">
+              Your enrollment request for <span className="text-emerald font-medium">{course?.title}</span> has been successfully logged.
+            </p>
+          </div>
+          <div className="p-6 bg-glass-light border border-border-med text-left space-y-4">
+            <div className="flex gap-3">
+              <div className="w-8 h-8 rounded-full bg-emerald-dim border border-emerald/20 flex items-center justify-center flex-shrink-0">
+                <Smartphone className="w-4 h-4 text-emerald" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-white mb-1">What happens next?</p>
+                <p className="text-[11px] text-white/40 leading-relaxed">
+                  Our system will verify your payment reference ID. Once confirmed, you will receive a briefing via WhatsApp and Email ASAP.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <div className="w-8 h-8 rounded-full bg-emerald-dim border border-emerald/20 flex items-center justify-center flex-shrink-0">
+                <Info className="w-4 h-4 text-emerald" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-white mb-1">Need help?</p>
+                <p className="text-[11px] text-white/40 leading-relaxed">
+                  If you don't hear from us within 24 hours, feel free to contact our support team.
+                </p>
+              </div>
+            </div>
+          </div>
+          <button 
+            onClick={() => router.push('/')} 
+            className="w-full h-12 border border-border-med hover:border-emerald/50 hover:bg-emerald/5 text-sm font-medium transition-all duration-200"
+          >
+            Back to Home
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-black text-white selection:bg-emerald/30 selection:text-white">
       {/* Background glow */}
@@ -248,7 +322,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
       </div>
 
       <div className="pb-20 px-4 md:px-8 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 pt-8">
 
           {/* Main Form Area */}
           <div className="lg:col-span-2 space-y-6">
@@ -264,13 +338,13 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
             </div>
 
             {/* Stepper */}
-            <div className="flex items-center gap-2 md:gap-3 py-6 border-b border-border-med">
+            <div className="flex items-center gap-2 md:gap-3 py-6 border-b border-border-med overflow-x-auto no-scrollbar">
               {stepConfig.map((s, i) => {
                 const StepIcon = s.icon;
                 const isActive = step === i + 1;
                 const isDone = step > i + 1;
                 return (
-                  <div key={s.label} className="flex items-center gap-2 md:gap-3 flex-1">
+                  <div key={s.label} className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className={`w-10 h-10 flex-shrink-0 flex items-center justify-center border-2 transition-all duration-300 ${
                         isDone ? 'bg-emerald border-emerald text-black' :
@@ -278,14 +352,14 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                       }`}>
                         {isDone ? <CheckCircle2 className="w-5 h-5" /> : <StepIcon className="w-4 h-4" />}
                       </div>
-                      <div className="hidden md:block min-w-0">
+                      <div className="hidden sm:block min-w-0">
                         <div className={`text-sm font-medium truncate ${isActive ? 'text-white' : isDone ? 'text-emerald' : 'text-white/30'}`}>{s.label}</div>
                         <div className="text-[11px] text-white/20 truncate">{s.description}</div>
                       </div>
                     </div>
-                    {i < 2 && (
-                      <div className="flex-1 h-px min-w-4">
-                        <div className={`h-full transition-colors duration-300 ${isDone ? 'bg-emerald/50' : 'bg-border-med'}`} />
+                    {i < stepConfig.length - 1 && (
+                      <div className="w-6 sm:w-12 h-px bg-border-med">
+                        <div className={`h-full transition-all duration-300 ${isDone ? 'bg-emerald/50' : 'bg-transparent'}`} />
                       </div>
                     )}
                   </div>
@@ -303,7 +377,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
             {/* Form Steps */}
             <div className="space-y-6">
               {step === 1 && (
-                <div className="space-y-6">
+                <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center gap-2 pb-2">
                     <User className="w-4 h-4 text-emerald" />
                     <h2 className="text-lg font-display font-semibold text-white">Personal Details</h2>
@@ -313,7 +387,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                       <InputField label="Full Name" icon={User} value={formData.name} onChange={v => updateField('name', v)} placeholder="Enter your full name" error={formErrors.name} required />
                     </div>
                     <InputField label="Email Address" icon={Mail} value={formData.email} onChange={v => updateField('email', v)} placeholder="you@example.com" error={formErrors.email} type="email" required />
-                    <InputField label="Phone Number" icon={Phone} value={formData.phone} onChange={v => updateField('phone', v)} placeholder="+91 XXXXX XXXXX" error={formErrors.phone} type="tel" required />
+                    <InputField label="Phone Number" icon={Phone} value={formData.phone} onChange={v => updateField('phone', v)} placeholder="10-digit mobile number" error={formErrors.phone} type="tel" required />
                     <InputField label="WhatsApp Number" icon={MessageCircle} value={formData.whatsappNumber} onChange={v => updateField('whatsappNumber', v)} placeholder="Same as phone or different" />
                     <InputField label="City" icon={MapPin} value={formData.city} onChange={v => updateField('city', v)} placeholder="Your city" error={formErrors.city} required />
                   </div>
@@ -321,7 +395,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
               )}
 
               {step === 2 && (
-                <div className="space-y-6">
+                <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center gap-2 pb-2">
                     <GraduationCap className="w-4 h-4 text-emerald" />
                     <h2 className="text-lg font-display font-semibold text-white">Academic Information</h2>
@@ -342,7 +416,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
               )}
 
               {step === 3 && (
-                <div className="space-y-6">
+                <div className="space-y-6 animate-fade-in">
                   <div className="flex items-center gap-2 pb-2">
                     <ClipboardCheck className="w-4 h-4 text-emerald" />
                     <h2 className="text-lg font-display font-semibold text-white">Review Your Details</h2>
@@ -402,33 +476,147 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                       </div>
                     </div>
 
-                    {/* Course & Payment */}
+                    {/* Course Summary */}
                     <div className="p-5 bg-emerald-dim">
-                      <div className="flex items-center gap-2 mb-4">
-                        <Cpu className="w-4 h-4 text-emerald" />
-                        <span className="text-xs font-medium text-emerald uppercase tracking-wider">Enrollment Summary</span>
-                      </div>
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-white font-semibold">{course?.title}</div>
                           <div className="text-xs text-white/40 mt-0.5">{course?.duration} &middot; {course?.category}</div>
                         </div>
                         <div className="text-right">
-                          {course?.originalPrice && course.originalPrice > course.price && (
-                            <div className="text-xs text-white/30 line-through">{formatCurrency(course.originalPrice)}</div>
-                          )}
                           <div className="text-2xl font-bold text-emerald">{formatCurrency(course?.price || 0)}</div>
                         </div>
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
 
-                  {/* Terms */}
-                  <div className="flex items-start gap-3 p-4 bg-glass-light border border-border-med">
-                    <ShieldCheck className="w-5 h-5 text-emerald flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-white/40 leading-relaxed">
-                      By proceeding with enrollment, you agree to the D-Blanks training terms, refund policy, and code of conduct. Your payment is processed securely through our verified gateway.
-                    </p>
+              {step === 4 && (
+                <div className="space-y-8 animate-fade-in">
+                  <div className="flex items-center gap-2 pb-2">
+                    <QrCode className="w-4 h-4 text-emerald" />
+                    <h2 className="text-lg font-display font-semibold text-white uppercase tracking-wider">Payment Verification</h2>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-10">
+                    {/* QR Code Column */}
+                    <div className="space-y-6">
+                      <div className="relative group p-6 bg-white rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+                        <div className="relative aspect-square w-full max-w-[260px] mx-auto">
+                          <Image 
+                            src="/QRcode.jpeg" 
+                            alt="Payment QR Code" 
+                            fill 
+                            className="object-contain"
+                            priority
+                          />
+                        </div>
+                        <div className="absolute inset-0 rounded-2xl border-2 border-emerald/20 group-hover:border-emerald/40 transition-colors pointer-events-none" />
+                        
+                        {/* Scan indicators */}
+                        <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-emerald/40" />
+                        <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-emerald/40" />
+                        <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-emerald/40" />
+                        <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-emerald/40" />
+                      </div>
+                      
+                      <div className="p-5 bg-glass-light border border-emerald/20 rounded-xl space-y-4">
+                        <div className="flex items-center gap-2.5 text-xs font-bold text-emerald uppercase tracking-widest">
+                          <Smartphone className="w-4 h-4" />
+                          Execution Protocol
+                        </div>
+                        <ol className="space-y-3">
+                          {[
+                            "Open any UPI application (GPay, PhonePe, Paytm).",
+                            `Transfer precisely ${formatCurrency(course?.price || 0)} to the scanned address.`,
+                            "Copy the Transaction ID or UTR Number.",
+                            "Capture a visual record (screenshot) of the confirmation."
+                          ].map((text, i) => (
+                            <li key={i} className="flex gap-3 text-[11px] text-white/50 leading-relaxed">
+                              <span className="font-mono text-emerald/60">{i + 1}.</span>
+                              {text}
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    </div>
+
+                    {/* Inputs Column */}
+                    <div className="flex flex-col gap-6">
+                      <div className="space-y-4">
+                        <InputField 
+                          label="Transaction Reference ID" 
+                          icon={Hash} 
+                          value={formData.paymentReferenceId} 
+                          onChange={v => updateField('paymentReferenceId', v)} 
+                          placeholder="UTR / Transaction ID / Ref No." 
+                          error={formErrors.paymentReferenceId} 
+                          required 
+                        />
+
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-1.5 text-xs font-medium text-white/60 tracking-wide">
+                            <Upload className="w-3.5 h-3.5 text-emerald/70" />
+                            Visual Confirmation (Receipt)
+                          </label>
+                          
+                          <div className="relative group">
+                            {formData.paymentReceiptUrl ? (
+                              <div className="relative border border-emerald/30 bg-emerald-dim/20 rounded-xl p-4 flex items-center justify-between group overflow-hidden">
+                                <div className="absolute inset-0 bg-emerald/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="flex items-center gap-4 relative z-10">
+                                  <div className="w-14 h-14 relative rounded-lg overflow-hidden bg-black border border-emerald/20">
+                                    <Image src={formData.paymentReceiptUrl} alt="Receipt Preview" fill className="object-cover" />
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-white font-medium block">Receipt Attached</span>
+                                    <span className="text-[10px] text-emerald/60 uppercase tracking-widest mt-1">Ready for transmission</span>
+                                  </div>
+                                </div>
+                                <button 
+                                  onClick={() => setFormData({...formData, paymentReceiptUrl: ''})} 
+                                  className="p-2 rounded-full hover:bg-red/10 text-white/40 hover:text-red transition-all relative z-10"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ) : (
+                              <label className={`flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-2xl transition-all cursor-pointer ${
+                                uploadingReceipt ? 'border-emerald/50 bg-emerald-dim/10' : 'border-border-med hover:border-emerald/40 hover:bg-glass-light bg-glass-light/50'
+                              }`}>
+                                {uploadingReceipt ? (
+                                  <div className="flex flex-col items-center gap-3">
+                                    <Loader2 className="w-8 h-8 animate-spin text-emerald" />
+                                    <span className="text-xs text-emerald font-mono uppercase tracking-widest animate-pulse">Uploading Data...</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-col items-center gap-3 p-6 text-center">
+                                    <div className="w-12 h-12 rounded-full bg-emerald/10 flex items-center justify-center mb-1">
+                                      <Upload className="w-6 h-6 text-emerald/60" />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <span className="text-sm text-white font-medium block">Upload Receipt Image</span>
+                                      <span className="text-[10px] text-white/30 uppercase tracking-[0.2em]">JPG, PNG · Max 2MB</span>
+                                    </div>
+                                  </div>
+                                )}
+                                <input type="file" className="hidden" accept="image/*" onChange={handleReceiptUpload} disabled={uploadingReceipt} />
+                              </label>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-auto p-4 bg-glass-light/30 border border-white/5 rounded-xl flex items-start gap-4">
+                        <div className="w-8 h-8 rounded-lg bg-emerald/10 flex items-center justify-center flex-shrink-0 mt-1">
+                          <Info className="w-4 h-4 text-emerald" />
+                        </div>
+                        <p className="text-[11px] text-white/30 leading-relaxed italic">
+                          By initiating authorization, you certify that the payment has been completed. Intentional misinformation will lead to immediate account termination.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -437,7 +625,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
             {/* Navigation Controls */}
             <div className="flex justify-between items-center pt-6 border-t border-border-med">
               <div className="text-xs text-white/30 font-mono">
-                Step {step} of 3
+                Step {step} of 4
               </div>
               <div className="flex gap-3">
                 {step > 1 && (
@@ -445,15 +633,15 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                     Back
                   </button>
                 )}
-                {step < 3 ? (
+                {step < 4 ? (
                   <button onClick={handleNext} style={{ backgroundColor: '#10b981' }} className="h-11 px-8 text-black text-sm font-semibold transition-all duration-200 flex items-center gap-2 group hover:opacity-90">
-                    Continue
+                    {step === 3 ? 'Proceed to Payment' : 'Continue'}
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                 ) : (
-                  <button onClick={handleSubmit} disabled={submitting} style={{ backgroundColor: '#10b981' }} className="h-12 px-8 text-black text-sm font-bold transition-all duration-200 flex items-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90" >
+                  <button onClick={handleSubmit} disabled={submitting || uploadingReceipt} style={{ backgroundColor: '#10b981' }} className="h-12 px-8 text-black text-sm font-bold transition-all duration-200 flex items-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90" >
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
-                    {submitting ? 'Processing...' : `Pay ${formatCurrency(course?.price || 0)}`}
+                    {submitting ? 'Transmitting...' : 'Complete Enrollment'}
                   </button>
                 )}
               </div>
@@ -506,8 +694,8 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                   <ShieldCheck className="w-5 h-5 text-emerald" />
                 </div>
                 <div>
-                  <div className="text-xs font-medium text-white">Secure Payment</div>
-                  <div className="text-[11px] text-white/30">256-bit SSL encrypted checkout</div>
+                  <div className="text-xs font-medium text-white">Manual Verification</div>
+                  <div className="text-[11px] text-white/30">Verified within 24 hours</div>
                 </div>
               </div>
             </div>

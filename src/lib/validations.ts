@@ -21,6 +21,8 @@ export const enrollmentSchema = z.object({
   studentId: z.string().optional(), // For logged in/existing students
   studentData: studentSchema.optional(), // For new students
   paymentMethod: z.string().optional(),
+  paymentReferenceId: z.string().optional(), // Manual transaction ID
+  paymentReceiptUrl: z.string().url('Invalid receipt URL').optional().or(z.literal('')), // Optional but recommended
 });
 
 // Course Module Schema

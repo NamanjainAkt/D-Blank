@@ -38,7 +38,7 @@ interface Student {
   city: string;
   courseId?: { title: string };
   courseName: string;
-  paymentStatus: 'paid' | 'pending' | 'failed';
+  paymentStatus: 'paid' | 'pending' | 'failed' | 'rejected';
   paymentAmount: number;
   enrollmentStatus: string;
   createdAt: string;
@@ -230,6 +230,7 @@ export default function AdminEnrollmentsPage() {
               <SelectItem value="paid" className="text-[10px] font-mono uppercase tracking-widest">Paid</SelectItem>
               <SelectItem value="pending" className="text-[10px] font-mono uppercase tracking-widest">Pending</SelectItem>
               <SelectItem value="failed" className="text-[10px] font-mono uppercase tracking-widest">Failed</SelectItem>
+              <SelectItem value="rejected" className="text-[10px] font-mono uppercase tracking-widest">Rejected</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -295,7 +296,8 @@ export default function AdminEnrollmentsPage() {
                           className={`text-[9px] font-mono uppercase tracking-widest border px-2 py-0.5 ${
                             student.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                             student.paymentStatus === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                            'bg-red-500/10 text-red-400 border-red-500/20'
+                            student.paymentStatus === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                            'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
                           }`}
                         >
                           {student.paymentStatus}

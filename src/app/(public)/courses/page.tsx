@@ -148,10 +148,6 @@ export default function CoursesPage() {
                           <Clock className="w-4 h-4 text-primary" />
                           <span className="tracking-[0.2em]">{course.duration}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-[10px] font-mono uppercase text-zinc-400">
-                          <Users className="w-4 h-4 text-primary" />
-                          <span className="tracking-[0.2em] font-black">{course.enrolledCount} Students Enrolled</span>
-                        </div>
                       </div>
 
                       <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-between">

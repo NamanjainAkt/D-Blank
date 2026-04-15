@@ -71,6 +71,7 @@ export async function GET(request: Request) {
         paid: { $sum: { $cond: [{ $eq: ['$paymentStatus', 'paid'] }, 1, 0] } },
         pending: { $sum: { $cond: [{ $eq: ['$paymentStatus', 'pending'] }, 1, 0] } },
         failed: { $sum: { $cond: [{ $eq: ['$paymentStatus', 'failed'] }, 1, 0] } },
+        rejected: { $sum: { $cond: [{ $eq: ['$paymentStatus', 'rejected'] }, 1, 0] } },
         revenue: { $sum: { $cond: [{ $eq: ['$paymentStatus', 'paid'] }, '$paymentAmount', 0] } },
       }},
     ]);
@@ -83,7 +84,7 @@ export async function GET(request: Request) {
         total,
         pages: Math.ceil(total / limit),
       },
-      stats: stats[0] || { total: 0, paid: 0, pending: 0, failed: 0, revenue: 0 },
+      stats: stats[0] || { total: 0, paid: 0, pending: 0, failed: 0, rejected: 0, revenue: 0 },
     });
   } catch (error) {
     console.error('Error fetching enrollments:', error);

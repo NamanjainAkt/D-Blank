@@ -7,11 +7,12 @@ import { z } from 'zod';
 
 // Validation schema for enrollment updates
 const updateEnrollmentSchema = z.object({
-  paymentStatus: z.enum(['pending', 'paid', 'failed', 'refunded']).optional(),
+  paymentStatus: z.enum(['pending', 'paid', 'failed', 'refunded', 'rejected']).optional(),
   enrollmentStatus: z.enum(['pending', 'confirmed', 'in_progress', 'completed', 'cancelled']).optional(),
   paymentId: z.string().optional(),
   paymentAmount: z.number().optional(),
   paymentDate: z.string().optional(),
+  adminNote: z.string().optional(),
 });
 
 export async function PATCH(
@@ -109,7 +110,10 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ enrollment });
+    return NextResponse.json({ 
+      success: true,
+      student: enrollment 
+    });
   } catch (error) {
     console.error('Error fetching enrollment:', error);
     return NextResponse.json(
