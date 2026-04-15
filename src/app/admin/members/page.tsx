@@ -207,13 +207,16 @@ export default function AdminMembersPage() {
 
   const handleToggleStatus = async (member: Member) => {
     try {
-      const res = await fetch(`/api/members/${member._id}/status`, {
-        method: 'PATCH',
+      const nextStatus = member.status === 'active' ? 'inactive' : 'active';
+      const res = await fetch(`/api/members/${member._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
       });
-      
+
       if (!res.ok) throw new Error('Failed to update status');
       fetchMembers();
-      showSuccess(`Member ${member.status === 'active' ? 'deactivated' : 'activated'} successfully`);
+      showSuccess(`Member ${nextStatus === 'active' ? 'activated' : 'deactivated'} successfully`);
     } catch (err) {
       console.error('Error toggling status:', err);
       setError('Failed to update member status');

@@ -3,6 +3,7 @@ import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
 import { Student } from '@/models/Student';
 import { Course } from '@/models/Course';
+import { Coupon } from '@/models/Coupon';
 import { enrollmentSchema } from '@/lib/validations';
 
 export async function POST(request: Request) {
@@ -10,7 +11,7 @@ export async function POST(request: Request) {
     await dbConnect();
 
     const body = await request.json();
-    
+
     // Validate input
     const validation = enrollmentSchema.safeParse(body);
     if (!validation.success) {
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { courseId, studentData, paymentMethod, paymentReferenceId, paymentReceiptUrl } = body;
+    const { courseId, studentData, paymentMethod, paymentReferenceId, paymentReceiptUrl, couponCode } = body;
 
     if (!courseId.match(/^[0-9a-fA-F]{24}$/)) {
       return NextResponse.json({ error: 'Invalid course ID' }, { status: 400 });
@@ -60,7 +61,39 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Create/Update Enrollment
+    // 3. Revalidate coupon server-side (never trust client totals)
+    let finalAmount = course.price;
+    let discountAmount = 0;
+    let appliedCouponCode: string | undefined;
+    let couponDoc: any = null;
+
+    if (couponCode && typeof couponCode === 'string' && couponCode.trim()) {
+      const code = couponCode.trim().toUpperCase();
+      couponDoc = await Coupon.findOne({ code });
+      if (!couponDoc) {
+        return NextResponse.json({ error: 'Invalid coupon code' }, { status: 400 });
+      }
+      if (!couponDoc.isActive) {
+        return NextResponse.json({ error: 'Coupon is no longer active' }, { status: 400 });
+      }
+      if (new Date(couponDoc.validUntil) < new Date()) {
+        return NextResponse.json({ error: 'Coupon has expired' }, { status: 400 });
+      }
+      if (couponDoc.maxUses && couponDoc.usedCount >= couponDoc.maxUses) {
+        return NextResponse.json({ error: 'Coupon usage limit reached' }, { status: 400 });
+      }
+      if (couponDoc.minPurchase && course.price < couponDoc.minPurchase) {
+        return NextResponse.json(
+          { error: `Minimum purchase of ₹${couponDoc.minPurchase} required` },
+          { status: 400 }
+        );
+      }
+      discountAmount = Math.min(couponDoc.discountAmount, course.price);
+      finalAmount = Math.max(0, course.price - discountAmount);
+      appliedCouponCode = couponDoc.code;
+    }
+
+    // 4. Create/Update Enrollment
     const enrollmentData = {
       studentId: student._id,
       courseId: course._id,
@@ -69,7 +102,10 @@ export async function POST(request: Request) {
       studentEmail: student.email,
       paymentStatus: 'pending',
       enrollmentStatus: 'pending',
-      paymentAmount: course.price,
+      paymentAmount: finalAmount,
+      originalAmount: course.price,
+      couponCode: appliedCouponCode,
+      discountAmount,
       paymentMethod: paymentMethod || 'UPI',
       paymentReferenceId, // For manual payment
       paymentReceiptUrl, // For manual payment
@@ -82,11 +118,19 @@ export async function POST(request: Request) {
       enrollment = await Enrollment.create(enrollmentData);
     }
 
+    // 5. Increment coupon usage (only on first successful use — i.e. not a re-submit)
+    if (couponDoc && !existingEnrollment) {
+      await Coupon.findByIdAndUpdate(couponDoc._id, { $inc: { usedCount: 1 } });
+    }
+
     return NextResponse.json({
       success: true,
       enrollmentId: enrollment._id,
       courseName: course.title,
-      amount: course.price,
+      amount: finalAmount,
+      originalAmount: course.price,
+      discountAmount,
+      couponCode: appliedCouponCode,
     });
   } catch (error) {
     console.error('Enrollment error:', error);

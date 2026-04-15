@@ -1,23 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-
-function usePresence(present: boolean) {
-  const [mounted, setMounted] = React.useState(present)
-
-  React.useEffect(() => {
-    if (present) setMounted(true)
-  }, [present])
-
-  const onAnimationEnd = React.useCallback(() => {
-    if (!present) setMounted(false)
-  }, [present])
-
-  return { mounted, onAnimationEnd }
-}
 
 interface DialogContextValue {
   open: boolean
@@ -86,8 +73,8 @@ DialogTrigger.displayName = "DialogTrigger"
 const DialogPortal = ({ children }: { children?: React.ReactNode }) => {
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
-  if (!mounted) return null
-  return <>{children}</>
+  if (!mounted || typeof document === "undefined") return null
+  return createPortal(children, document.body)
 }
 
 const DialogOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -144,9 +131,21 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     const context = React.useContext(DialogContext)
     if (!context) throw new Error("DialogContent must be used within Dialog")
 
-    const { mounted, onAnimationEnd } = usePresence(context.open)
+    React.useEffect(() => {
+      if (!context.open) return
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") context.onOpenChange(false)
+      }
+      document.addEventListener("keydown", onKey)
+      const prev = document.body.style.overflow
+      document.body.style.overflow = "hidden"
+      return () => {
+        document.removeEventListener("keydown", onKey)
+        document.body.style.overflow = prev
+      }
+    }, [context.open, context.onOpenChange])
 
-    if (!mounted) return null
+    if (!context.open) return null
 
     return (
       <DialogPortal>
@@ -156,9 +155,6 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
           role="dialog"
           aria-modal="true"
           aria-labelledby="dialog-title"
-          onAnimationEnd={(e) => {
-            if (e.target === e.currentTarget) onAnimationEnd()
-          }}
           className={cn(
             "fixed z-50 rounded-lg border border-white/20 bg-black p-6 shadow-2xl",
             "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",

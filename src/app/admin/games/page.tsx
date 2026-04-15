@@ -86,7 +86,7 @@ export default function AdminGamesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Abort this title? This action cannot be undone.')) return;
+    if (!confirm('Are you sure you want to delete this title? This action cannot be undone.')) return;
     
     try {
       const res = await fetch(`/api/admin/games/${id}`, { method: 'DELETE' });

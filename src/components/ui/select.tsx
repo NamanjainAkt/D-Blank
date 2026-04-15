@@ -5,20 +5,6 @@ import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-function usePresence(present: boolean) {
-  const [mounted, setMounted] = React.useState(present)
-
-  React.useEffect(() => {
-    if (present) setMounted(true)
-  }, [present])
-
-  const onAnimationEnd = React.useCallback(() => {
-    if (!present) setMounted(false)
-  }, [present])
-
-  return { mounted, onAnimationEnd }
-}
-
 interface SelectContextValue {
   value: string
   onValueChange: (value: string) => void
@@ -113,6 +99,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttrib
     const triggerRef = React.useRef<HTMLButtonElement>(null)
     React.useImperativeHandle(ref, () => triggerRef.current as HTMLButtonElement)
 
+    const { open: isOpen, setOpen } = context
     React.useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
         if (triggerRef.current && !triggerRef.current.contains(event.target as Node)) {
@@ -126,17 +113,17 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttrib
             target = target.parentElement;
           }
           if (isInsideMenu) return;
-          context.setOpen(false)
+          setOpen(false)
         }
       }
 
-      if (context.open) {
+      if (isOpen) {
         document.addEventListener("mousedown", handleClickOutside)
       }
       return () => {
         document.removeEventListener("mousedown", handleClickOutside)
       }
-    }, [context])
+    }, [isOpen, setOpen])
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (context.disabled || props.disabled) return;
@@ -201,20 +188,15 @@ SelectScrollDownButton.displayName = "SelectScrollDownButton"
 const SelectContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { position?: "popper" | "item-aligned" }>(
   ({ className, children, position = "popper", ...props }, ref) => {
     const context = React.useContext(SelectContext)
-    const { mounted, onAnimationEnd } = usePresence(context?.open ?? false)
-
     if (!context) throw new Error("SelectContent must be used within Select")
 
-    if (!mounted) return null
+    if (!context.open) return null
 
     return (
       <div
         ref={ref}
         role="listbox"
         data-select-content="true"
-        onAnimationEnd={(e) => {
-          if (e.target === e.currentTarget) onAnimationEnd()
-        }}
         className={cn(
           "absolute top-full z-50 mt-1 max-h-96 min-w-[8rem] w-full overflow-hidden rounded-md border border-white/10 bg-black shadow-lg",
           className
@@ -242,11 +224,12 @@ const SelectItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
     if (!context) throw new Error("SelectItem must be used within Select")
 
     const isSelected = context.value === value
+    const { registerItem, unregisterItem } = context
 
     React.useEffect(() => {
-      context.registerItem(value, children)
-      return () => context.unregisterItem(value)
-    }, [value, children, context])
+      registerItem(value, children)
+      return () => unregisterItem(value)
+    }, [value, registerItem, unregisterItem])
 
     return (
       <div

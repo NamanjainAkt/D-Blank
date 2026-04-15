@@ -19,6 +19,9 @@ const enrollmentSchema = new Schema({
   paymentReceiptUrl: { type: String }, // URL of the uploaded receipt
   adminNote: { type: String }, // Admin note for rejection or status
   paymentAmount: { type: Number },
+  originalAmount: { type: Number },
+  couponCode: { type: String },
+  discountAmount: { type: Number, default: 0 },
   paymentDate: { type: Date },
   paymentMethod: { type: String }, // 'UPI', 'Card', 'NetBanking', etc.
   

@@ -28,7 +28,9 @@ import {
   QrCode,
   X,
   Smartphone,
-  Info
+  Info,
+  Tag,
+  CheckCheck
 } from 'lucide-react';
 
 interface Course {
@@ -104,10 +106,15 @@ function SelectField({ label, icon: Icon, value, onChange, placeholder, options,
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        className={`w-full bg-glass-light border ${error ? 'border-red/60' : 'border-border-med'} p-3 text-sm text-white focus:border-emerald/70 focus:ring-1 focus:ring-emerald/30 outline-none transition-all duration-200 appearance-none`}
+        style={{ color: '#fff', backgroundColor: 'rgba(255,255,255,0.03)' }}
+        className={`w-full border ${error ? 'border-red/60' : 'border-border-med'} p-3 text-sm focus:border-emerald/70 focus:ring-1 focus:ring-emerald/30 outline-none transition-all duration-200 appearance-none`}
       >
-        <option value="" className="bg-charcoal">{placeholder}</option>
-        {options.map(o => <option key={o.value} value={o.value} className="bg-charcoal">{o.label}</option>)}
+        <option value="" style={{ backgroundColor: '#0a0a0a', color: '#fff' }}>{placeholder}</option>
+        {options.map(o => (
+          <option key={o.value} value={o.value} style={{ backgroundColor: '#0a0a0a', color: '#fff' }}>
+            {o.label}
+          </option>
+        ))}
       </select>
       {error && (
         <p className="flex items-center gap-1.5 text-xs text-red mt-1">
@@ -147,6 +154,64 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
 
   const [formErrors, setErrors] = useState<Partial<Record<string, string>>>({});
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+
+  // Coupon state
+  const [couponInput, setCouponInput] = useState('');
+  const [couponApplying, setCouponApplying] = useState(false);
+  const [couponError, setCouponError] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountAmount: number;
+    savings: number;
+    discountedPrice: number;
+    description?: string;
+  } | null>(null);
+
+  const originalPrice = course?.price || 0;
+  const finalPrice = appliedCoupon ? appliedCoupon.discountedPrice : originalPrice;
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) {
+      setCouponError('Enter a coupon code');
+      return;
+    }
+    if (!course) return;
+
+    setCouponApplying(true);
+    setCouponError('');
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, coursePrice: course.price }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.valid) {
+        setCouponError(data.error || 'Invalid coupon');
+        setAppliedCoupon(null);
+        return;
+      }
+      setAppliedCoupon({
+        code: data.coupon.code,
+        discountAmount: data.coupon.discountAmount,
+        savings: data.coupon.savings,
+        discountedPrice: data.coupon.discountedPrice,
+        description: data.coupon.description,
+      });
+      setCouponInput(data.coupon.code);
+    } catch (err: any) {
+      setCouponError('Failed to validate coupon. Try again.');
+    } finally {
+      setCouponApplying(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError('');
+  };
 
   useEffect(() => {
     async function fetchCourse() {
@@ -232,6 +297,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
           paymentMethod: 'UPI',
           paymentReferenceId: formData.paymentReferenceId,
           paymentReceiptUrl: formData.paymentReceiptUrl,
+          couponCode: appliedCoupon?.code,
         }),
       });
 
@@ -484,7 +550,17 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                           <div className="text-xs text-white/40 mt-0.5">{course?.duration} &middot; {course?.category}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-emerald">{formatCurrency(course?.price || 0)}</div>
+                          {appliedCoupon ? (
+                            <>
+                              <div className="text-xs text-white/40 line-through">{formatCurrency(originalPrice)}</div>
+                              <div className="text-2xl font-bold text-emerald">{formatCurrency(finalPrice)}</div>
+                              <div className="text-[10px] text-emerald/70 font-mono uppercase tracking-wider mt-0.5">
+                                Coupon {appliedCoupon.code} applied
+                              </div>
+                            </>
+                          ) : (
+                            <div className="text-2xl font-bold text-emerald">{formatCurrency(originalPrice)}</div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -529,7 +605,7 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                         <ol className="space-y-3">
                           {[
                             "Open any UPI application (GPay, PhonePe, Paytm).",
-                            `Transfer precisely ${formatCurrency(course?.price || 0)} to the scanned address.`,
+                            `Transfer precisely ${formatCurrency(finalPrice)} to the scanned address.`,
                             "Copy the Transaction ID or UTR Number.",
                             "Capture a visual record (screenshot) of the confirmation."
                           ].map((text, i) => (
@@ -545,8 +621,96 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                     {/* Inputs Column */}
                     <div className="flex flex-col gap-6">
                       <div className="space-y-4">
-                        <InputField 
-                          label="Transaction Reference ID" 
+                        {/* Coupon */}
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-1.5 text-xs font-medium text-white/60 tracking-wide">
+                            <Tag className="w-3.5 h-3.5 text-emerald/70" />
+                            Have a coupon code?
+                          </label>
+                          {appliedCoupon ? (
+                            <div className="relative border border-emerald/40 bg-emerald-dim/30 rounded-xl p-4 flex items-center justify-between overflow-hidden">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-emerald/20 border border-emerald/40 flex items-center justify-center flex-shrink-0">
+                                  <CheckCheck className="w-5 h-5 text-emerald" />
+                                </div>
+                                <div>
+                                  <div className="text-sm font-mono font-bold text-emerald tracking-wider">
+                                    {appliedCoupon.code}
+                                  </div>
+                                  <div className="text-[10px] text-emerald/70 uppercase tracking-widest mt-0.5">
+                                    You saved {formatCurrency(appliedCoupon.savings)}
+                                  </div>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={removeCoupon}
+                                className="p-2 rounded-full hover:bg-red/10 text-white/40 hover:text-red transition-all"
+                                aria-label="Remove coupon"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  value={couponInput}
+                                  onChange={e => {
+                                    setCouponInput(e.target.value.toUpperCase());
+                                    if (couponError) setCouponError('');
+                                  }}
+                                  onKeyDown={e => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      applyCoupon();
+                                    }
+                                  }}
+                                  placeholder="SAVE500"
+                                  disabled={couponApplying}
+                                  className={`flex-1 bg-glass-light border ${couponError ? 'border-red/60' : 'border-border-med'} p-3 text-sm text-white placeholder-white/30 font-mono uppercase tracking-wider focus:border-emerald/70 focus:ring-1 focus:ring-emerald/30 outline-none transition-all duration-200`}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={applyCoupon}
+                                  disabled={couponApplying || !couponInput.trim()}
+                                  style={{ backgroundColor: '#10b981' }}
+                                  className="px-5 text-black text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+                                >
+                                  {couponApplying ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+                                </button>
+                              </div>
+                              {couponError && (
+                                <p className="flex items-center gap-1.5 text-xs text-red mt-1">
+                                  <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                                  {couponError}
+                                </p>
+                              )}
+                            </>
+                          )}
+                        </div>
+
+                        {/* Price Breakdown */}
+                        <div className="p-4 bg-glass-light/40 border border-border-med rounded-xl space-y-2">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-white/40">Course fee</span>
+                            <span className="text-white/70 font-mono">{formatCurrency(originalPrice)}</span>
+                          </div>
+                          {appliedCoupon && (
+                            <div className="flex justify-between text-xs">
+                              <span className="text-emerald/80">Discount ({appliedCoupon.code})</span>
+                              <span className="text-emerald font-mono">- {formatCurrency(appliedCoupon.savings)}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-end pt-2 border-t border-border-med">
+                            <span className="text-[11px] text-white/40 uppercase tracking-wider">Amount to pay</span>
+                            <span className="text-xl font-bold text-emerald">{formatCurrency(finalPrice)}</span>
+                          </div>
+                        </div>
+
+                        <InputField
+                          label="Transaction Reference ID"
                           icon={Hash} 
                           value={formData.paymentReferenceId} 
                           onChange={v => updateField('paymentReferenceId', v)} 
@@ -679,10 +843,19 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
                   <div className="flex items-end justify-between pt-3 border-t border-border-med">
                     <div className="text-xs text-white/30 uppercase tracking-wide">Total Fee</div>
                     <div className="text-right">
-                      {course?.originalPrice && course.originalPrice > course.price && (
-                        <div className="text-xs text-white/30 line-through">{formatCurrency(course.originalPrice)}</div>
+                      {appliedCoupon ? (
+                        <>
+                          <div className="text-xs text-white/30 line-through">{formatCurrency(originalPrice)}</div>
+                          <div className="text-2xl font-bold text-emerald">{formatCurrency(finalPrice)}</div>
+                        </>
+                      ) : (
+                        <>
+                          {course?.originalPrice && course.originalPrice > course.price && (
+                            <div className="text-xs text-white/30 line-through">{formatCurrency(course.originalPrice)}</div>
+                          )}
+                          <div className="text-2xl font-bold text-emerald">{formatCurrency(originalPrice)}</div>
+                        </>
                       )}
-                      <div className="text-2xl font-bold text-emerald">{formatCurrency(course?.price || 0)}</div>
                     </div>
                   </div>
                 </div>

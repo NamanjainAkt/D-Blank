@@ -23,6 +23,7 @@ export const enrollmentSchema = z.object({
   paymentMethod: z.string().optional(),
   paymentReferenceId: z.string().optional(), // Manual transaction ID
   paymentReceiptUrl: z.string().url('Invalid receipt URL').optional().or(z.literal('')), // Optional but recommended
+  couponCode: z.string().optional().or(z.literal('')),
 });
 
 // Course Module Schema
