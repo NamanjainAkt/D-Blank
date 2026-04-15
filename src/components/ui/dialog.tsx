@@ -150,7 +150,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 
     return (
       <DialogPortal>
-        <DialogOverlay />
+        <DialogOverlay className="fixed inset-0 z-40 bg-black/80" />
         <div
           ref={ref}
           role="dialog"
@@ -160,17 +160,29 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
             if (e.target === e.currentTarget) onAnimationEnd()
           }}
           className={cn(
-            "fixed left-1/2 top-1/2 z-50 w-[95%] max-w-2xl max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border border-white/10 bg-black p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)]",
+            "fixed z-50 rounded-lg border border-white/20 bg-black p-6 shadow-2xl",
+            "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+            "w-[95vw] max-w-2xl max-h-[85vh] overflow-y-auto",
             className
           )}
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'
+          }}
           data-state={context.open ? "open" : "closed"}
           {...props}
         >
-          {children}
-          <DialogClose className="absolute right-4 top-4 rounded-full p-1.5 bg-white/10 hover:bg-white/20 text-white transition-colors">
+          <button
+            type="button"
+            onClick={() => context.onOpenChange(false)}
+            className="absolute right-3 top-3 rounded-full p-1.5 bg-white/10 hover:bg-white/20 text-white transition-colors z-50"
+            aria-label="Close"
+          >
             <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogClose>
+          </button>
+          {children}
         </div>
       </DialogPortal>
     )

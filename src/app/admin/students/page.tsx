@@ -204,7 +204,7 @@ export default function AdminStudentsPage() {
                   </div>
                   <div>
                     <DialogTitle className="text-2xl font-display font-black text-white uppercase tracking-tighter">
-                      {studentDetails.name}
+                      {studentDetails.student?.name || 'Unknown'}
                     </DialogTitle>
                     <DialogDescription className="text-[10px] font-mono text-acid-green uppercase tracking-widest mt-1">
                       Entity Profile // Level 01 Operator
@@ -213,20 +213,20 @@ export default function AdminStudentsPage() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
                   <div className="p-3 bg-white/5 border border-white/5 rounded">
-                    <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Email Uplink</div>
-                    <div className="text-[10px] font-mono text-white break-all">{studentDetails.email}</div>
+                    <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mb-1">Email Uplink</div>
+                    <div className="text-[10px] font-mono text-white break-all">{studentDetails.student?.email || 'N/A'}</div>
                   </div>
                   <div className="p-3 bg-white/5 border border-white/5 rounded">
-                    <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Comm Link</div>
-                    <div className="text-[10px] font-mono text-white">{studentDetails.phone}</div>
+                    <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mb-1">Comm Link</div>
+                    <div className="text-[10px] font-mono text-white">{studentDetails.student?.phone || 'N/A'}</div>
                   </div>
                   <div className="p-3 bg-white/5 border border-white/5 rounded">
-                    <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Roll Signature</div>
-                    <div className="text-[10px] font-mono text-white">{studentDetails.rollNumber}</div>
+                    <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mb-1">Roll Signature</div>
+                    <div className="text-[10px] font-mono text-white">{studentDetails.student?.rollNumber || 'N/A'}</div>
                   </div>
                   <div className="p-3 bg-white/5 border border-white/5 rounded">
-                    <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Current Year</div>
-                    <div className="text-[10px] font-mono text-white uppercase">{studentDetails.year} Year</div>
+                    <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mb-1">Current Year</div>
+                    <div className="text-[10px] font-mono text-white uppercase">{studentDetails.student?.year || 'N/A'} Year</div>
                   </div>
                 </div>
               </DialogHeader>
@@ -240,22 +240,22 @@ export default function AdminStudentsPage() {
                     </h4>
                     <div className="space-y-3 p-4 bg-black/40 border border-white/5 rounded">
                       <div>
-                        <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">College/Institution</div>
-                        <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.collegeName}</div>
+                        <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mb-1">College/Institution</div>
+                        <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.student?.collegeName || 'N/A'}</div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Branch</div>
-                          <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.branch}</div>
+                          <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mb-1">Branch</div>
+                          <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.student?.branch || 'N/A'}</div>
                         </div>
                         <div>
-                          <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Semester</div>
-                          <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.semester} SEM</div>
+                          <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mb-1">Semester</div>
+                          <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.student?.semester || 'N/A'} SEM</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                        <MapPin className="w-3 h-3 text-zinc-500" />
-                        <span className="text-[10px] font-mono text-white uppercase tracking-widest">{studentDetails.city}</span>
+                        <MapPin className="w-3 h-3 text-zinc-400" />
+                        <span className="text-[10px] font-mono text-white uppercase tracking-widest">{studentDetails.student?.city || 'N/A'}</span>
                       </div>
                     </div>
                   </div>
@@ -266,14 +266,14 @@ export default function AdminStudentsPage() {
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-4 bg-black/40 border border-white/5 rounded text-center">
-                        <div className="text-[20px] font-display font-black text-white">{studentDetails.student ? studentDetails.enrollments?.length || 0 : 0}</div>
-                        <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mt-1">Module Uplinks</div>
+                        <div className="text-[20px] font-display font-black text-white">{studentDetails.enrollments?.length || 0}</div>
+                        <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mt-1">Module Uplinks</div>
                       </div>
                       <div className="p-4 bg-black/40 border border-white/5 rounded text-center">
                         <div className="text-[20px] font-display font-black text-white">
-                          {studentDetails.student ? (studentDetails.enrollments || []).filter((e: any) => e.paymentStatus === 'paid').length : 0}
+                          {(studentDetails.enrollments || []).filter((e: any) => e.paymentStatus === 'paid').length}
                         </div>
-                        <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mt-1">Active Modules</div>
+                        <div className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest mt-1">Active Modules</div>
                       </div>
                     </div>
                   </div>
@@ -290,7 +290,7 @@ export default function AdminStudentsPage() {
                         <div key={enrollment._id} className="flex items-center justify-between p-3 bg-black/40 border border-white/5 rounded">
                           <div>
                             <div className="text-xs font-mono text-white uppercase">{enrollment.courseId?.title || enrollment.courseName}</div>
-                            <div className="text-[10px] font-mono text-zinc-500">{format(new Date(enrollment.createdAt), 'MMM d, yyyy HH:mm')}</div>
+                            <div className="text-[10px] font-mono text-zinc-400">{format(new Date(enrollment.createdAt), 'MMM d, yyyy HH:mm')}</div>
                           </div>
                           <Badge variant="outline" className={enrollment.paymentStatus === 'paid' ? 'border-emerald text-emerald' : 'border-amber text-amber'}>
                             {enrollment.paymentStatus}
