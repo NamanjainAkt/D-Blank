@@ -98,7 +98,7 @@ const DialogOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
         ref={ref}
         onClick={() => context?.onOpenChange(false)}
         className={cn(
-          "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          "fixed inset-0 z-50 bg-black/80 backdrop-blur-sm",
           className
         )}
         data-state={context?.open ? "open" : "closed"}
@@ -155,18 +155,19 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
           ref={ref}
           role="dialog"
           aria-modal="true"
+          aria-labelledby="dialog-title"
           onAnimationEnd={(e) => {
             if (e.target === e.currentTarget) onAnimationEnd()
           }}
           className={cn(
-            "fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-xl border border-white/10 bg-black p-6 shadow-[0_0_50px_rgba(168,85,247,0.3)] w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            "fixed left-1/2 top-1/2 z-50 w-[95%] max-w-2xl max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border border-white/10 bg-black p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)]",
             className
           )}
           data-state={context.open ? "open" : "closed"}
           {...props}
         >
           {children}
-          <DialogClose className="absolute right-4 top-4 rounded-full p-1.5 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-colors">
+          <DialogClose className="absolute right-4 top-4 rounded-full p-1.5 bg-white/10 hover:bg-white/20 text-white transition-colors">
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogClose>
@@ -189,14 +190,14 @@ DialogFooter.displayName = "DialogFooter"
 
 const DialogTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h2 ref={ref} className={cn("text-xl font-display font-black text-white uppercase tracking-tighter", className)} {...props} />
+    <h2 ref={ref} id="dialog-title" className={cn("text-xl font-display font-black text-white uppercase tracking-tighter", className)} {...props} />
   )
 )
 DialogTitle.displayName = "DialogTitle"
 
 const DialogDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-xs font-mono text-zinc-500 uppercase tracking-widest mt-1", className)} {...props} />
+    <p ref={ref} className={cn("text-xs font-mono text-zinc-400 uppercase tracking-widest mt-1", className)} {...props} />
   )
 )
 DialogDescription.displayName = "DialogDescription"

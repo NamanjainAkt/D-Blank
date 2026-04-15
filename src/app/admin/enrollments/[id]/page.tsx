@@ -73,7 +73,7 @@ interface InfoFieldProps {
 function InfoField({ label, value, mono = false, className = '', children }: InfoFieldProps) {
   return (
     <div className={className}>
-      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-1.5">{label}</div>
+      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 mb-1.5">{label}</div>
       <div className={cn(
         "text-sm",
         mono ? 'font-mono text-zinc-300 bg-white/5 px-2 py-1 rounded-sm border border-white/5 inline-block' : 'text-zinc-200'
@@ -245,7 +245,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       <div className="flex items-center justify-center h-96" role="status" aria-label="Loading student details">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-laser-cyan" aria-hidden="true" />
-          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em]">Retrieving Personnel File...</span>
+          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.2em]">Retrieving Personnel File...</span>
         </div>
       </div>
     );
@@ -255,7 +255,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="flex flex-col items-center justify-center h-96 space-y-6">
         <AlertCircle className="w-12 h-12 text-red-500 opacity-50" aria-hidden="true" />
-        <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest">{error}</p>
+        <p className="text-zinc-400 font-mono text-xs uppercase tracking-widest">{error}</p>
         <Button 
           variant="outline" 
           onClick={() => router.push('/admin/enrollments')}
@@ -288,7 +288,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         <div className="space-y-4">
           <Link 
             href="/admin/enrollments" 
-            className="text-[10px] font-mono text-zinc-600 hover:text-laser-cyan uppercase tracking-[0.2em] transition-colors flex items-center gap-2"
+            className="text-[10px] font-mono text-zinc-300 hover:text-laser-cyan uppercase tracking-[0.2em] transition-colors flex items-center gap-2"
           >
             <span aria-hidden="true">←</span> Back to Registry
           </Link>
@@ -296,7 +296,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             <h1 className="text-4xl font-display font-black text-white tracking-tighter uppercase">
               {student.studentName}
             </h1>
-            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
+            <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF]" />
               Personnel ID: {student.enrollmentId} // Archive Entry
             </p>
@@ -368,7 +368,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
 
               {student.paymentReceiptUrl && (
                 <div>
-                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-3">Verification Image</div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 mb-3">Verification Image</div>
                   <div className="relative aspect-video w-full max-w-md border border-white/5 bg-black overflow-hidden group">
                     <Image 
                       src={student.paymentReceiptUrl} 
@@ -436,7 +436,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <SectionCard title="System Status" icon={Clock}>
             <div className="space-y-6">
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-3">Credits Status</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 mb-3">Credits Status</div>
                 <Badge 
                   variant="outline"
                   className={cn(
@@ -451,7 +451,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 </Badge>
               </div>
               <div className="space-y-3">
-                <label htmlFor="enrollment-status" className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 block">
+                <label htmlFor="enrollment-status" className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 block">
                   Assignment Status
                 </label>
                 <Select value={student?.enrollmentStatus || 'pending'} onValueChange={updateEnrollmentStatus} disabled={updating}>
@@ -478,7 +478,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <SectionCard title="Credits Ledger" icon={CreditCard}>
             <div className="space-y-6">
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2">Total Transfer</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 mb-2">Total Transfer</div>
                 <div className="text-3xl font-display font-black text-white tracking-tighter">
                   {student.paymentAmount ? formatCurrency(student.paymentAmount) : '-'}
                 </div>
@@ -536,7 +536,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 <div className="w-1.5 h-1.5 mt-2 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF] flex-shrink-0 group-hover/log:scale-125 transition-transform" />
                 <div>
                   <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-300">File Created</div>
-                  <div className="text-[10px] font-mono text-zinc-600 mt-1">
+                  <div className="text-[10px] font-mono text-zinc-300 mt-1">
                     {format(new Date(student.createdAt), 'yyyy.MM.dd // HH:mm')}
                   </div>
                 </div>
@@ -546,7 +546,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                   <div className="w-1.5 h-1.5 mt-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] flex-shrink-0 group-hover/log:scale-125 transition-transform" />
                   <div>
                     <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-300">Credits Received</div>
-                    <div className="text-[10px] font-mono text-zinc-600 mt-1">
+                    <div className="text-[10px] font-mono text-zinc-300 mt-1">
                       {format(new Date(student.paymentDate), 'yyyy.MM.dd // HH:mm')}
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -133,7 +134,7 @@ export default function AdminStudentsPage() {
                     <TableCell colSpan={5} className="py-20 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <AlertCircle className="w-6 h-6 text-zinc-700" />
-                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600">No Entities Found</span>
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400">No Entities Found</span>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -143,17 +144,17 @@ export default function AdminStudentsPage() {
                       <TableCell className="py-5 px-6">
                         <div className="flex flex-col">
                           <span className="text-sm font-medium text-zinc-200 group-hover/row:text-white transition-colors uppercase tracking-tight">{person.name}</span>
-                          <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-tight mt-0.5">ID: {person._id.slice(-8)}</span>
+                          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-tight mt-0.5">ID: {person._id.slice(-8)}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-5">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2 text-zinc-400">
-                            <Mail className="w-3 h-3 text-zinc-600" />
+                            <Mail className="w-3 h-3 text-zinc-400" />
                             <span className="text-[11px] font-mono lowercase">{person.email}</span>
                           </div>
                           <div className="flex items-center gap-2 text-zinc-400">
-                            <Phone className="w-3 h-3 text-zinc-600" />
+                            <Phone className="w-3 h-3 text-zinc-400" />
                             <span className="text-[11px] font-mono">{person.phone}</span>
                           </div>
                         </div>
@@ -161,7 +162,7 @@ export default function AdminStudentsPage() {
                       <TableCell className="py-5">
                         <div className="flex flex-col">
                           <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-tight line-clamp-1">{person.collegeName}</span>
-                          <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">{person.branch} // {person.semester} SEM</span>
+                          <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest">{person.branch} // {person.semester} SEM</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-5 font-mono text-[11px] text-zinc-500">
@@ -194,7 +195,7 @@ export default function AdminStudentsPage() {
               <Loader2 className="w-8 h-8 animate-spin text-acid-green" />
               <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-500">Extracting Profile Data...</span>
             </div>
-          ) : studentDetails ? (
+) : studentDetails ? (
             <>
               <DialogHeader className="border-b border-white/5 pb-6 mb-8">
                 <div className="flex items-center gap-4 mb-4">
@@ -203,7 +204,7 @@ export default function AdminStudentsPage() {
                   </div>
                   <div>
                     <DialogTitle className="text-2xl font-display font-black text-white uppercase tracking-tighter">
-                      {studentDetails.student.name}
+                      {studentDetails.name}
                     </DialogTitle>
                     <DialogDescription className="text-[10px] font-mono text-acid-green uppercase tracking-widest mt-1">
                       Entity Profile // Level 01 Operator
@@ -212,20 +213,20 @@ export default function AdminStudentsPage() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
                   <div className="p-3 bg-white/5 border border-white/5 rounded">
-                    <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Email Uplink</div>
-                    <div className="text-[10px] font-mono text-zinc-300 break-all">{studentDetails.student.email}</div>
+                    <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Email Uplink</div>
+                    <div className="text-[10px] font-mono text-white break-all">{studentDetails.email}</div>
                   </div>
                   <div className="p-3 bg-white/5 border border-white/5 rounded">
-                    <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Comm Link</div>
-                    <div className="text-[10px] font-mono text-zinc-300">{studentDetails.student.phone}</div>
+                    <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Comm Link</div>
+                    <div className="text-[10px] font-mono text-white">{studentDetails.phone}</div>
                   </div>
                   <div className="p-3 bg-white/5 border border-white/5 rounded">
-                    <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Roll Signature</div>
-                    <div className="text-[10px] font-mono text-zinc-300">{studentDetails.student.rollNumber}</div>
+                    <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Roll Signature</div>
+                    <div className="text-[10px] font-mono text-white">{studentDetails.rollNumber}</div>
                   </div>
                   <div className="p-3 bg-white/5 border border-white/5 rounded">
-                    <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Current Year</div>
-                    <div className="text-[10px] font-mono text-zinc-300 uppercase">{studentDetails.student.year} Year</div>
+                    <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Current Year</div>
+                    <div className="text-[10px] font-mono text-white uppercase">{studentDetails.year} Year</div>
                   </div>
                 </div>
               </DialogHeader>
@@ -234,95 +235,71 @@ export default function AdminStudentsPage() {
                 {/* Secondary Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
+                    <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-400 flex items-center gap-2">
                       <School className="w-3 h-3" /> Origin Information
                     </h4>
                     <div className="space-y-3 p-4 bg-black/40 border border-white/5 rounded">
                       <div>
-                        <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">College/Institution</div>
-                        <div className="text-[11px] font-mono text-zinc-300 uppercase tracking-tight">{studentDetails.student.collegeName}</div>
+                        <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">College/Institution</div>
+                        <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.collegeName}</div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Branch</div>
-                          <div className="text-[11px] font-mono text-zinc-300 uppercase tracking-tight">{studentDetails.student.branch}</div>
+                          <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Branch</div>
+                          <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.branch}</div>
                         </div>
                         <div>
-                          <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Semester</div>
-                          <div className="text-[11px] font-mono text-zinc-300 uppercase tracking-tight">{studentDetails.student.semester} SEM</div>
+                          <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Semester</div>
+                          <div className="text-[11px] font-mono text-white uppercase tracking-tight">{studentDetails.semester} SEM</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                        <MapPin className="w-3 h-3 text-zinc-600" />
-                        <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">{studentDetails.student.city}</span>
+                        <MapPin className="w-3 h-3 text-zinc-500" />
+                        <span className="text-[10px] font-mono text-white uppercase tracking-widest">{studentDetails.city}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
+                    <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-400 flex items-center gap-2">
                       <BarChart3 className="w-3 h-3" /> Intelligence Summary
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-4 bg-black/40 border border-white/5 rounded text-center">
-                        <div className="text-[20px] font-display font-black text-white">{studentDetails.enrollments.length}</div>
-                        <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mt-1">Module Uplinks</div>
+                        <div className="text-[20px] font-display font-black text-white">{studentDetails.student ? studentDetails.enrollments?.length || 0 : 0}</div>
+                        <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mt-1">Module Uplinks</div>
                       </div>
                       <div className="p-4 bg-black/40 border border-white/5 rounded text-center">
                         <div className="text-[20px] font-display font-black text-white">
-                          ₹{studentDetails.enrollments.reduce((acc: number, curr: any) => acc + (curr.paymentStatus === 'paid' ? curr.paymentAmount : 0), 0).toLocaleString()}
+                          {studentDetails.student ? (studentDetails.enrollments || []).filter((e: any) => e.paymentStatus === 'paid').length : 0}
                         </div>
-                        <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mt-1">LTV Contribution</div>
-                      </div>
-                      <div className="col-span-2 p-3 bg-white/5 border border-white/5 rounded">
-                        <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Acquisition Channel</div>
-                        <div className="text-[10px] font-mono text-zinc-400 uppercase">{studentDetails.student.referrer || 'Organic Discovery'}</div>
+                        <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest mt-1">Active Modules</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Enrollments History */}
-                <div className="space-y-4 pb-4">
-                  <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
-                    <BookOpen className="w-3 h-3" /> Module Authorization History
-                  </h4>
-                  <div className="space-y-3">
-                    {studentDetails.enrollments.length === 0 ? (
-                      <div className="p-8 text-center border border-white/5 rounded bg-black/20">
-                        <span className="text-[10px] font-mono uppercase text-zinc-700">No active module authorizations found.</span>
-                      </div>
-                    ) : (
-                      studentDetails.enrollments.map((enr: any) => (
-                        <div key={enr._id} className="p-4 bg-black/40 border border-white/5 rounded flex items-center justify-between group hover:border-white/20 transition-all">
-                          <div className="flex items-center gap-4">
-                            <div className={cn(
-                              "w-1 h-8 rounded-full",
-                              enr.paymentStatus === 'paid' ? "bg-acid-green shadow-[0_0_8px_#39FF14]" : "bg-red-500 shadow-[0_0_8px_red]"
-                            )} />
-                            <div>
-                              <div className="text-[12px] font-mono font-bold text-zinc-200 uppercase tracking-tight group-hover:text-white transition-colors">{enr.courseId?.title || enr.courseName}</div>
-                              <div className="flex items-center gap-4 mt-1">
-                                <div className="text-[9px] font-mono text-zinc-600 uppercase flex items-center gap-1">
-                                  <Calendar className="w-2.5 h-2.5" /> {formatDate(enr.createdAt)}
-                                </div>
-                                <div className="text-[9px] font-mono text-zinc-600 uppercase flex items-center gap-1">
-                                  <CreditCard className="w-2.5 h-2.5" /> {formatCurrency(enr.paymentAmount || 0)}
-                                </div>
-                              </div>
-                            </div>
+                {/* Enrollments List */}
+                {studentDetails.enrollments && studentDetails.enrollments.length > 0 && (
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-zinc-400 flex items-center gap-2">
+                      <BookOpen className="w-3 h-3" /> Module History
+                    </h4>
+                    <div className="space-y-2">
+                      {studentDetails.enrollments.map((enrollment: any) => (
+                        <div key={enrollment._id} className="flex items-center justify-between p-3 bg-black/40 border border-white/5 rounded">
+                          <div>
+                            <div className="text-xs font-mono text-white uppercase">{enrollment.courseId?.title || enrollment.courseName}</div>
+                            <div className="text-[10px] font-mono text-zinc-500">{format(new Date(enrollment.createdAt), 'MMM d, yyyy HH:mm')}</div>
                           </div>
-                          <Badge className={cn(
-                            "text-[8px] font-mono uppercase tracking-widest px-2",
-                            enr.paymentStatus === 'paid' ? "bg-acid-green/10 text-acid-green border-acid-green/20" : "bg-red-500/10 text-red-400 border-red-500/20"
-                          )}>
-                            {enr.paymentStatus}
+                          <Badge variant="outline" className={enrollment.paymentStatus === 'paid' ? 'border-emerald text-emerald' : 'border-amber text-amber'}>
+                            {enrollment.paymentStatus}
                           </Badge>
                         </div>
-                      ))
-                    )}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </>
           ) : null}

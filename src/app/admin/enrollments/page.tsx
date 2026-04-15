@@ -191,7 +191,7 @@ export default function AdminEnrollmentsPage() {
           <h1 className="text-4xl font-display font-black text-white tracking-tighter uppercase">
             Personnel <span className="text-laser-cyan shadow-laser-cyan">Database</span>
           </h1>
-          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
+          <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF]" />
             Records: {pagination.total} // Authorized Access Only
           </p>
@@ -212,12 +212,12 @@ export default function AdminEnrollmentsPage() {
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-ink/40 p-4 border border-white/5 backdrop-blur-sm rounded-sm">
         <div className="md:col-span-2 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
           <Input
             placeholder="Search by name, email, or enrollment ID..."
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pl-10 bg-black/40 border-white/5 focus:border-laser-cyan/50 text-sm font-mono placeholder:text-zinc-600 h-10"
+            className="pl-10 bg-black/40 border-white/5 focus:border-laser-cyan/50 text-sm font-mono placeholder:text-zinc-400 h-10"
           />
         </div>
         <div>
@@ -244,11 +244,11 @@ export default function AdminEnrollmentsPage() {
             <Table>
               <TableHeader>
                 <TableRow className="border-white/5 hover:bg-transparent">
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Operator</TableHead>
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">ID / Origin</TableHead>
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Module</TableHead>
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4">Status</TableHead>
-                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 py-4 text-right">Action</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 py-4">Operator</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 py-4">ID / Origin</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 py-4">Module</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 py-4">Status</TableHead>
+                  <TableHead className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 py-4 text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -257,7 +257,7 @@ export default function AdminEnrollmentsPage() {
                     <TableCell colSpan={5} className="py-20 text-center">
                       <div className="flex flex-col items-center gap-3">
                         <Loader2 className="w-6 h-6 animate-spin text-laser-cyan" />
-                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500">Retrieving Records...</span>
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400">Retrieving Records...</span>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -266,7 +266,7 @@ export default function AdminEnrollmentsPage() {
                     <TableCell colSpan={5} className="py-20 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <AlertCircle className="w-6 h-6 text-zinc-700" />
-                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-600">No Records Found</span>
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400">No Records Found</span>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -276,13 +276,13 @@ export default function AdminEnrollmentsPage() {
                       <TableCell className="py-5">
                         <div className="flex flex-col">
                           <span className="text-sm font-medium text-zinc-200 group-hover/row:text-white transition-colors">{student.studentName}</span>
-                          <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-tight">{student.email}</span>
+                          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-tight">{student.email}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-5">
                         <div className="flex flex-col">
                           <span className="text-[11px] font-mono text-zinc-400">{student.enrollmentId}</span>
-                          <span className="text-[9px] font-mono text-zinc-600 uppercase">{student.collegeName}</span>
+                          <span className="text-[9px] font-mono text-zinc-400 uppercase">{student.collegeName}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-5">
@@ -325,7 +325,7 @@ export default function AdminEnrollmentsPage() {
       {/* Pagination */}
       {pagination.pages > 1 && (
         <div className="flex items-center justify-between pt-6">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-600">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
             Page {pagination.page} of {pagination.pages}
           </div>
           <div className="flex items-center gap-2">
