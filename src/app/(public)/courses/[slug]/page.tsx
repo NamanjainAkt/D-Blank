@@ -3,7 +3,6 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import Footer2 from "@/components/Footer2";
 import { 
@@ -87,7 +86,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <Navbar />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">

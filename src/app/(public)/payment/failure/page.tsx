@@ -1,12 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
 
 export default function PaymentFailurePage() {
   return (
     <main className="min-h-screen bg-black">
-      <Navbar />
+      
 
       <div className="pt-24 pb-16 px-8">
         <div className="max-w-lg mx-auto">

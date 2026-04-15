@@ -1,4 +1,3 @@
-import { Navbar } from '@/components/Navbar';
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 import Footer2 from "@/components/Footer2";
@@ -13,7 +12,6 @@ export default function RefundPolicyPage() {
   
   return (
     <main className="min-h-screen bg-black">
-      <Navbar />
       
       <div className="pt-24 pb-16 px-8">
         <div className="max-w-4xl mx-auto">

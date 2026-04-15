@@ -3,17 +3,18 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, Gamepad2, BookOpen, Users, Mail, X } from 'lucide-react';
+import { Menu, Gamepad2, BookOpen, Users, Mail, X, House } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetClose,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { label: 'Home',     href: '/',        icon: null },
+  { label: 'Home',     href: '/',        icon: House },
   { label: 'Games',    href: '/games',   icon: Gamepad2 },
   { label: 'Studio',   href: '/studio',  icon: Users },
   { label: 'Training', href: '/courses', icon: BookOpen },
@@ -67,7 +68,7 @@ export function Navbar() {
           <Logo size="md" />
 
           {/* ── Desktop Nav ── */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden xl:flex items-center gap-1">
             {navItems.map((item) => {
               const active = pathname === item.href;
               return (
@@ -102,23 +103,25 @@ export function Navbar() {
 
           {/* ── Mobile Menu ── */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="lg:hidden">
-              <button
-                className="relative w-9 h-9 flex items-center justify-center border border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all duration-200"
-                aria-label="Open menu"
-              >
-                {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-              </button>
-            </SheetTrigger>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="xl:hidden relative w-9 h-9 flex items-center justify-center border border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all duration-200 z-[60]"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+            >
+              {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
 
             <SheetContent
               side="right"
-              className="w-[280px] bg-zinc-950/98 border-l border-zinc-800/60 p-0 backdrop-blur-xl"
+              className="w-[300px] bg-black border-l border-white/10 p-0 backdrop-blur-2xl z-[100]"
             >
               <div className="flex flex-col h-full">
                 {/* Menu header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800/60">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
                   <Logo size="sm" />
+                  <SheetClose className="w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/10 rounded-xl transition-all shadow-sm">
+                    <X className="w-4 h-4" />
+                  </SheetClose>
                 </div>
 
                 {/* Nav links */}
@@ -132,17 +135,17 @@ export function Navbar() {
                         href={item.href}
                         onClick={() => setIsOpen(false)}
                         className={cn(
-                          'flex items-center gap-3 px-3.5 py-3 text-[11px] font-display tracking-[0.15em] transition-all duration-200',
+                          'flex items-center gap-4 px-4 py-4 text-[12px] font-display tracking-[0.2em] transition-all duration-300 border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02]',
                           active
-                            ? 'text-primary'
-                            : 'text-zinc-500 hover:text-zinc-200'
+                            ? 'text-primary bg-primary/5'
+                            : 'text-zinc-100 hover:text-white'
                         )}
                       >
                         {Icon && (
-                          <Icon className={cn('w-4 h-4 shrink-0', active ? 'text-primary' : 'text-zinc-600')} />
+                          <Icon className={cn('w-5 h-5 shrink-0', active ? 'text-primary' : 'text-zinc-400')} />
                         )}
-                        <span className="flex-1">{item.label}</span>
-                        {active && <span className="w-1.5 h-1.5 bg-primary shrink-0" />}
+                        <span className="flex-1 uppercase">{item.label}</span>
+                        {active && <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(168,85,247,0.5)]" />}
                       </Link>
                     );
                   })}
