@@ -4,6 +4,7 @@ import { SessionProvider } from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { MagneticCursor } from "@/components/ui/MagneticCursor";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const orbitron = Orbitron({ 
@@ -101,6 +102,7 @@ export default function RootLayout({
             </LenisProvider>
           </ThemeProvider>
         </SessionProvider>
+        <Analytics />
       </body>
     </html>
   );
