@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
+import { Coupon } from '@/models/Coupon';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
@@ -101,7 +102,9 @@ export async function GET(
       );
     }
 
-    const enrollment = await Enrollment.findById(id).populate('courseId', 'title duration schedule meetLink');
+    const enrollment = await Enrollment.findById(id)
+      .populate('courseId', 'title duration schedule meetLink')
+      .populate('studentId', 'name email phone whatsappNumber collegeName branch semester rollNumber city referrer');
 
     if (!enrollment) {
       return NextResponse.json(
@@ -110,9 +113,35 @@ export async function GET(
       );
     }
 
+    let couponDescription = '';
+    if (enrollment.couponCode) {
+      const couponDoc = await Coupon.findOne({ code: enrollment.couponCode }).select('description');
+      couponDescription = couponDoc?.description || '';
+    }
+
+    const enrollmentObj = enrollment.toObject();
+
     return NextResponse.json({ 
       success: true,
-      student: enrollment 
+      student: {
+        ...enrollmentObj,
+        _id: enrollmentObj._id.toString(),
+        enrollmentId: enrollmentObj._id.toString(),
+        // Map student data from populated studentId
+        email: enrollmentObj.studentId?.email || enrollmentObj.studentEmail,
+        phone: enrollmentObj.studentId?.phone || enrollmentObj.phone,
+        whatsappNumber: enrollmentObj.studentId?.whatsappNumber || enrollmentObj.whatsappNumber,
+        collegeName: enrollmentObj.studentId?.collegeName || '',
+        branch: enrollmentObj.studentId?.branch || '',
+        semester: enrollmentObj.studentId?.semester || '',
+        rollNumber: enrollmentObj.studentId?.rollNumber || '',
+        city: enrollmentObj.studentId?.city || enrollmentObj.city,
+        referrer: enrollmentObj.studentId?.referrer || '',
+        // Keep courseId as populated object
+        courseId: enrollmentObj.courseId,
+        // Add coupon description
+        couponDescription,
+      }
     });
   } catch (error) {
     console.error('Error fetching enrollment:', error);

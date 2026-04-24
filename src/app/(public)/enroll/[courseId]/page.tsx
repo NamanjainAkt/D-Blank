@@ -56,16 +56,16 @@ const stepConfig = [
 ];
 
 const validationMessages: Record<string, string> = {
-  name: 'Please enter your full name',
-  email: 'A valid email address is required',
-  phone: 'Phone number is required for communication',
-  collegeName: 'Please enter your college or institute name',
-  branch: 'Your branch or specialization is required',
-  year: 'Please select your current year',
-  semester: 'Please select your current semester',
-  rollNumber: 'University roll number is required',
-  city: 'Please enter your city',
-  paymentReferenceId: 'Transaction Reference ID is required to verify payment',
+  name: 'Enter your full name as per documents',
+  email: 'Enter a valid email address (e.g., name@example.com)',
+  phone: 'Enter a valid 10-digit mobile number (starting with 6-9)',
+  collegeName: 'Enter your college or institute name',
+  branch: 'Enter your branch or specialization (e.g., Computer Science)',
+  year: 'Select your current year of study',
+  semester: 'Select your current semester',
+  rollNumber: 'Enter your university roll number',
+  city: 'Enter your city name',
+  paymentReferenceId: 'Enter the UTR/Transaction ID from your payment',
 };
 
 function InputField({ label, icon: Icon, value, onChange, placeholder, error, type = 'text', required = false }: {
@@ -235,9 +235,9 @@ export default function EnrollPage({ params }: { params: Promise<{ courseId: str
     if (currentStep === 1) {
       if (!formData.name.trim()) errs.name = validationMessages.name;
       if (!formData.email.trim()) errs.email = validationMessages.email;
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errs.email = 'Please enter a valid email address';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errs.email = 'Enter a valid email like name@example.com';
       if (!formData.phone.trim()) errs.phone = validationMessages.phone;
-      else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\s/g, ''))) errs.phone = 'Please enter a valid 10-digit phone number';
+      else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\s/g, ''))) errs.phone = 'Mobile must be 10 digits starting with 6, 7, 8, or 9';
     } else if (currentStep === 2) {
       if (!formData.collegeName.trim()) errs.collegeName = validationMessages.collegeName;
       if (!formData.branch.trim()) errs.branch = validationMessages.branch;

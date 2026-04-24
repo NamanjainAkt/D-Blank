@@ -11,6 +11,7 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
+        rememberMe: { label: 'Remember Me', type: 'checkbox' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -39,21 +40,26 @@ export const authOptions: NextAuthOptions = {
           id: admin._id.toString(),
           email: admin.email,
           name: admin.name,
+          rememberMe: credentials.rememberMe === 'true',
         };
       },
     }),
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60, // 24 hours
+    maxAge: 30 * 24 * 60 * 60, // 30 days for all environments
   },
   pages: {
     signIn: '/admin/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === 'update' && session) {
+        token.name = session.name;
+      }
       if (user) {
         token.id = user.id;
+        token.rememberMe = (user as any).rememberMe || false;
       }
       return token;
     },

@@ -43,6 +43,7 @@ interface Student {
   semester: string;
   rollNumber: string;
   city: string;
+  referrer?: string;
   courseId?: {
     title: string;
     duration: string;
@@ -52,10 +53,14 @@ interface Student {
   courseName: string;
   paymentStatus: 'paid' | 'pending' | 'failed' | 'rejected';
   paymentAmount: number;
+  originalAmount: number;
+  discountAmount: number;
   paymentId: string;
   paymentReferenceId: string;
   paymentReceiptUrl: string;
   adminNote: string;
+  couponCode?: string;
+  couponDescription?: string;
   paymentDate: string;
   enrollmentStatus: string;
   confirmationEmailSent: boolean;
@@ -73,10 +78,10 @@ interface InfoFieldProps {
 function InfoField({ label, value, mono = false, className = '', children }: InfoFieldProps) {
   return (
     <div className={className}>
-      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 mb-1.5">{label}</div>
+      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white mb-1.5">{label}</div>
       <div className={cn(
         "text-sm",
-        mono ? 'font-mono text-zinc-300 bg-white/5 px-2 py-1 rounded-sm border border-white/5 inline-block' : 'text-zinc-200'
+        mono ? 'font-mono text-white bg-white/5 px-2 py-1 rounded-sm border border-white/5 inline-block' : 'text-white'
       )}>
         {children || value}
       </div>
@@ -245,7 +250,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       <div className="flex items-center justify-center h-96" role="status" aria-label="Loading student details">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-laser-cyan" aria-hidden="true" />
-          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.2em]">Retrieving Personnel File...</span>
+          <span className="text-[10px] font-mono text-white uppercase tracking-[0.2em]">Retrieving Personnel File...</span>
         </div>
       </div>
     );
@@ -255,7 +260,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="flex flex-col items-center justify-center h-96 space-y-6">
         <AlertCircle className="w-12 h-12 text-red-500 opacity-50" aria-hidden="true" />
-        <p className="text-zinc-400 font-mono text-xs uppercase tracking-widest">{error}</p>
+        <p className="text-white font-mono text-xs uppercase tracking-widest">{error}</p>
         <Button 
           variant="outline" 
           onClick={() => router.push('/admin/enrollments')}
@@ -288,7 +293,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         <div className="space-y-4">
           <Link 
             href="/admin/enrollments" 
-            className="text-[10px] font-mono text-zinc-300 hover:text-laser-cyan uppercase tracking-[0.2em] transition-colors flex items-center gap-2"
+            className="text-[10px] font-mono text-white hover:text-laser-cyan uppercase tracking-[0.2em] transition-colors flex items-center gap-2"
           >
             <span aria-hidden="true">←</span> Back to Registry
           </Link>
@@ -296,20 +301,21 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             <h1 className="text-4xl font-display font-black text-white tracking-tighter uppercase">
               {student.studentName}
             </h1>
-            <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
+            <p className="text-[10px] font-mono text-white uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF]" />
               Personnel ID: {student.enrollmentId} // Archive Entry
             </p>
           </div>
         </div>
         <div className="flex gap-3">
-          <Button
-            onClick={() => openWhatsApp(whatsappPhone)}
-            className="bg-emerald-500 text-black hover:bg-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-10 px-6 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
-          >
-            <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
-            Open Uplink
-          </Button>
+            <Button
+              variant="green"
+              onClick={() => openWhatsApp(whatsappPhone)}
+              className="font-mono font-bold text-[10px] uppercase tracking-widest h-10 px-6 shadow-[0_0_15px_rgba(16,185,129,0.2)] text-white"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
+              Open Uplink
+            </Button>
           <Button
             variant="outline"
             onClick={() => copyToClipboard(student.phone)}
@@ -338,9 +344,13 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               <InfoField label="Legal Identity" value={student.studentName} />
               <InfoField label="Comm Link (Email)" value={
-                <a href={`mailto:${student.email}`} className="text-laser-cyan hover:underline transition-colors">
-                  {student.email}
-                </a>
+                student.email ? (
+                  <a href={`mailto:${student.email}`} className="text-laser-cyan hover:underline transition-colors">
+                    {student.email}
+                  </a>
+                ) : (
+                  <span className="text-white/40">Not provided</span>
+                )
               } />
               <InfoField label="Primary Comm" value={student.phone} mono />
               <InfoField label="WhatsApp Comm" value={whatsappPhone} mono />
@@ -362,13 +372,26 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <SectionCard title="Payment Evidence" icon={CreditCard}>
             <div className="space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <InfoField label="Course Enrolled" value={student.courseName || '-'} />
                 <InfoField label="Transaction Reference ID" value={student.paymentReferenceId || 'Not Provided'} mono />
-                <InfoField label="Admin Note" value={student.adminNote || 'No notes added'} />
               </div>
+
+              {(student.couponCode || student.discountAmount > 0) && (
+                <div className="p-4 bg-laser-cyan/5 border border-laser-cyan/20 rounded-sm">
+                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white mb-3">Coupon Applied</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <InfoField label="Coupon Code" value={student.couponCode || '-'} mono />
+                    <InfoField label="Discount Amount" value={student.discountAmount > 0 ? formatCurrency(student.discountAmount) : '-'} />
+                    {student.couponDescription && (
+                      <InfoField label="Description" value={student.couponDescription} className="sm:col-span-2" />
+                    )}
+                  </div>
+                </div>
+              )}
 
               {student.paymentReceiptUrl && (
                 <div>
-                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 mb-3">Verification Image</div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white mb-3">Verification Image</div>
                   <div className="relative aspect-video w-full max-w-md border border-white/5 bg-black overflow-hidden group">
                     <Image 
                       src={student.paymentReceiptUrl} 
@@ -391,11 +414,11 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
 
               {student.paymentStatus === 'pending' && (
                 <div className="flex flex-wrap gap-4 pt-4 border-t border-white/5">
-                  <Button
-                    onClick={() => updatePaymentStatus('paid')}
-                    disabled={updating}
-                    className="bg-emerald-500 text-black hover:bg-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-9 px-6"
-                  >
+                   <Button
+                     onClick={() => updatePaymentStatus('paid')}
+                     disabled={updating}
+                     className="bg-emerald-500 text-white hover:bg-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-9 px-6"
+                   >
                     {updating ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Check className="w-3 h-3 mr-2" />}
                     Approve Payment
                   </Button>
@@ -436,7 +459,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <SectionCard title="System Status" icon={Clock}>
             <div className="space-y-6">
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 mb-3">Credits Status</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white mb-3">Credits Status</div>
                 <Badge 
                   variant="outline"
                   className={cn(
@@ -444,30 +467,30 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                     student.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]' :
                     student.paymentStatus === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.1)]' :
                     student.paymentStatus === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]' :
-                    'bg-zinc-500/10 text-zinc-400 border-zinc-500/30'
+                    'bg-zinc-500/10 text-white border-zinc-500/30'
                   )}
                 >
                   {student.paymentStatus}
                 </Badge>
               </div>
               <div className="space-y-3">
-                <label htmlFor="enrollment-status" className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 block">
+                <label htmlFor="enrollment-status" className="text-[10px] font-mono uppercase tracking-[0.2em] text-white block">
                   Assignment Status
                 </label>
                 <Select value={student?.enrollmentStatus || 'pending'} onValueChange={updateEnrollmentStatus} disabled={updating}>
-                  <SelectTrigger id="enrollment-status" className="w-full bg-black/40 border-white/5 text-[10px] font-mono uppercase tracking-widest h-10">
+                  <SelectTrigger id="enrollment-status" className="w-full bg-ink/40 border-white/5 text-[10px] font-mono uppercase tracking-widest h-10 text-white">
                     {updating ? (
                       <Loader2 className="w-4 h-4 animate-spin text-laser-cyan" aria-hidden="true" />
                     ) : (
-                      <SelectValue />
+                      <SelectValue className="text-white" />
                     )}
                   </SelectTrigger>
                   <SelectContent className="bg-ink border-white/5">
-                    <SelectItem value="pending" className="text-[10px] font-mono uppercase tracking-widest">Pending</SelectItem>
-                    <SelectItem value="confirmed" className="text-[10px] font-mono uppercase tracking-widest">Confirmed</SelectItem>
-                    <SelectItem value="in_progress" className="text-[10px] font-mono uppercase tracking-widest">In Progress</SelectItem>
-                    <SelectItem value="completed" className="text-[10px] font-mono uppercase tracking-widest">Completed</SelectItem>
-                    <SelectItem value="cancelled" className="text-[10px] font-mono uppercase tracking-widest">Cancelled</SelectItem>
+                    <SelectItem value="pending" className="text-[10px] font-mono uppercase tracking-widest text-white">Pending</SelectItem>
+                    <SelectItem value="confirmed" className="text-[10px] font-mono uppercase tracking-widest text-white">Confirmed</SelectItem>
+                    <SelectItem value="in_progress" className="text-[10px] font-mono uppercase tracking-widest text-white">In Progress</SelectItem>
+                    <SelectItem value="completed" className="text-[10px] font-mono uppercase tracking-widest text-white">Completed</SelectItem>
+                    <SelectItem value="cancelled" className="text-[10px] font-mono uppercase tracking-widest text-white">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -478,30 +501,39 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <SectionCard title="Credits Ledger" icon={CreditCard}>
             <div className="space-y-6">
               <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-300 mb-2">Total Transfer</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white mb-2">Total Transfer</div>
                 <div className="text-3xl font-display font-black text-white tracking-tighter">
                   {student.paymentAmount ? formatCurrency(student.paymentAmount) : '-'}
                 </div>
               </div>
-              <InfoField label="Transaction Hash" value={student.paymentId || '-'} mono />
-              <InfoField label="Timestamp" value={
-                student.paymentDate 
-                  ? format(new Date(student.paymentDate), 'yyyy.MM.dd // HH:mm')
-                  : '-'
-              } />
+               <InfoField label="Transaction Hash" value={student.paymentReferenceId?.trim() || student.paymentId?.trim() || '-'} mono />
+               <InfoField label="Timestamp" value={
+                  student.paymentDate 
+                    ? (() => {
+                        const date = new Date(student.paymentDate);
+                        return isNaN(date.getTime()) ? '-' : format(date, 'yyyy.MM.dd // HH:mm');
+                      })()
+                    : student.createdAt
+                    ? (() => {
+                        const date = new Date(student.createdAt);
+                        return isNaN(date.getTime()) ? '-' : format(date, 'yyyy.MM.dd // HH:mm');
+                      })()
+                    : '-'
+                } />
             </div>
           </SectionCard>
 
           {/* Quick Actions */}
           <SectionCard title="Control Panel" icon={ExternalLink}>
             <div className="space-y-3">
-              <Button
-                onClick={() => openWhatsApp(whatsappPhone)}
-                className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-10 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
-                Initiate Comm
-              </Button>
+                <Button
+                  variant="green"
+                  onClick={() => openWhatsApp(whatsappPhone)}
+                  className="w-full font-mono font-bold text-[10px] uppercase tracking-widest h-10 shadow-[0_0_15px_rgba(16,185,129,0.1)] text-white"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
+                  Initiate Comm
+                </Button>
               <Button
                 variant="outline"
                 onClick={resendConfirmationEmail}
@@ -535,8 +567,8 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
               <div className="flex gap-4 group/log">
                 <div className="w-1.5 h-1.5 mt-2 rounded-full bg-laser-cyan shadow-[0_0_8px_#00F0FF] flex-shrink-0 group-hover/log:scale-125 transition-transform" />
                 <div>
-                  <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-300">File Created</div>
-                  <div className="text-[10px] font-mono text-zinc-300 mt-1">
+                  <div className="text-[11px] font-mono uppercase tracking-widest text-white">File Created</div>
+                  <div className="text-[10px] font-mono text-white mt-1">
                     {format(new Date(student.createdAt), 'yyyy.MM.dd // HH:mm')}
                   </div>
                 </div>
@@ -545,8 +577,8 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 <div className="flex gap-4 group/log">
                   <div className="w-1.5 h-1.5 mt-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] flex-shrink-0 group-hover/log:scale-125 transition-transform" />
                   <div>
-                    <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-300">Credits Received</div>
-                    <div className="text-[10px] font-mono text-zinc-300 mt-1">
+                    <div className="text-[11px] font-mono uppercase tracking-widest text-white">Credits Received</div>
+                    <div className="text-[10px] font-mono text-white mt-1">
                       {format(new Date(student.paymentDate), 'yyyy.MM.dd // HH:mm')}
                     </div>
                   </div>

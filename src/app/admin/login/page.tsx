@@ -10,6 +10,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
 
@@ -22,6 +23,7 @@ export default function AdminLoginPage() {
         redirect: false,
         email,
         password,
+        rememberMe: rememberMe.toString(),
       });
 
       if (result?.error) {
@@ -93,6 +95,19 @@ export default function AdminLoginPage() {
                 required
                 autoComplete="current-password"
               />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="remember"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-zinc-600 bg-black text-laser-cyan focus:ring-laser-cyan focus:ring-offset-0"
+              />
+              <label htmlFor="remember" className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                Keep session alive
+              </label>
             </div>
 
             <button

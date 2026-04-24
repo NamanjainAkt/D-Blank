@@ -4,7 +4,10 @@ import { SessionProvider as NextAuthSessionProvider } from 'next-auth/react';
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   return (
-    <NextAuthSessionProvider>
+    <NextAuthSessionProvider
+      refetchInterval={60 * 5}
+      refetchOnWindowFocus={true}
+    >
       {children}
     </NextAuthSessionProvider>
   );

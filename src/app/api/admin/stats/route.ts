@@ -127,12 +127,17 @@ export async function GET(request: Request) {
       recentEnrollments,
       recentGames,
       enrollmentTrend,
-      courseSaturation: courses.map((c: any) => ({
-        name: c.title,
-        seats: c.totalSeats,
-        filled: c.enrolledCount,
-        percentage: Math.round((c.enrolledCount / c.totalSeats) * 100),
-      })),
+      courseSaturation: courses.map((c: any) => {
+        const seats = c.totalSeats || 0;
+        const filled = c.enrolledCount || 0;
+        const percentage = seats > 0 ? Math.min(Math.round((filled / seats) * 100), 100) : 0;
+        return {
+          name: c.title,
+          seats,
+          filled,
+          percentage,
+        };
+      }),
     });
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
