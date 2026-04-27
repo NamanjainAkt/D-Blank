@@ -186,6 +186,12 @@ export default function HomePage() {
                     href="/games"
                     className="group w-full sm:w-auto"
                   />
+                  <CrystalButton
+                    href="/courses"
+                    primaryText="Explore Training"
+                    secondaryText="Level Up!"
+                    className="group w-full sm:w-auto"
+                  />
                 </div>
               </div>
 

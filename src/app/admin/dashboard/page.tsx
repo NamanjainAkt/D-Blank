@@ -176,7 +176,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: "Total Revenue",
-      value: `₹${(stats.overall.totalRevenue / 100000).toFixed(1)}L`,
+      value: `₹${(stats.overall.totalRevenue / 1000).toFixed(1)}k`,
       icon: CreditCard,
       trend: "15%",
       trendUp: true

@@ -5,6 +5,8 @@ import { Course } from '@/models/Course';
 import { authOptions } from '@/lib/auth';
 import { courseSchema } from '@/lib/validations';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);

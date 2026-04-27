@@ -34,7 +34,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Plus, Edit, AlertCircle, CheckCircle2, Loader2, BookOpen } from 'lucide-react';
+import { Plus, Edit, AlertCircle, CheckCircle2, Loader2, BookOpen, Copy, Trash2 } from 'lucide-react';
 import CourseForm from '@/components/admin/courses/CourseForm';
 import { CourseFormData } from '@/lib/validations';
 
@@ -124,6 +124,49 @@ export default function AdminCoursesPage() {
   const handleEdit = (course: any) => {
     setEditingCourse(course);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this course?')) return;
+    
+    try {
+      const res = await fetch(`/api/admin/courses/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete course');
+      }
+      fetchCourses();
+      showSuccess('Course deleted successfully');
+    } catch (err: any) {
+      console.error('Error deleting course:', err);
+      alert(err.message || 'Failed to delete course');
+    }
+  };
+
+  const handleDuplicate = async (course: Course) => {
+    try {
+      setSaving(true);
+      const { _id, ...courseData } = course;
+      courseData.title = `${course.title} (Copy)`;
+      courseData.slug = `${course.slug}-copy-${Date.now()}`;
+      courseData.isPublished = false;
+      courseData.enrolledCount = 0;
+      
+      const res = await fetch('/api/admin/courses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(courseData),
+      });
+
+      if (!res.ok) throw new Error('Failed to duplicate course');
+      fetchCourses();
+      showSuccess('Course duplicated successfully');
+    } catch (err: any) {
+      console.error('Error duplicating course:', err);
+      alert('Failed to duplicate course');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleTogglePublish = async (course: Course) => {
@@ -299,14 +342,35 @@ export default function AdminCoursesPage() {
                         </button>
                       </TableCell>
                       <TableCell className="text-right py-5 px-6">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green transition-all"
-                          onClick={() => handleEdit(course)}
-                        >
-                          <Edit className="w-3.5 h-3.5" />
-                        </Button>
+                        <div className="flex items-center justify-end gap-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="Duplicate Course"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-zinc-400 hover:text-acid-green transition-all"
+                            onClick={() => handleDuplicate(course as any)}
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="Edit Course"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green transition-all"
+                            onClick={() => handleEdit(course)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="Delete Course"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-500 transition-all"
+                            onClick={() => handleDelete(course._id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

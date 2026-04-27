@@ -58,9 +58,33 @@ export default function ContactPage() {
     return () => observer.disconnect();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Operational dispatch initiated:', formData);
+    setIsSubmitting(true);
+    setError('');
+    
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send message');
+
+      setSuccess(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setSuccess(false), 5000);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactMethods = [
@@ -178,6 +202,18 @@ export default function ContactPage() {
                   </div>
                 </div>
 
+                {success && (
+                  <div className="mb-8 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[10px] uppercase tracking-widest text-center animate-fade-up">
+                    Operation Successful // Message Dispatched
+                  </div>
+                )}
+
+                {error && (
+                  <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-400 font-mono text-[10px] uppercase tracking-widest text-center animate-fade-up">
+                    Critical Error // {error}
+                  </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-3">
@@ -226,11 +262,13 @@ export default function ContactPage() {
                   
                   <div className="flex justify-center pt-4">
                     <div data-magnetic>
-                      <CrystalButton 
-                        primaryText="Send Message" 
-                        secondaryText="Sending..." 
-                        className="scale-90 md:scale-100"
-                      />
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="bg-primary/20 hover:bg-primary/30 border border-primary/50 text-primary font-black italic uppercase tracking-widest px-10 py-4 rounded-xl transition-all disabled:opacity-50"
+                      >
+                        {isSubmitting ? 'Dispatching...' : 'Send Message'}
+                      </button>
                     </div>
                   </div>
                 </form>

@@ -7,6 +7,8 @@ import { Game } from '@/models/Game';
 import { Student } from '@/models/Student';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -100,11 +102,27 @@ export async function GET(request: Request) {
       { $sort: { _id: 1 } },
     ]);
 
-    // Course saturation
+    // Course saturation - calculate from Enrollment collection
     const courses = await Course.find({ isPublished: true })
-      .select('title totalSeats enrolledCount')
-      .sort({ enrolledCount: -1 })
+      .select('title totalSeats')
+      .sort({ title: 1 })
       .limit(5);
+
+    // Get real enrollment counts from Enrollment collection
+    const enrollmentCounts = await Enrollment.aggregate([
+      { $match: { paymentStatus: 'paid', courseId: { $ne: null } } },
+      {
+        $group: {
+          _id: '$courseId',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const enrollmentCountMap = enrollmentCounts.reduce((acc: Record<string, number>, item: any) => {
+      acc[item._id?.toString() || ''] = item.count;
+      return acc;
+    }, {});
 
     return NextResponse.json({
       today: {
@@ -128,8 +146,9 @@ export async function GET(request: Request) {
       recentGames,
       enrollmentTrend,
       courseSaturation: courses.map((c: any) => {
-        const seats = c.totalSeats || 0;
-        const filled = c.enrolledCount || 0;
+        const courseId = c._id.toString();
+        const seats = c.totalSeats || 60;
+        const filled = enrollmentCountMap[courseId] || 0;
         const percentage = seats > 0 ? Math.min(Math.round((filled / seats) * 100), 100) : 0;
         return {
           name: c.title,

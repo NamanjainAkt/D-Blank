@@ -7,6 +7,10 @@ function getResendClient() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
+const FROM_EMAIL = 'D-Blanks <support@dblanks.site>';
+const ADMIN_EMAIL = 'admin@dblanks.site';
+const WHATSAPP_GROUP = 'https://chat.whatsapp.com/HPdK6rY0ykn4kov4Dlv2ki?mode=gi_t';
+
 interface EnrollmentConfirmationProps {
   studentName: string;
   email: string;
@@ -26,21 +30,20 @@ export async function sendEnrollmentConfirmation({
   duration,
   schedule,
   meetLink,
-  whatsappGroupLink,
+  whatsappGroupLink = WHATSAPP_GROUP,
 }: EnrollmentConfirmationProps) {
   const resend = getResendClient();
   
   if (!resend) {
     console.log('RESEND_API_KEY not configured. Skipping email send.');
-    console.log('Email details:', { email, courseName, enrollmentId });
     return { success: false, error: 'Email service not configured' };
   }
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'D-Blanks <onboarding@resend.dev>',
+      from: FROM_EMAIL,
       to: email,
-      subject: `Enrollment Confirmed: ${courseName}`,
+      subject: `CONGRATULATIONS: Your Enrollment is Confirmed! - ${courseName}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -49,112 +52,82 @@ export async function sendEnrollmentConfirmation({
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Enrollment Confirmation</title>
         </head>
-        <body style="margin: 0; padding: 0; background-color: #000000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <body style="margin: 0; padding: 0; background-color: #000000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px; border: 1px solid #1a1a1a; background: linear-gradient(180deg, #050505 0%, #000000 100%);">
             
             <!-- Header -->
-            <div style="text-align: center; margin-bottom: 40px;">
-              <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px;">
-                <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
-                <span style="color: #ffffff; font-size: 20px; font-weight: bold;">D-Blanks</span>
-              </div>
-              <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0 0 16px 0;">
-                Enrollment Confirmed! 🎉
+            <div style="text-align: center; margin-bottom: 40px; border-bottom: 1px solid #1a1a1a; padding-bottom: 30px;">
+              <h1 style="color: #06b6d4; font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 4px; margin: 0;">
+                D-BLANKS
               </h1>
-              <p style="color: #888888; font-size: 16px; margin: 0;">
-                Welcome to ${courseName}
+              <p style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-top: 10px;">
+                // SECURE UPLINK ESTABLISHED
               </p>
             </div>
 
-            <!-- Main Card -->
-            <div style="background-color: #111111; border: 1px solid #222222; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
-              
-              <!-- Greeting -->
-              <p style="color: #ffffff; font-size: 18px; margin: 0 0 24px 0;">
-                Hi ${studentName},
+            <!-- Hero Section -->
+            <div style="text-align: center; margin-bottom: 40px;">
+              <h2 style="font-size: 32px; font-weight: 900; margin: 0; text-transform: uppercase; font-style: italic; color: #ffffff;">
+                CONGRATULATIONS
+              </h2>
+              <p style="color: #10b981; font-size: 16px; font-weight: bold; margin-top: 10px;">
+                YOU ARE SUCCESSFULLY ENROLLED
               </p>
-              
-              <p style="color: #888888; font-size: 14px; line-height: 1.6; margin: 0 0 32px 0;">
-                Your enrollment has been confirmed. Here are your course details:
+            </div>
+
+            <!-- Content -->
+            <div style="padding: 0 20px;">
+              <p style="font-size: 16px; line-height: 1.6; color: #ccc;">
+                Hi <strong style="color: #fff;">${studentName}</strong>,
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; color: #888; margin-bottom: 30px;">
+                We have reviewed your request for <span style="color: #06b6d4; font-weight: bold;">${courseName}</span>. Your personnel file has been authorized and your module access is now active.
               </p>
 
-              <!-- Enrollment ID -->
-              <div style="background-color: #1a1a1a; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
-                <p style="color: #666666; font-size: 10px; font-family: monospace; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 8px 0;">
-                  Enrollment ID
-                </p>
-                <p style="color: #ffffff; font-size: 20px; font-family: monospace; font-weight: 500; margin: 0;">
-                  ${enrollmentId}
-                </p>
+              <!-- Stats Grid -->
+              <div style="background-color: #0a0a0a; border: 1px solid #1a1a1a; padding: 25px; border-radius: 4px; margin-bottom: 40px;">
+                <div style="margin-bottom: 20px; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px;">
+                  <span style="color: #444; font-size: 10px; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">Module Name</span>
+                  <span style="font-size: 16px; font-weight: bold; color: #fff;">${courseName}</span>
+                </div>
+                <div style="margin-bottom: 20px; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px;">
+                  <span style="color: #444; font-size: 10px; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">Personnel ID</span>
+                  <span style="font-size: 16px; font-family: monospace; color: #06b6d4;">#${enrollmentId}</span>
+                </div>
+                <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 20px;">
+                   <div style="display: inline-block; width: 45%;">
+                      <span style="color: #444; font-size: 10px; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">Duration</span>
+                      <span style="font-size: 14px; color: #fff;">${duration}</span>
+                   </div>
+                   <div style="display: inline-block; width: 45%;">
+                      <span style="color: #444; font-size: 10px; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px;">Schedule</span>
+                      <span style="font-size: 14px; color: #fff;">${schedule}</span>
+                   </div>
+                </div>
               </div>
 
-              <!-- Course Details -->
-              <div style="margin-bottom: 24px;">
-                <h3 style="color: #ffffff; font-size: 16px; font-weight: 600; margin: 0 0 16px 0;">Course Details</h3>
-                
-                <table style="width: 100%; border-collapse: collapse;">
-                  <tr>
-                    <td style="padding: 12px 0; border-bottom: 1px solid #222222; color: #666666; font-size: 14px;">Course</td>
-                    <td style="padding: 12px 0; border-bottom: 1px solid #222222; color: #ffffff; font-size: 14px; text-align: right;">${courseName}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 12px 0; border-bottom: 1px solid #222222; color: #666666; font-size: 14px;">Duration</td>
-                    <td style="padding: 12px 0; border-bottom: 1px solid #222222; color: #ffffff; font-size: 14px; text-align: right;">${duration}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 12px 0; color: #666666; font-size: 14px;">Schedule</td>
-                    <td style="padding: 12px 0; color: #ffffff; font-size: 14px; text-align: right;">${schedule}</td>
-                  </tr>
-                </table>
-              </div>
-
-              <!-- Google Meet Button -->
-              <div style="text-align: center; margin-bottom: 24px;">
-                <a href="${meetLink}" style="display: inline-block; background-color: #10b981; color: #000000; text-decoration: none; font-size: 14px; font-weight: 600; padding: 14px 32px; border-radius: 8px;">
-                  Join Google Meet Class
+              <!-- CTA Section -->
+              <div style="text-align: center; margin-bottom: 40px;">
+                <p style="color: #888; font-size: 13px; margin-bottom: 20px;">Please join the tactical communication group for further updates:</p>
+                <a href="${whatsappGroupLink}" style="display: inline-block; background-color: #25D366; color: #fff; text-decoration: none; font-weight: 800; font-size: 14px; padding: 15px 40px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
+                  JOIN WHATSAPP GROUP
                 </a>
               </div>
 
-              <!-- WhatsApp Group -->
-              ${whatsappGroupLink ? `
-              <div style="text-align: center; margin-bottom: 24px;">
-                <a href="${whatsappGroupLink}" style="display: inline-block; background-color: #25D366; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600; padding: 14px 32px; border-radius: 8px;">
-                  Join WhatsApp Group
-                </a>
-              </div>
-              ` : ''}
-
-              <!-- Checklist -->
-              <div style="background-color: #1a1a1a; border-radius: 12px; padding: 24px;">
-                <h4 style="color: #ffffff; font-size: 14px; font-weight: 600; margin: 0 0 16px 0;">Next Steps</h4>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                  <li style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-                    <span style="flex-shrink: 0; width: 20px; height: 20px; background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 10px;">✓</span>
-                    <span style="color: #888888; font-size: 14px;">Save your enrollment ID for future reference</span>
-                  </li>
-                  <li style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-                    <span style="flex-shrink: 0; width: 20px; height: 20px; background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 10px;">✓</span>
-                    <span style="color: #888888; font-size: 14px;">Join the WhatsApp group for updates</span>
-                  </li>
-                  <li style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-                    <span style="flex-shrink: 0; width: 20px; height: 20px; background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 10px;">✓</span>
-                    <span style="color: #888888; font-size: 14px;">Mark your calendar for the first session</span>
-                  </li>
-                  <li style="display: flex; align-items: flex-start; gap: 12px;">
-                    <span style="flex-shrink: 0; width: 20px; height: 20px; background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 10px;">✓</span>
-                    <span style="color: #888888; font-size: 14px;">Ensure you have a stable internet connection</span>
-                  </li>
-                </ul>
+              <div style="text-align: center;">
+                 <a href="${meetLink}" style="color: #06b6d4; font-size: 12px; font-weight: bold; text-decoration: none; border-bottom: 1px solid #06b6d4;">
+                   Access Virtual Learning Environment (Meet)
+                 </a>
               </div>
             </div>
 
             <!-- Footer -->
-            <div style="text-align: center; padding-top: 24px;">
-                <p style="color: #666666; font-size: 12px; margin: 0 0 8px 0;">
-                  Need help? Contact us at <a href="mailto:arshgupta723@gmail.com" style="color: #3b82f6;">arshgupta723@gmail.com</a>
-                </p>
-              <p style="color: #444444; font-size: 12px; margin: 0;">
-                © 2026 D-Blanks. All rights reserved.
+            <div style="margin-top: 60px; padding-top: 30px; border-top: 1px solid #1a1a1a; text-align: center;">
+              <p style="color: #444; font-size: 11px; margin-bottom: 10px;">
+                THIS IS AN AUTOMATED DISPATCH. DO NOT REPLY TO THIS UPLINK.
+              </p>
+              <p style="color: #666; font-size: 11px;">
+                © 2026 D-BLANKS OPERATIONS. ALL RIGHTS RESERVED.
               </p>
             </div>
           </div>
@@ -164,23 +137,56 @@ export async function sendEnrollmentConfirmation({
     });
 
     if (error) {
-      console.error('Email send error:', error);
-      return { success: false, error };
+      console.error('Resend error:', error);
+      return { success: false, error: error.message || 'Failed to send email' };
     }
 
     return { success: true, data };
-  } catch (error) {
-    console.error('Email send error:', error);
-    return { success: false, error };
+  } catch (err: any) {
+    console.error('Email send error:', err);
+    return { success: false, error: err.message || 'Internal server error' };
   }
 }
 
-interface PaymentConfirmationProps {
-  studentName: string;
+export async function sendContactFormEmail({
+  name,
+  email,
+  subject,
+  message,
+}: {
+  name: string;
   email: string;
-  courseName: string;
-  amount: number;
-  transactionId: string;
+  subject: string;
+  message: string;
+}) {
+  const resend = getResendClient();
+  if (!resend) return { success: false, error: 'Email service not configured' };
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: `D-Blanks Contact <contact@dblanks.site>`,
+      to: ADMIN_EMAIL,
+      replyTo: email,
+      subject: `NEW INQUIRY: ${subject}`,
+      html: `
+        <div style="background-color: #000; color: #fff; padding: 30px; font-family: sans-serif;">
+          <h2 style="color: #06b6d4; border-bottom: 1px solid #333; padding-bottom: 10px;">New Contact Form Submission</h2>
+          <p><strong>From:</strong> ${name} (${email})</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <div style="background: #111; padding: 20px; border-radius: 5px; margin-top: 20px;">
+            <p style="white-space: pre-wrap;">${message}</p>
+          </div>
+        </div>
+      `,
+    });
+
+    if (error) {
+       return { success: false, error: error.message || 'Failed to send contact email' };
+    }
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Internal error' };
+  }
 }
 
 export async function sendPaymentConfirmation({
@@ -189,61 +195,40 @@ export async function sendPaymentConfirmation({
   courseName,
   amount,
   transactionId,
-}: PaymentConfirmationProps) {
+}: {
+  studentName: string;
+  email: string;
+  courseName: string;
+  amount: number;
+  transactionId: string;
+}) {
   const resend = getResendClient();
-  
-  if (!resend) {
-    console.log('RESEND_API_KEY not configured. Skipping email send.');
-    return { success: false, error: 'Email service not configured' };
-  }
+  if (!resend) return { success: false, error: 'Email service not configured' };
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'D-Blanks <onboarding@resend.dev>',
+      from: FROM_EMAIL,
       to: email,
-      subject: `Payment Received: ₹${amount.toLocaleString()} - ${courseName}`,
+      subject: `PAYMENT RECEIVED: ₹${amount.toLocaleString()} for ${courseName}`,
       html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Payment Confirmation</title>
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #000000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-            <div style="text-align: center; margin-bottom: 40px;">
-              <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px;">
-                <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
-                <span style="color: #ffffff; font-size: 20px; font-weight: bold;">D-Blanks</span>
-              </div>
-              <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0 0 16px 0;">Payment Received ✓</h1>
-            </div>
-            <div style="background-color: #111111; border: 1px solid #222222; border-radius: 16px; padding: 32px;">
-              <p style="color: #ffffff; font-size: 18px; margin: 0 0 24px 0;">Hi ${studentName},</p>
-              <p style="color: #888888; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
-                We have received your payment for <strong style="color: #ffffff;">${courseName}</strong>.
-              </p>
-              <div style="background-color: #1a1a1a; border-radius: 12px; padding: 24px; text-align: center;">
-                <p style="color: #666666; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 8px 0;">Amount Paid</p>
-                <p style="color: #10b981; font-size: 32px; font-family: monospace; font-weight: 500; margin: 0;">₹${amount.toLocaleString()}</p>
-                <p style="color: #666666; font-size: 12px; margin: 16px 0 0 0;">Transaction ID: ${transactionId}</p>
-              </div>
-            </div>
-            <div style="text-align: center; padding-top: 24px;">
-                <p style="color: #666666; font-size: 12px; margin: 0;">Questions? Contact <a href="mailto:arshgupta723@gmail.com" style="color: #3b82f6;">arshgupta723@gmail.com</a></p>
-            </div>
+        <div style="background-color: #000; color: #fff; padding: 40px; font-family: sans-serif; text-align: center;">
+          <h1 style="color: #10b981; text-transform: uppercase;">Payment Verified ✓</h1>
+          <p>Hi ${studentName}, we have received your payment for <strong>${courseName}</strong>.</p>
+          <div style="background: #111; padding: 30px; border: 1px solid #222; margin: 20px auto; max-width: 400px;">
+            <p style="color: #888; font-size: 12px; text-transform: uppercase;">Amount Paid</p>
+            <p style="font-size: 32px; color: #10b981; font-weight: bold; margin: 10px 0;">₹${amount.toLocaleString()}</p>
+            <p style="color: #444; font-size: 11px;">Transaction ID: ${transactionId}</p>
           </div>
-        </body>
-        </html>
+          <p style="color: #666; font-size: 12px;">Our team is reviewing your enrollment. You will receive a briefing email shortly.</p>
+        </div>
       `,
     });
 
     if (error) {
-      return { success: false, error };
+       return { success: false, error: error.message || 'Failed to send payment confirmation' };
     }
-
     return { success: true, data };
-  } catch (error) {
-    return { success: false, error };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Internal error' };
   }
 }

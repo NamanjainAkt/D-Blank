@@ -23,15 +23,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Download, Search, ChevronLeft, ChevronRight, Eye, AlertCircle, Loader2 } from 'lucide-react';
+import { Download, Search, ChevronLeft, ChevronRight, Eye, AlertCircle, Loader2, Plus, Trash2 } from 'lucide-react';
+import { EnrollmentFormModal } from '@/components/admin/enrollments/EnrollmentFormModal';
 
 interface Student {
   _id: string;
-  enrollmentId: string;
   studentName: string;
   email: string;
   phone: string;
-  collegeName: string;
+  studentId?: { collegeName: string };
+  collegeName?: string; // Fallback
   branch: string;
   semester: string;
   rollNumber: string;
@@ -65,6 +66,9 @@ export default function AdminEnrollmentsPage() {
     const status = searchParams.get('status');
     return status === '' || status === null ? 'all' : status;
   });
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
   
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -183,6 +187,25 @@ export default function AdminEnrollmentsPage() {
     router.push(`/admin/enrollments?${params.toString()}`);
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this enrollment?')) return;
+    try {
+      setDeleting(id);
+      const res = await fetch(`/api/admin/enrollments/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete enrollment');
+      }
+      fetchStudents(false);
+      showSuccess('Enrollment deleted successfully');
+    } catch (err: any) {
+      console.error('Error deleting enrollment:', err);
+      alert(err.message || 'Failed to delete enrollment');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   return (
     <div className="space-y-10 animate-fade-up">
       {/* Header */}
@@ -198,10 +221,17 @@ export default function AdminEnrollmentsPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-laser-cyan text-black hover:bg-laser-cyan/90 text-[10px] font-mono font-bold uppercase tracking-widest px-6"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Enrollment
+          </Button>
+          <Button 
             variant="outline" 
             onClick={handleExport}
             size="sm"
-            className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest h-9"
+            className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-laser-cyan/50 text-[10px] font-mono uppercase tracking-widest h-10"
           >
             <Download className="w-3.5 h-3.5 mr-2" />
             Export Archive
@@ -281,8 +311,8 @@ export default function AdminEnrollmentsPage() {
                       </TableCell>
                       <TableCell className="py-5">
                         <div className="flex flex-col">
-                          <span className="text-[11px] font-mono text-zinc-400">{student.enrollmentId}</span>
-                          <span className="text-[9px] font-mono text-zinc-400 uppercase">{student.collegeName}</span>
+                          <span className="text-[11px] font-mono text-zinc-400">{student._id.slice(-8).toUpperCase()}</span>
+                          <span className="text-[9px] font-mono text-zinc-400 uppercase">{student.studentId?.collegeName || student.collegeName || 'N/A'}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-5">
@@ -304,14 +334,27 @@ export default function AdminEnrollmentsPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right py-5">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 text-laser-cyan transition-all"
-                          onClick={() => router.push(`/admin/enrollments/${student._id}`)}
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </Button>
+                        <div className="flex justify-end gap-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="View Enrollment"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 text-laser-cyan transition-all"
+                            onClick={() => router.push(`/admin/enrollments/${student._id}`)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="Delete Enrollment"
+                            disabled={deleting === student._id}
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-500 transition-all disabled:opacity-50"
+                            onClick={() => handleDelete(student._id)}
+                          >
+                            {deleting === student._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -350,6 +393,12 @@ export default function AdminEnrollmentsPage() {
           </div>
         </div>
       )}
+
+      <EnrollmentFormModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSuccess={() => fetchStudents(false)} 
+      />
     </div>
   );
 }

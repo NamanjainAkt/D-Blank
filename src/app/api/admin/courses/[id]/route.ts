@@ -84,12 +84,22 @@ export async function DELETE(
     await dbConnect();
     const { id } = await params;
 
-    // Soft delete - just unpublish
-    const course = await Course.findByIdAndUpdate(
-      id,
-      { $set: { isPublished: false } },
-      { new: true }
-    );
+    // Check for existing enrollments
+    const mongoose = require('mongoose');
+    const EnrollmentModel = mongoose.models.Enrollment;
+    
+    if (EnrollmentModel) {
+      const hasEnrollments = await EnrollmentModel.exists({ courseId: id });
+      if (hasEnrollments) {
+        return NextResponse.json(
+          { error: 'Cannot delete course. There are students enrolled in this course.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Hard delete
+    const course = await Course.findByIdAndDelete(id);
 
     if (!course) {
       return NextResponse.json(

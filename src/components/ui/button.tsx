@@ -21,7 +21,7 @@ const buttonVariants = cva(
         // Cyberpunk variants
         cyber: "bg-neon-purple text-white border-2 border-neon-purple shadow-[0_0_20px_rgba(176,38,255,0.3)] hover:bg-cyber-pink hover:border-cyber-pink hover:shadow-[0_0_30px_rgba(255,0,127,0.4)]",
         laser: "bg-laser-cyan text-white border-2 border-laser-cyan shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)]",
-        green: "bg-emerald text-white border-2 border-emerald shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]",
+        green: "bg-emerald text-white border-2 border-emerald shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:bg-emerald-light hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]",
       },
       size: {
         default: "h-10 px-5 py-2 rounded-none",

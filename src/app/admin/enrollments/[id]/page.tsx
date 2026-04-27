@@ -220,11 +220,12 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         setStudent({ ...student, confirmationEmailSent: true });
         showSuccess('Confirmation email sent successfully');
       } else {
-        setError(data.error || 'Failed to send email');
+        const errorMsg = typeof data.error === 'object' ? (data.error.message || JSON.stringify(data.error)) : data.error;
+        setError(errorMsg || 'Failed to send email');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error sending email:', err);
-      setError('Failed to send confirmation email');
+      setError(err.message || 'Failed to send confirmation email');
     } finally {
       setEmailSending(false);
     }
@@ -241,8 +242,11 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const openWhatsApp = (phone: string) => {
+    if (!student) return;
     const formatted = phone.replace(/\D/g, '');
-    window.open(`https://wa.me/91${formatted}`, '_blank', 'noopener,noreferrer');
+    const message = `*CONGRATULATIONS!* 🎉\n\nHi *${student.studentName}*,\n\nWe have reviewed your request for *${student.courseName}* and you are successfully enrolled! ✅\n\nPlease join the group for further updates:\nhttps://chat.whatsapp.com/HPdK6rY0ykn4kov4Dlv2ki?mode=gi_t\n\n_// Secure Uplink Established_`;
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/91${formatted}?text=${encoded}`, '_blank', 'noopener,noreferrer');
   };
 
   if (loading) {
@@ -307,11 +311,10 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             </p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-4">
             <Button
-              variant="green"
               onClick={() => openWhatsApp(whatsappPhone)}
-              className="font-mono font-bold text-[10px] uppercase tracking-widest h-10 px-6 shadow-[0_0_15px_rgba(16,185,129,0.2)] text-white"
+              className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-10 px-6 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
             >
               <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
               Open Uplink
@@ -527,9 +530,8 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <SectionCard title="Control Panel" icon={ExternalLink}>
             <div className="space-y-3">
                 <Button
-                  variant="green"
                   onClick={() => openWhatsApp(whatsappPhone)}
-                  className="w-full font-mono font-bold text-[10px] uppercase tracking-widest h-10 shadow-[0_0_15px_rgba(16,185,129,0.1)] text-white"
+                  className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 font-mono font-bold text-[10px] uppercase tracking-widest h-10 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
                   Initiate Comm

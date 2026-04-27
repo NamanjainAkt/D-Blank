@@ -50,9 +50,9 @@ export async function POST(request: Request) {
 
     const result = await sendEnrollmentConfirmation({
       studentName: enrollment.studentName,
-      email: enrollment.email,
+      email: enrollment.studentEmail || (enrollment as any).email,
       courseName: enrollment.courseName,
-      enrollmentId: enrollment.enrollmentId,
+      enrollmentId: enrollment._id.toString().slice(-8).toUpperCase(),
       duration: course?.duration || 'TBA',
       schedule: course?.schedule || 'TBA',
       meetLink: course?.meetLink || 'https://meet.google.com',

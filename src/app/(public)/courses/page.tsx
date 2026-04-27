@@ -48,7 +48,7 @@ export default function CoursesPage() {
   const fetchCourses = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/courses?category=${activeCategory}`);
+      const res = await fetch(`/api/courses`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       setCourses(data.courses || []);
@@ -57,7 +57,7 @@ export default function CoursesPage() {
     } finally {
       setLoading(false);
     }
-  }, [activeCategory]);
+  }, []);
 
   useEffect(() => {
     fetchCourses();
@@ -80,24 +80,8 @@ export default function CoursesPage() {
       <section className="py-20 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <AnimatedContent className="mb-12 text-center">
-            <Badge variant="outline" className="mb-4 text-primary border-primary/40 bg-primary/5">Course Categories</Badge>
-            <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter">Browse Courses</h2>
-            
-            <div className="inline-flex p-1.5 bg-zinc-900/80 backdrop-blur-md rounded-2xl border border-white/5 mt-8">
-              <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
-                <TabsList className="bg-transparent border-none">
-                  {courseCategories.map((cat) => (
-                    <TabsTrigger 
-                      key={cat.id} 
-                      value={cat.id}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-white text-[10px] font-mono uppercase tracking-[0.2em] px-6 py-2.5 rounded-xl transition-all"
-                    >
-                      {cat.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            </div>
+            <Badge variant="outline" className="mb-4 text-primary border-primary/40 bg-primary/5">Mission Training</Badge>
+            <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter">Browse Modules</h2>
           </AnimatedContent>
 
           {loading ? (

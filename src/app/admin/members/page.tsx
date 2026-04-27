@@ -3,26 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import { 
   Table, 
   TableBody, 
@@ -31,8 +14,15 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Switch } from '@/components/ui/switch';
-import { Plus, Edit, AlertCircle, CheckCircle2, Loader2, Users, X, Trash2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Plus, Edit, Loader2, Users, Trash2, CheckCircle2 } from 'lucide-react';
+import { MemberFormModal } from '@/components/admin/members/MemberFormModal';
 
 interface Member {
   _id: string;
@@ -52,38 +42,6 @@ interface Member {
   createdAt: string;
 }
 
-interface MemberFormData {
-  name: string;
-  designation: string;
-  bio: string;
-  skills: string[];
-  image: string;
-  handle: string;
-  type: 'founder' | 'team';
-  status: 'active' | 'inactive';
-  socials: {
-    twitter?: string;
-    linkedin?: string;
-    github?: string;
-  };
-}
-
-const initialFormData: MemberFormData = {
-  name: '',
-  designation: '',
-  bio: '',
-  skills: [],
-  image: '',
-  handle: '',
-  type: 'team',
-  status: 'active',
-  socials: {
-    twitter: '',
-    linkedin: '',
-    github: '',
-  },
-};
-
 export default function AdminMembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,21 +49,19 @@ export default function AdminMembersPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
-  const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [formData, setFormData] = useState<MemberFormData>(initialFormData);
-  const [skillInput, setSkillInput] = useState('');
 
   const fetchMembers = useCallback(async () => {
     try {
+      setLoading(true);
       setError(null);
       const params = new URLSearchParams();
       if (filterType !== 'all') params.set('type', filterType);
       if (filterStatus !== 'all') params.set('status', filterStatus);
       
-      const res = await fetch(`/api/members?${params.toString()}`);
+      const res = await fetch(`/api/admin/members?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to fetch members');
       const data = await res.json();
       setMembers(data.members || []);
@@ -126,90 +82,16 @@ export default function AdminMembersPage() {
     setTimeout(() => setSuccessMessage(null), 3000);
   };
 
-  const handleInputChange = (field: keyof MemberFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSocialChange = (field: 'twitter' | 'linkedin' | 'github', value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      socials: { ...prev.socials, [field]: value }
-    }));
-  };
-
-  const handleAddSkill = () => {
-    if (skillInput.trim() && !formData.skills.includes(skillInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        skills: [...prev.skills, skillInput.trim()]
-      }));
-      setSkillInput('');
-    }
-  };
-
-  const handleRemoveSkill = (skill: string) => {
-    setFormData(prev => ({
-      ...prev,
-      skills: prev.skills.filter(s => s !== skill)
-    }));
-  };
-
-  const handleSubmit = async () => {
-    setSaving(true);
-    setError(null);
-
-    try {
-      const url = editingMember 
-        ? `/api/members/${editingMember._id}`
-        : '/api/members';
-      
-      const method = editingMember ? 'PUT' : 'POST';
-      
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Failed to save member');
-      }
-
-      setIsModalOpen(false);
-      setEditingMember(null);
-      setFormData(initialFormData);
-      fetchMembers();
-      showSuccess(editingMember ? 'Member updated successfully' : 'Member created successfully');
-    } catch (err) {
-      console.error('Error saving member:', err);
-      setError(err instanceof Error ? err.message : 'Failed to save member');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleEdit = (member: Member) => {
     setEditingMember(member);
-    setFormData({
-      name: member.name,
-      designation: member.designation,
-      bio: member.bio,
-      skills: member.skills || [],
-      image: member.image || '',
-      handle: member.handle,
-      type: member.type,
-      status: member.status,
-      socials: member.socials || { twitter: '', linkedin: '', github: '' },
-    });
     setIsModalOpen(true);
   };
 
   const handleToggleStatus = async (member: Member) => {
     try {
       const nextStatus = member.status === 'active' ? 'inactive' : 'active';
-      const res = await fetch(`/api/members/${member._id}`, {
-        method: 'PUT',
+      const res = await fetch(`/api/admin/members/${member._id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),
       });
@@ -219,7 +101,7 @@ export default function AdminMembersPage() {
       showSuccess(`Member ${nextStatus === 'active' ? 'activated' : 'deactivated'} successfully`);
     } catch (err) {
       console.error('Error toggling status:', err);
-      setError('Failed to update member status');
+      alert('Failed to update member status');
     }
   };
 
@@ -227,7 +109,7 @@ export default function AdminMembersPage() {
     if (!confirm(`Are you sure you want to delete ${member.name}?`)) return;
     
     try {
-      const res = await fetch(`/api/members/${member._id}`, {
+      const res = await fetch(`/api/admin/members/${member._id}`, {
         method: 'DELETE',
       });
       
@@ -236,14 +118,8 @@ export default function AdminMembersPage() {
       showSuccess('Member deleted successfully');
     } catch (err) {
       console.error('Error deleting member:', err);
-      setError('Failed to delete member');
+      alert('Failed to delete member');
     }
-  };
-
-  const resetForm = () => {
-    setEditingMember(null);
-    setFormData(initialFormData);
-    setSkillInput('');
   };
 
   const filteredMembers = members.filter(member => {
@@ -269,244 +145,51 @@ export default function AdminMembersPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Dialog open={isModalOpen} onOpenChange={(open) => {
-            if (!open) resetForm();
-            setIsModalOpen(open);
-          }}>
-            <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-cyber-pink/50 text-cyber-pink text-[10px] font-mono uppercase tracking-widest h-9 shadow-[0_0_15px_rgba(255,16,240,0.1)]"
-                onClick={() => {
-                  setEditingMember(null);
-                  setFormData(initialFormData);
-                }}
-              >
-                <Plus className="w-3.5 h-3.5 mr-2" />
-                Recruit Member
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-ink border-white/5 max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
-              <DialogHeader className="border-b border-white/5 pb-4 mb-6">
-                <DialogTitle className="text-xl font-display font-black text-white uppercase tracking-tighter">
-                  {editingMember ? 'Reconfigure Member' : 'Recruit New Member'}
-                </DialogTitle>
-                <DialogDescription className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-2">
-                  Team Parameters // Member Configuration
-                </DialogDescription>
-              </DialogHeader>
-              
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-mono uppercase tracking-widest mb-6" role="alert">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                  {error}
-                </div>
-              )}
-              
-              <div className="space-y-6">
-                {/* Name & Handle */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Name</Label>
-                    <Input 
-                      value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
-                      placeholder="John Doe"
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Handle</Label>
-                    <Input 
-                      value={formData.handle}
-                      onChange={(e) => handleInputChange('handle', e.target.value)}
-                      placeholder="@username"
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Designation & Type */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Designation</Label>
-                    <Input 
-                      value={formData.designation}
-                      onChange={(e) => handleInputChange('designation', e.target.value)}
-                      placeholder="Full Stack Developer"
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Type</Label>
-                    <Select value={formData.type} onValueChange={(val) => handleInputChange('type', val as 'founder' | 'team')}>
-                      <SelectTrigger className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-ink border-white/5">
-                        <SelectItem value="founder" className="font-mono text-zinc-200">Founder</SelectItem>
-                        <SelectItem value="team" className="font-mono text-zinc-200">Team</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {/* Bio */}
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Bio</Label>
-                  <Textarea 
-                    value={formData.bio}
-                    onChange={(e) => handleInputChange('bio', e.target.value)}
-                    placeholder="Brief bio about the member..."
-                    rows={3}
-                    className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm resize-none"
-                  />
-                </div>
-
-                {/* Image URL */}
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Image URL</Label>
-                  <Input 
-                    value={formData.image}
-                    onChange={(e) => handleInputChange('image', e.target.value)}
-                    placeholder="https://..."
-                    className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                  />
-                </div>
-
-                {/* Skills */}
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Skills</Label>
-                  <div className="flex gap-2">
-                    <Input 
-                      value={skillInput}
-                      onChange={(e) => setSkillInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
-                      placeholder="Add a skill..."
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                    <Button 
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAddSkill}
-                      className="border-white/5 bg-white/5 text-zinc-400 hover:text-cyber-pink hover:border-cyber-pink/50"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  {formData.skills.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {formData.skills.map((skill, idx) => (
-                        <Badge 
-                          key={idx}
-                          variant="outline"
-                          className="bg-white/5 border-white/10 text-zinc-300 font-mono text-[10px] pr-1"
-                        >
-                          {skill}
-                          <button 
-                            type="button"
-                            onClick={() => handleRemoveSkill(skill)}
-                            className="ml-1 hover:text-red-400"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Socials */}
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Social Links</Label>
-                  <div className="grid grid-cols-3 gap-4">
-                    <Input 
-                      value={formData.socials.twitter}
-                      onChange={(e) => handleSocialChange('twitter', e.target.value)}
-                      placeholder="Twitter URL"
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                    <Input 
-                      value={formData.socials.linkedin}
-                      onChange={(e) => handleSocialChange('linkedin', e.target.value)}
-                      placeholder="LinkedIn URL"
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                    <Input 
-                      value={formData.socials.github}
-                      onChange={(e) => handleSocialChange('github', e.target.value)}
-                      placeholder="GitHub URL"
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Status */}
-                <div className="flex items-center gap-3">
-                  <Switch 
-                    id="status"
-                    checked={formData.status === 'active'}
-                    onCheckedChange={(checked: boolean) => handleInputChange('status', checked ? 'active' : 'inactive')}
-                  />
-                  <Label htmlFor="status" className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
-                    Active Status
-                  </Label>
-                </div>
-
-                {/* Submit Button */}
-                <Button 
-                  onClick={handleSubmit}
-                  disabled={saving}
-                  className="w-full bg-cyber-pink/20 hover:bg-cyber-pink/30 border border-cyber-pink/50 text-cyber-pink font-mono text-xs uppercase tracking-widest"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    editingMember ? 'Update Member' : 'Recruit Member'
-                  )}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-cyber-pink/50 text-cyber-pink text-[10px] font-mono uppercase tracking-widest h-9 shadow-[0_0_15px_rgba(255,16,240,0.1)]"
+            onClick={() => {
+              setEditingMember(null);
+              setIsModalOpen(true);
+            }}
+          >
+            <Plus className="w-3.5 h-3.5 mr-2" />
+            Recruit Member
+          </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4 bg-ink/40 p-4 border border-white/5 rounded-sm backdrop-blur-sm">
         <Input 
           placeholder="Search by name, designation, or handle..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="md:w-80 bg-white/5 border-white/5 text-zinc-200 font-mono text-sm placeholder:text-zinc-600"
+          className="md:w-80 bg-black/40 border-white/5 text-zinc-200 font-mono text-[11px] placeholder:text-zinc-600 h-10 uppercase tracking-widest"
         />
         <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="md:w-40 bg-white/5 border-white/5 text-zinc-200 font-mono text-sm">
+          <SelectTrigger className="md:w-40 bg-black/40 border-white/5 text-zinc-200 font-mono text-[10px] uppercase tracking-widest h-10">
             <SelectValue placeholder="Type" />
           </SelectTrigger>
           <SelectContent className="bg-ink border-white/5">
-            <SelectItem value="all" className="font-mono text-zinc-200">All Types</SelectItem>
-            <SelectItem value="founder" className="font-mono text-zinc-200">Founder</SelectItem>
-            <SelectItem value="team" className="font-mono text-zinc-200">Team</SelectItem>
+            <SelectItem value="all" className="font-mono text-[10px] uppercase tracking-widest">All Types</SelectItem>
+            <SelectItem value="founder" className="font-mono text-[10px] uppercase tracking-widest">Founder</SelectItem>
+            <SelectItem value="team" className="font-mono text-[10px] uppercase tracking-widest">Team</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="md:w-40 bg-white/5 border-white/5 text-zinc-200 font-mono text-sm">
+          <SelectTrigger className="md:w-40 bg-black/40 border-white/5 text-zinc-200 font-mono text-[10px] uppercase tracking-widest h-10">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent className="bg-ink border-white/5">
-            <SelectItem value="all" className="font-mono text-zinc-200">All Status</SelectItem>
-            <SelectItem value="active" className="font-mono text-zinc-200">Active</SelectItem>
-            <SelectItem value="inactive" className="font-mono text-zinc-200">Inactive</SelectItem>
+            <SelectItem value="all" className="font-mono text-[10px] uppercase tracking-widest">All Status</SelectItem>
+            <SelectItem value="active" className="font-mono text-[10px] uppercase tracking-widest">Active</SelectItem>
+            <SelectItem value="inactive" className="font-mono text-[10px] uppercase tracking-widest">Inactive</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Success/Error Messages */}
       {successMessage && (
         <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] uppercase tracking-widest animate-fade-up" role="status" aria-live="polite">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
@@ -514,7 +197,7 @@ export default function AdminMembersPage() {
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Main Table */}
       <Card className="bg-ink/40 border-white/5 backdrop-blur-sm relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyber-pink/50 to-transparent" />
         <CardContent className="p-0">
@@ -554,7 +237,7 @@ export default function AdminMembersPage() {
                     <TableRow key={member._id} className="border-white/5 hover:bg-white/[0.02] transition-colors group/row">
                       <TableCell className="py-5 px-6">
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium text-zinc-200 group-hover/row:text-white transition-colors">{member.name}</span>
+                          <span className="text-sm font-medium text-zinc-200 group-hover/row:text-white transition-colors uppercase">{member.name}</span>
                           <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-tight">{member.designation}</span>
                         </div>
                       </TableCell>
@@ -601,22 +284,24 @@ export default function AdminMembersPage() {
                         </button>
                       </TableCell>
                       <TableCell className="text-right py-5 px-6">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-4">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-cyber-pink/50 text-cyber-pink transition-all"
+                            title="Edit Crew"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-cyber-pink/50 text-cyber-pink transition-all"
                             onClick={() => handleEdit(member)}
                           >
-                            <Edit className="w-3.5 h-3.5" />
+                            <Edit className="w-4 h-4" />
                           </Button>
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-400 transition-all"
+                            title="Delete Crew"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-400 transition-all"
                             onClick={() => handleDelete(member)}
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -628,6 +313,13 @@ export default function AdminMembersPage() {
           </div>
         </CardContent>
       </Card>
+
+      <MemberFormModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        initialData={editingMember} 
+        onSuccess={fetchMembers} 
+      />
     </div>
   );
 }

@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Gamepad2, AlertCircle, Loader2, Star, Monitor, Smartphone, Layout } from 'lucide-react';
+import { Plus, Edit, Trash2, Gamepad2, AlertCircle, Loader2, Star, Monitor, Smartphone, Layout, Copy } from 'lucide-react';
 import GameForm from '@/components/admin/games/GameForm';
 import { cn } from '@/lib/utils';
 import type { GameFormData } from '@/lib/validations';
@@ -83,6 +83,30 @@ export default function AdminGamesPage() {
   const handleEdit = (game: any) => {
     setEditingGame(game);
     setIsModalOpen(true);
+  };
+
+  const handleDuplicate = async (game: any) => {
+    try {
+      setSaving(true);
+      const { _id, ...gameData } = game;
+      gameData.title = `${game.title} (Copy)`;
+      gameData.slug = `${game.slug}-copy-${Date.now()}`;
+      gameData.isPublished = false;
+      
+      const res = await fetch('/api/admin/games', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(gameData),
+      });
+
+      if (!res.ok) throw new Error('Failed to duplicate game');
+      fetchGames();
+    } catch (err: any) {
+      console.error('Error duplicating game:', err);
+      alert('Failed to duplicate game');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -226,22 +250,33 @@ export default function AdminGamesPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right py-5 px-6">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-end gap-4">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green"
-                            onClick={() => handleEdit(game)}
+                            title="Duplicate Game"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-zinc-400 hover:text-acid-green transition-all"
+                            onClick={() => handleDuplicate(game)}
                           >
-                            <Edit className="w-3.5 h-3.5" />
+                            <Copy className="w-4 h-4" />
                           </Button>
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-500"
+                            title="Edit Game"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green"
+                            onClick={() => handleEdit(game)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="Delete Game"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-500"
                             onClick={() => handleDelete(game._id)}
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>

@@ -3,27 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cn, formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Table, 
   TableBody, 
@@ -32,8 +13,15 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Switch } from '@/components/ui/switch';
-import { Plus, Edit, AlertCircle, CheckCircle2, Loader2, Tag, Trash2, Percent } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Plus, Edit, Loader2, Tag, Trash2, CheckCircle2 } from 'lucide-react';
+import { CouponFormModal } from '@/components/admin/coupons/CouponFormModal';
 
 interface Coupon {
   _id: string;
@@ -49,26 +37,6 @@ interface Coupon {
   createdAt: string;
 }
 
-interface CouponFormData {
-  code: string;
-  description: string;
-  discountAmount: number;
-  minPurchase: number;
-  maxUses: number;
-  validUntil: string;
-  isActive: boolean;
-}
-
-const initialFormData: CouponFormData = {
-  code: '',
-  description: '',
-  discountAmount: 0,
-  minPurchase: 0,
-  maxUses: 100,
-  validUntil: '',
-  isActive: true,
-};
-
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,19 +44,18 @@ export default function AdminCouponsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
-  const [saving, setSaving] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [formData, setFormData] = useState<CouponFormData>(initialFormData);
 
   const fetchCoupons = useCallback(async () => {
     try {
+      setLoading(true);
       setError(null);
       const params = new URLSearchParams();
       if (filterStatus !== 'all') {
         params.set('isActive', filterStatus === 'active' ? 'true' : 'false');
       }
       
-      const res = await fetch(`/api/coupons?${params.toString()}`);
+      const res = await fetch(`/api/admin/coupons?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to fetch coupons');
       const data = await res.json();
       setCoupons(data.coupons || []);
@@ -109,63 +76,15 @@ export default function AdminCouponsPage() {
     setTimeout(() => setSuccessMessage(null), 3000);
   };
 
-  const handleInputChange = (field: keyof CouponFormData, value: string | number | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async () => {
-    setSaving(true);
-    setError(null);
-
-    try {
-      const url = editingCoupon 
-        ? `/api/coupons/${editingCoupon._id}`
-        : '/api/coupons';
-      
-      const method = editingCoupon ? 'PUT' : 'POST';
-      
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Failed to save coupon');
-      }
-
-      setIsModalOpen(false);
-      setEditingCoupon(null);
-      setFormData(initialFormData);
-      fetchCoupons();
-      showSuccess(editingCoupon ? 'Coupon updated successfully' : 'Coupon created successfully');
-    } catch (err) {
-      console.error('Error saving coupon:', err);
-      setError(err instanceof Error ? err.message : 'Failed to save coupon');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleEdit = (coupon: Coupon) => {
     setEditingCoupon(coupon);
-    setFormData({
-      code: coupon.code,
-      description: coupon.description || '',
-      discountAmount: coupon.discountAmount,
-      minPurchase: coupon.minPurchase,
-      maxUses: coupon.maxUses,
-      validUntil: new Date(coupon.validUntil).toISOString().split('T')[0],
-      isActive: coupon.isActive,
-    });
     setIsModalOpen(true);
   };
 
   const handleToggleActive = async (coupon: Coupon) => {
     try {
-      const res = await fetch(`/api/coupons/${coupon._id}`, {
-        method: 'PUT',
+      const res = await fetch(`/api/admin/coupons/${coupon._id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !coupon.isActive }),
       });
@@ -175,7 +94,7 @@ export default function AdminCouponsPage() {
       showSuccess(`Coupon ${coupon.isActive ? 'deactivated' : 'activated'} successfully`);
     } catch (err) {
       console.error('Error toggling coupon:', err);
-      setError('Failed to update coupon');
+      alert('Failed to update coupon');
     }
   };
 
@@ -183,7 +102,7 @@ export default function AdminCouponsPage() {
     if (!confirm(`Are you sure you want to delete coupon ${coupon.code}?`)) return;
     
     try {
-      const res = await fetch(`/api/coupons/${coupon._id}`, {
+      const res = await fetch(`/api/admin/coupons/${coupon._id}`, {
         method: 'DELETE',
       });
       
@@ -192,13 +111,8 @@ export default function AdminCouponsPage() {
       showSuccess('Coupon deleted successfully');
     } catch (err) {
       console.error('Error deleting coupon:', err);
-      setError('Failed to delete coupon');
+      alert('Failed to delete coupon');
     }
-  };
-
-  const resetForm = () => {
-    setEditingCoupon(null);
-    setFormData(initialFormData);
   };
 
   const isExpired = (validUntil: string) => {
@@ -226,159 +140,31 @@ export default function AdminCouponsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Dialog open={isModalOpen} onOpenChange={(open) => {
-            if (!open) resetForm();
-            setIsModalOpen(open);
-          }}>
-            <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-laser-cyan/50 text-laser-cyan text-[10px] font-mono uppercase tracking-widest h-9 shadow-[0_0_15px_rgba(0,255,255,0.1)]"
-                onClick={() => {
-                  setEditingCoupon(null);
-                  setFormData(initialFormData);
-                }}
-              >
-                <Plus className="w-3.5 h-3.5 mr-2" />
-                Generate Code
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-ink border-white/5 max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar">
-              <DialogHeader className="border-b border-white/5 pb-4 mb-6">
-                <DialogTitle className="text-xl font-display font-black text-white uppercase tracking-tighter">
-                  {editingCoupon ? 'Reconfigure Code' : 'Generate Promo Code'}
-                </DialogTitle>
-                <DialogDescription className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-2">
-                  Discount Parameters // Coupon Configuration
-                </DialogDescription>
-              </DialogHeader>
-              
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-mono uppercase tracking-widest mb-6" role="alert">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                  {error}
-                </div>
-              )}
-              
-              <div className="space-y-6">
-                {/* Code */}
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Code</Label>
-                  <Input 
-                    value={formData.code}
-                    onChange={(e) => handleInputChange('code', e.target.value.toUpperCase())}
-                    placeholder="SAVE500"
-                    maxLength={20}
-                    className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm uppercase"
-                  />
-                </div>
-
-                {/* Description */}
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Description</Label>
-                  <Textarea 
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Discount description..."
-                    rows={2}
-                    className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm resize-none"
-                  />
-                </div>
-
-                {/* Discount Amount & Min Purchase */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Discount (₹)</Label>
-                    <Input 
-                      type="number"
-                      value={formData.discountAmount}
-                      onChange={(e) => handleInputChange('discountAmount', parseInt(e.target.value) || 0)}
-                      placeholder="500"
-                      min={0}
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Min Purchase (₹)</Label>
-                    <Input 
-                      type="number"
-                      value={formData.minPurchase}
-                      onChange={(e) => handleInputChange('minPurchase', parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                      min={0}
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Max Uses & Valid Until */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Max Uses</Label>
-                    <Input 
-                      type="number"
-                      value={formData.maxUses}
-                      onChange={(e) => handleInputChange('maxUses', parseInt(e.target.value) || 1)}
-                      placeholder="100"
-                      min={1}
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Valid Until</Label>
-                    <Input 
-                      type="date"
-                      value={formData.validUntil}
-                      onChange={(e) => handleInputChange('validUntil', e.target.value)}
-                      className="bg-white/5 border-white/5 text-zinc-200 font-mono text-sm"
-                    />
-                  </div>
-                </div>
-
-                {/* Active Status */}
-                <div className="flex items-center gap-3">
-                  <Switch 
-                    id="isActive"
-                    checked={formData.isActive}
-                    onCheckedChange={(checked: boolean) => handleInputChange('isActive', checked)}
-                  />
-                  <Label htmlFor="isActive" className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
-                    Active
-                  </Label>
-                </div>
-
-                {/* Submit Button */}
-                <Button 
-                  onClick={handleSubmit}
-                  disabled={saving}
-                  className="w-full bg-laser-cyan/20 hover:bg-laser-cyan/30 border border-laser-cyan/50 text-laser-cyan font-mono text-xs uppercase tracking-widest"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    editingCoupon ? 'Update Code' : 'Generate Code'
-                  )}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-laser-cyan/50 text-laser-cyan text-[10px] font-mono uppercase tracking-widest h-9 shadow-[0_0_15px_rgba(0,255,255,0.1)]"
+            onClick={() => {
+              setEditingCoupon(null);
+              setIsModalOpen(true);
+            }}
+          >
+            <Plus className="w-3.5 h-3.5 mr-2" />
+            Generate Code
+          </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4 bg-ink/40 p-4 border border-white/5 rounded-sm backdrop-blur-sm">
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="md:w-48 bg-white/5 border-white/5 text-zinc-200 font-mono text-sm">
+          <SelectTrigger className="md:w-48 bg-black/40 border-white/5 text-zinc-200 font-mono text-[10px] uppercase tracking-widest h-10">
             <SelectValue placeholder="Filter Status" />
           </SelectTrigger>
           <SelectContent className="bg-ink border-white/5">
-            <SelectItem value="all" className="font-mono text-zinc-200">All Coupons</SelectItem>
-            <SelectItem value="active" className="font-mono text-zinc-200">Active</SelectItem>
-            <SelectItem value="expired" className="font-mono text-zinc-200">Expired</SelectItem>
+            <SelectItem value="all" className="font-mono text-[10px] uppercase tracking-widest text-zinc-200">All Coupons</SelectItem>
+            <SelectItem value="active" className="font-mono text-[10px] uppercase tracking-widest text-zinc-200">Active</SelectItem>
+            <SelectItem value="expired" className="font-mono text-[10px] uppercase tracking-widest text-zinc-200">Expired</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -489,22 +275,24 @@ export default function AdminCouponsPage() {
                           </button>
                         </TableCell>
                         <TableCell className="text-right py-5 px-6">
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center justify-end gap-4">
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 text-laser-cyan transition-all"
+                              title="Edit Code"
+                              className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-laser-cyan/50 text-laser-cyan transition-all"
                               onClick={() => handleEdit(coupon)}
                             >
-                              <Edit className="w-3.5 h-3.5" />
+                              <Edit className="w-4 h-4" />
                             </Button>
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="h-8 w-8 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-400 transition-all"
+                              title="Delete Code"
+                              className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-400 transition-all"
                               onClick={() => handleDelete(coupon)}
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
                         </TableCell>
@@ -517,6 +305,13 @@ export default function AdminCouponsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <CouponFormModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        initialData={editingCoupon} 
+        onSuccess={fetchCoupons} 
+      />
     </div>
   );
 }

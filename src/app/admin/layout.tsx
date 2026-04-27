@@ -30,10 +30,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [pathname, setLastPageTitle]);
 
   useEffect(() => {
+    console.log('[AdminLayout] status:', status, 'session:', session, 'pathname:', pathname);
+    if (status === 'loading') return;
     if (!session && pathname !== '/admin/login') {
+      console.log('[AdminLayout] Redirecting to login!');
       router.push('/admin/login');
     }
-  }, [session, pathname, router]);
+  }, [session, status, pathname, router]);
 
   if (status === 'loading') {
     return (

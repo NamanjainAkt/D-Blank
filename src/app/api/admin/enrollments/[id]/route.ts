@@ -4,6 +4,7 @@ import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
 import { Coupon } from '@/models/Coupon';
 import { authOptions } from '@/lib/auth';
+import { sendPaymentConfirmation } from '@/lib/email';
 import { z } from 'zod';
 
 // Validation schema for enrollment updates
@@ -33,6 +34,11 @@ export async function PATCH(
     await dbConnect();
     const { id } = await params;
     const body = await request.json();
+    
+    // Add paymentDate if status is paid
+    if (body.paymentStatus === 'paid') {
+      body.paymentDate = new Date();
+    }
 
     // Validate input
     const validation = updateEnrollmentSchema.safeParse(body);
@@ -62,6 +68,17 @@ export async function PATCH(
         { error: 'Enrollment not found' },
         { status: 404 }
       );
+    }
+
+    // Send payment confirmation email if just marked as paid
+    if (body.paymentStatus === 'paid') {
+      await sendPaymentConfirmation({
+        studentName: enrollment.studentName,
+        email: enrollment.studentEmail || (enrollment as any).email, // Handle fallback
+        courseName: enrollment.courseName,
+        amount: enrollment.paymentAmount || 0,
+        transactionId: enrollment.paymentReferenceId || enrollment.paymentId || 'N/A',
+      });
     }
 
     return NextResponse.json({
@@ -147,6 +164,51 @@ export async function GET(
     console.error('Error fetching enrollment:', error);
     return NextResponse.json(
       { error: 'Failed to fetch enrollment' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    await dbConnect();
+    const { id } = await params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return NextResponse.json(
+        { error: 'Invalid enrollment ID format' },
+        { status: 400 }
+      );
+    }
+
+    const enrollment = await Enrollment.findByIdAndDelete(id);
+
+    if (!enrollment) {
+      return NextResponse.json(
+        { error: 'Enrollment not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+    });
+  } catch (error) {
+    console.error('Error deleting enrollment:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete enrollment' },
       { status: 500 }
     );
   }

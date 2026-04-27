@@ -4,6 +4,8 @@ import dbConnect from '@/lib/db';
 import { Enrollment } from '@/models/Enrollment';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -57,6 +59,7 @@ export async function GET(request: Request) {
     const [students, total] = await Promise.all([
       Enrollment.find(query)
         .populate('courseId', 'title category')
+        .populate('studentId', 'collegeName')
         .sort(sortOrder)
         .skip(skip)
         .limit(limit),
@@ -92,5 +95,22 @@ export async function GET(request: Request) {
       { error: 'Failed to fetch enrollments' },
       { status: 500 }
     );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    await dbConnect();
+    const data = await request.json();
+
+    const enrollment = await Enrollment.create(data);
+
+    return NextResponse.json({ success: true, enrollment });
+  } catch (error: any) {
+    console.error('Error creating enrollment:', error);
+    return NextResponse.json({ error: error.message || 'Failed to create enrollment' }, { status: 500 });
   }
 }

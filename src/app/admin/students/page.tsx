@@ -21,6 +21,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { 
   UserCheck, 
   Search, 
@@ -37,19 +44,33 @@ import {
   CreditCard
 } from 'lucide-react';
 import { cn, formatDate, formatCurrency } from '@/lib/utils';
+import { StudentFormModal } from '@/components/admin/students/StudentFormModal';
+import { Edit, Trash2, Plus } from 'lucide-react';
 
 export default function AdminStudentsPage() {
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [semesterFilter, setSemesterFilter] = useState('all');
+  const [collegeFilter, setCollegeFilter] = useState('all');
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [studentDetails, setStudentDetails] = useState<any>(null);
 
+  // Form State
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<any>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
   const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/admin/students?search=${encodeURIComponent(search)}`);
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (semesterFilter && semesterFilter !== 'all') params.set('semester', semesterFilter);
+      if (collegeFilter && collegeFilter !== 'all') params.set('college', collegeFilter);
+      
+      const res = await fetch(`/api/admin/students?${params}`);
       if (!res.ok) throw new Error('Failed to fetch students');
       const data = await res.json();
       setStudents(data.students || []);
@@ -58,7 +79,7 @@ export default function AdminStudentsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search]);
+  }, [search, semesterFilter, collegeFilter]);
 
   useEffect(() => {
     const timer = setTimeout(fetchStudents, 500);
@@ -80,6 +101,30 @@ export default function AdminStudentsPage() {
     }
   };
 
+  const deleteStudent = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this entity?')) return;
+    
+    try {
+      setDeleting(id);
+      const res = await fetch(`/api/admin/students/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete student');
+      }
+      fetchStudents();
+    } catch (err: any) {
+      console.error('Error deleting student:', err);
+      alert(err.message || 'Failed to delete student');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const handleEdit = (student: any) => {
+    setEditingStudent(student);
+    setIsFormOpen(true);
+  };
+
   return (
     <div className="space-y-10 animate-fade-up">
       {/* Header */}
@@ -93,14 +138,60 @@ export default function AdminStudentsPage() {
             Database Status: {students.length} Unique Entities Detected
           </p>
         </div>
+        <div className="flex items-center gap-4">
+          <Button 
+            onClick={() => {
+              setEditingStudent(null);
+              setIsFormOpen(true);
+            }}
+            className="bg-acid-green text-black hover:bg-acid-green/90 text-[10px] font-mono font-bold uppercase tracking-widest px-6"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Entity
+          </Button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-ink/40 p-4 border border-white/5 backdrop-blur-sm rounded-sm">
         <div className="relative w-full md:w-80 group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-acid-green transition-colors" />
           <Input 
             placeholder="SCAN BY NAME / EMAIL / PHONE..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 bg-black/40 border-white/5 focus:border-acid-green/50 text-[10px] font-mono uppercase tracking-widest h-11"
+            className="pl-10 bg-black/40 border-white/5 focus:border-acid-green/50 text-[10px] font-mono uppercase tracking-widest h-10"
           />
+        </div>
+        <div>
+          <Select value={semesterFilter} onValueChange={setSemesterFilter}>
+            <SelectTrigger className="bg-black/40 border-white/5 focus:border-acid-green/50 text-[10px] font-mono uppercase tracking-widest h-10">
+              <SelectValue placeholder="Filter by Semester" />
+            </SelectTrigger>
+            <SelectContent className="bg-ink border-white/5">
+              <SelectItem value="all" className="text-[10px] font-mono uppercase tracking-widest">All Semesters</SelectItem>
+              <SelectItem value="1st" className="text-[10px] font-mono uppercase tracking-widest">1st Semester</SelectItem>
+              <SelectItem value="2nd" className="text-[10px] font-mono uppercase tracking-widest">2nd Semester</SelectItem>
+              <SelectItem value="3rd" className="text-[10px] font-mono uppercase tracking-widest">3rd Semester</SelectItem>
+              <SelectItem value="4th" className="text-[10px] font-mono uppercase tracking-widest">4th Semester</SelectItem>
+              <SelectItem value="5th" className="text-[10px] font-mono uppercase tracking-widest">5th Semester</SelectItem>
+              <SelectItem value="6th" className="text-[10px] font-mono uppercase tracking-widest">6th Semester</SelectItem>
+              <SelectItem value="7th" className="text-[10px] font-mono uppercase tracking-widest">7th Semester</SelectItem>
+              <SelectItem value="8th" className="text-[10px] font-mono uppercase tracking-widest">8th Semester</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Select value={collegeFilter} onValueChange={setCollegeFilter}>
+            <SelectTrigger className="bg-black/40 border-white/5 focus:border-acid-green/50 text-[10px] font-mono uppercase tracking-widest h-10">
+              <SelectValue placeholder="Filter by College" />
+            </SelectTrigger>
+            <SelectContent className="bg-ink border-white/5">
+              <SelectItem value="all" className="text-[10px] font-mono uppercase tracking-widest">All Colleges</SelectItem>
+              <SelectItem value="BIT" className="text-[10px] font-mono uppercase tracking-widest">BIT</SelectItem>
+              <SelectItem value="others" className="text-[10px] font-mono uppercase tracking-widest">Others</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -169,14 +260,36 @@ export default function AdminStudentsPage() {
                         {formatDate(person.createdAt)}
                       </TableCell>
                       <TableCell className="text-right py-5 px-6">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="h-9 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green text-[10px] font-mono uppercase tracking-widest"
-                          onClick={() => viewDetails(person._id)}
-                        >
-                          Access Profile <ChevronRight className="w-3.5 h-3.5 ml-2" />
-                        </Button>
+                        <div className="flex items-center justify-end gap-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="Access Profile"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green transition-colors"
+                            onClick={() => viewDetails(person._id)}
+                          >
+                            <UserCheck className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="Edit Entity"
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-acid-green/50 text-acid-green transition-colors"
+                            onClick={() => handleEdit(person)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            title="Delete Entity"
+                            disabled={deleting === person._id}
+                            className="h-9 w-9 p-0 border-white/5 bg-white/5 hover:border-red-500/50 text-red-500 transition-colors disabled:opacity-50"
+                            onClick={() => deleteStudent(person._id)}
+                          >
+                            {deleting === person._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -305,6 +418,13 @@ export default function AdminStudentsPage() {
           ) : null}
         </DialogContent>
       </Dialog>
+
+      <StudentFormModal 
+        isOpen={isFormOpen} 
+        onClose={() => setIsFormOpen(false)} 
+        initialData={editingStudent} 
+        onSuccess={fetchStudents} 
+      />
     </div>
   );
 }
