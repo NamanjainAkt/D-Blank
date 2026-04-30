@@ -13,7 +13,7 @@ const updateEnrollmentSchema = z.object({
   enrollmentStatus: z.enum(['pending', 'confirmed', 'in_progress', 'completed', 'cancelled']).optional(),
   paymentId: z.string().optional(),
   paymentAmount: z.number().optional(),
-  paymentDate: z.string().optional(),
+  paymentDate: z.union([z.string(), z.date()]).optional(),
   adminNote: z.string().optional(),
 });
 
@@ -35,16 +35,22 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     
+    console.log(`[API] PATCH enrollment ${id} - Body:`, JSON.stringify(body));
+
     // Add paymentDate if status is paid
-    if (body.paymentStatus === 'paid') {
+    if (body.paymentStatus === 'paid' && !body.paymentDate) {
       body.paymentDate = new Date();
     }
 
     // Validate input
     const validation = updateEnrollmentSchema.safeParse(body);
     if (!validation.success) {
+      console.error(`[API] Validation failed for enrollment ${id}:`, validation.error.format());
       return NextResponse.json(
-        { error: validation.error.errors[0].message },
+        { 
+          error: 'Validation failed', 
+          details: validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        },
         { status: 400 }
       );
     }

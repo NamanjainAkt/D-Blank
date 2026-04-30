@@ -185,7 +185,10 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to update payment status');
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || data.details || 'Failed to update payment status');
+      }
       
       setStudent({ 
         ...student, 
@@ -194,9 +197,9 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         enrollmentStatus: status === 'paid' ? 'confirmed' : 'pending'
       });
       showSuccess(`Payment ${status === 'paid' ? 'approved' : 'rejected'}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating payment:', err);
-      setError('Failed to update payment status');
+      setError(err.message || 'Failed to update payment status');
     } finally {
       setUpdating(false);
     }
