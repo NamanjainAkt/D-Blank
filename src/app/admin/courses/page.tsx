@@ -312,12 +312,12 @@ export default function AdminCoursesPage() {
                         <div className="flex flex-col gap-1.5 w-32">
                           <div className="flex justify-between text-[9px] font-mono uppercase text-zinc-500">
                             <span>{course.enrolledCount} / {course.totalSeats}</span>
-                            <span>{Math.round((course.enrolledCount / course.totalSeats) * 100)}%</span>
+                            <span>{course.totalSeats > 0 ? Math.round((course.enrolledCount / course.totalSeats) * 100) : 0}%</span>
                           </div>
                           <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-acid-green shadow-[0_0_8px_#39FF14]" 
-                              style={{ width: `${(course.enrolledCount / course.totalSeats) * 100}%` }}
+                              style={{ width: `${course.totalSeats > 0 ? (course.enrolledCount / course.totalSeats) * 100 : 0}%` }}
                             />
                           </div>
                         </div>

@@ -42,6 +42,9 @@ interface DashboardStats {
     enrollments: number;
     students: number;
     revenue: number;
+    enrollmentsTrend: number;
+    revenueTrend: number;
+    studentsTrend: number;
   };
   overall: {
     totalStudents: number;
@@ -50,6 +53,7 @@ interface DashboardStats {
     totalGames: number;
     totalRevenue: number;
     totalPaid: number;
+    revenueTrend: number;
   };
   paymentBreakdown: {
     paid?: number;
@@ -157,29 +161,29 @@ export default function AdminDashboardPage() {
       title: "Today's Enrollments",
       value: stats.today.enrollments,
       icon: Users,
-      trend: "12%",
-      trendUp: true
+      trend: `${stats.today.enrollmentsTrend >= 0 ? '+' : ''}${stats.today.enrollmentsTrend}%`,
+      trendUp: stats.today.enrollmentsTrend >= 0
     },
     {
       title: "Today's Revenue",
       value: `₹${stats.today.revenue.toLocaleString()}`,
       icon: DollarSign,
-      trend: "8%",
-      trendUp: true
+      trend: `${stats.today.revenueTrend >= 0 ? '+' : ''}${stats.today.revenueTrend}%`,
+      trendUp: stats.today.revenueTrend >= 0
     },
     {
       title: "Total Students",
       value: stats.overall.totalStudents ?? 0,
       icon: TrendingUp,
-      trend: "+23",
-      trendUp: true
+      trend: `${stats.today.studentsTrend >= 0 ? '+' : ''}${stats.today.studentsTrend}`,
+      trendUp: stats.today.studentsTrend >= 0
     },
     {
       title: "Total Revenue",
       value: `₹${(stats.overall.totalRevenue / 1000).toFixed(1)}k`,
       icon: CreditCard,
-      trend: "15%",
-      trendUp: true
+      trend: `${stats.overall.revenueTrend >= 0 ? '+' : ''}${stats.overall.revenueTrend}%`,
+      trendUp: stats.overall.revenueTrend >= 0
     }
   ];
 

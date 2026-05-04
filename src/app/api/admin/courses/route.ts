@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import dbConnect from '@/lib/db';
 import { Course } from '@/models/Course';
+import { Enrollment } from '@/models/Enrollment';
 import { authOptions } from '@/lib/auth';
 import { courseSchema } from '@/lib/validations';
 
@@ -22,7 +23,21 @@ export async function GET(request: Request) {
 
     const courses = await Course.find().sort({ createdAt: -1 });
 
-    return NextResponse.json({ courses });
+    const coursesWithEnrollment = await Promise.all(
+      courses.map(async (course) => {
+        const enrollmentCount = await Enrollment.countDocuments({
+          courseId: course._id,
+          paymentStatus: 'paid',
+          enrollmentStatus: { $in: ['confirmed', 'in_progress'] },
+        });
+        return {
+          ...course.toObject(),
+          enrolledCount: enrollmentCount,
+        };
+      })
+    );
+
+    return NextResponse.json({ courses: coursesWithEnrollment });
   } catch (error) {
     console.error('Error fetching courses:', error);
     return NextResponse.json(

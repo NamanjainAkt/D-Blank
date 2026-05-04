@@ -26,6 +26,11 @@ export async function GET(request: Request) {
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const dayBeforeYesterday = new Date(yesterday);
+    dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
 
     // Today's stats
     const todayEnrollments = await Enrollment.countDocuments({
@@ -51,6 +56,67 @@ export async function GET(request: Request) {
       },
     ]);
 
+    // Yesterday's stats for trend calculation
+    const yesterdayEnrollments = await Enrollment.countDocuments({
+      createdAt: { $gte: yesterday, $lt: today },
+    });
+
+    const yesterdayStudents = await Student.countDocuments({
+      createdAt: { $gte: yesterday, $lt: today },
+    });
+
+    const yesterdayRevenue = await Enrollment.aggregate([
+      {
+        $match: {
+          paymentStatus: 'paid',
+          paymentDate: { $gte: yesterday, $lt: today },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$paymentAmount' },
+        },
+      },
+    ]);
+
+    // Day before yesterday for previous period comparison
+    const dayBeforeYesterdayEnrollments = await Enrollment.countDocuments({
+      createdAt: { $gte: dayBeforeYesterday, $lt: yesterday },
+    });
+
+    const dayBeforeYesterdayStudents = await Student.countDocuments({
+      createdAt: { $gte: dayBeforeYesterday, $lt: yesterday },
+    });
+
+    const dayBeforeYesterdayRevenue = await Enrollment.aggregate([
+      {
+        $match: {
+          paymentStatus: 'paid',
+          paymentDate: { $gte: dayBeforeYesterday, $lt: yesterday },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$paymentAmount' },
+        },
+      },
+    ]);
+
+    // Calculate trends (current vs previous period)
+    const dailyEnrollmentTrend = yesterdayEnrollments > 0 
+      ? Math.round(((todayEnrollments - yesterdayEnrollments) / yesterdayEnrollments) * 100)
+      : (todayEnrollments > 0 ? 100 : 0);
+    
+    const dailyRevenueTrend = yesterdayRevenue[0]?.total > 0 
+      ? Math.round(((todayRevenue[0]?.total || 0) - yesterdayRevenue[0]?.total) / yesterdayRevenue[0]?.total * 100)
+      : (todayRevenue[0]?.total > 0 ? 100 : 0);
+
+    const dailyStudentTrend = dayBeforeYesterdayStudents > 0
+      ? todayStudents - yesterdayStudents
+      : todayStudents;
+
     // Overall stats
     const totalEnrollments = await Enrollment.countDocuments();
     const totalStudents = await Student.countDocuments();
@@ -67,6 +133,28 @@ export async function GET(request: Request) {
         },
       },
     ]);
+
+    // Previous period revenue (same period last month)
+    const prevPeriodStart = new Date(today);
+    prevPeriodStart.setMonth(prevPeriodStart.getMonth() - 1);
+    const prevPeriodRevenueData = await Enrollment.aggregate([
+      { 
+        $match: { 
+          paymentStatus: 'paid',
+          createdAt: { $gte: prevPeriodStart, $lt: today }
+        } 
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$paymentAmount' },
+        },
+      },
+    ]);
+    const previousPeriodRevenue = prevPeriodRevenueData[0]?.total || 0;
+    const totalRevTrend = previousPeriodRevenue > 0
+      ? Math.round(((revenueData[0]?.total || 0) - previousPeriodRevenue) / previousPeriodRevenue * 100)
+      : (revenueData[0]?.total > 0 ? 100 : 0);
 
     // Payment status breakdown
     const paymentStats = await Enrollment.aggregate([
@@ -91,7 +179,7 @@ export async function GET(request: Request) {
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const enrollmentTrend = await Enrollment.aggregate([
+    const last30DaysEnrollmentTrend = await Enrollment.aggregate([
       { $match: { createdAt: { $gte: thirtyDaysAgo } } },
       {
         $group: {
@@ -129,6 +217,9 @@ export async function GET(request: Request) {
         enrollments: todayEnrollments,
         students: todayStudents,
         revenue: todayRevenue[0]?.total || 0,
+        enrollmentsTrend: dailyEnrollmentTrend,
+        revenueTrend: dailyRevenueTrend,
+        studentsTrend: dailyStudentTrend,
       },
       overall: {
         totalEnrollments,
@@ -137,6 +228,7 @@ export async function GET(request: Request) {
         totalGames,
         totalRevenue: revenueData[0]?.total || 0,
         totalPaid: revenueData[0]?.count || 0,
+        revenueTrend: totalRevTrend,
       },
       paymentBreakdown: paymentStats.reduce((acc: any, stat: any) => {
         acc[stat._id] = stat.count;
@@ -144,7 +236,7 @@ export async function GET(request: Request) {
       }, {}),
       recentEnrollments,
       recentGames,
-      enrollmentTrend,
+      enrollmentTrend: last30DaysEnrollmentTrend,
       courseSaturation: courses.map((c: any) => {
         const courseId = c._id.toString();
         const seats = c.totalSeats || 60;
