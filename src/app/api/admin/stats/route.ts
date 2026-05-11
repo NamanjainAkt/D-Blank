@@ -123,16 +123,18 @@ export async function GET(request: Request) {
     const totalCourses = await Course.countDocuments({ isPublished: true });
     const totalGames = await Game.countDocuments({ isPublished: true });
 
-    const revenueData = await Enrollment.aggregate([
-      { $match: { paymentStatus: 'paid' } },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: '$paymentAmount' },
-          count: { $sum: 1 },
-        },
-      },
-    ]);
+    // const revenueData = await Enrollment.aggregate([
+    //   { $match: { paymentStatus: 'paid' } },
+    //   {
+    //     $group: {
+    //       _id: null,
+    //       total: { $sum: '$paymentAmount' },
+    //       count: { $sum: 1 },
+    //     },
+    //   },
+    // ]);
+    const totalPaidEnrollments = await Enrollment.countDocuments({ paymentStatus: 'paid' });
+    const totalRevenue = 1500 * totalEnrollments;
 
     // Previous period revenue (same period last month)
     const prevPeriodStart = new Date(today);
@@ -153,8 +155,8 @@ export async function GET(request: Request) {
     ]);
     const previousPeriodRevenue = prevPeriodRevenueData[0]?.total || 0;
     const totalRevTrend = previousPeriodRevenue > 0
-      ? Math.round(((revenueData[0]?.total || 0) - previousPeriodRevenue) / previousPeriodRevenue * 100)
-      : (revenueData[0]?.total > 0 ? 100 : 0);
+      ? Math.round(((totalRevenue) - previousPeriodRevenue) / previousPeriodRevenue * 100)
+      : (totalRevenue > 0 ? 100 : 0);
 
     // Payment status breakdown
     const paymentStats = await Enrollment.aggregate([
@@ -226,8 +228,8 @@ export async function GET(request: Request) {
         totalStudents,
         totalCourses,
         totalGames,
-        totalRevenue: revenueData[0]?.total || 0,
-        totalPaid: revenueData[0]?.count || 0,
+        totalRevenue,
+        totalPaid: totalPaidEnrollments,
         revenueTrend: totalRevTrend,
       },
       paymentBreakdown: paymentStats.reduce((acc: any, stat: any) => {
