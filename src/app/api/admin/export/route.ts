@@ -33,14 +33,13 @@ export async function GET(request: Request) {
       query.paymentStatus = paymentStatus;
     }
 
+    // Build search filter — only search fields guaranteed on the Enrollment model
+    // (studentName, studentEmail). Student-only fields (phone, collegeName, etc.)
+    // are not stored on Enrollment documents created through the app.
     if (search) {
       query.$or = [
         { studentName: { $regex: search, $options: 'i' } },
         { studentEmail: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } },
-        { collegeName: { $regex: search, $options: 'i' } },
-        { rollNumber: { $regex: search, $options: 'i' } },
-        { enrollmentId: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -50,9 +49,14 @@ export async function GET(request: Request) {
 
     const enrollments = await Enrollment.find(query)
       .populate('courseId', 'title')
+      .populate('studentId', 'phone whatsappNumber collegeName branch semester rollNumber city name email')
       .sort({ createdAt: -1 });
 
-    // Create CSV
+    // Helper: safely get string, trim whitespace
+    const str = (v: any): string => (v == null ? '' : String(v).trim());
+    // Helper: trim a number value
+    const num = (v: any): string => (v == null || v === '' ? '' : String(v).trim());
+
     const headers = [
       'Enrollment ID',
       'Name',
@@ -78,34 +82,45 @@ export async function GET(request: Request) {
       'Created At',
     ];
 
-    const rows = enrollments.map((e: any) => [
-      e.enrollmentId,
-      e.studentName,
-      e.studentEmail,
-      e.phone,
-      e.whatsappNumber || e.phone,
-      e.collegeName,
-      e.branch,
-      e.semester,
-      e.rollNumber,
-      e.city,
-      e.courseId?.title || e.courseName,
-      e.paymentAmount || '',
-      e.originalAmount || '',
-      e.discountAmount || 0,
-      e.couponCode || '',
-      e.paymentMethod || '',
-      e.paymentReferenceId || '',
-      e.paymentStatus,
-      e.enrollmentStatus,
-      e.adminNote || '',
-      e.paymentDate ? new Date(e.paymentDate).toLocaleDateString() : '',
-      new Date(e.createdAt).toLocaleDateString(),
-    ]);
+    const rows = enrollments.map((e: any) => {
+      const student = e.studentId || {};
+      return [
+        // Enrollment ID — fall back to last 8 chars of _id
+        str(e.enrollmentId) || e._id.toString().slice(-8).toUpperCase(),
+        str(e.studentName),
+        str(e.studentEmail),
+        // Student fields: prefer populated ref, fall back to direct (seed data)
+        str(student.phone || e.phone),
+        str(student.whatsappNumber || e.whatsappNumber || student.phone || e.phone),
+        str(student.collegeName || e.collegeName),
+        str(student.branch || e.branch),
+        str(student.semester || e.semester),
+        str(student.rollNumber || e.rollNumber),
+        str(student.city || e.city),
+        str(e.courseId?.title || e.courseName),
+        num(e.paymentAmount),
+        num(e.originalAmount),
+        num(e.discountAmount) || '0',
+        str(e.couponCode),
+        str(e.paymentMethod),
+        str(e.paymentReferenceId),
+        str(e.paymentStatus),
+        str(e.enrollmentStatus),
+        str(e.adminNote),
+        e.paymentDate ? new Date(e.paymentDate).toLocaleDateString() : '',
+        new Date(e.createdAt).toLocaleDateString(),
+      ];
+    });
+
+    // Build CSV — escape double-quotes by doubling them (RFC 4180)
+    const escapeCsv = (cell: string): string => {
+      const s = cell == null ? '' : String(cell);
+      return `"${s.replace(/"/g, '""')}"`;
+    };
 
     const csv = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell || ''}"`).join(',')),
+      ...rows.map(row => row.map(escapeCsv).join(',')),
     ].join('\n');
 
     return new NextResponse(csv, {
