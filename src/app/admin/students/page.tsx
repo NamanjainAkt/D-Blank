@@ -41,7 +41,8 @@ import {
   Loader2,
   AlertCircle,
   BarChart3,
-  CreditCard
+  CreditCard,
+  Download
 } from 'lucide-react';
 import { cn, formatDate, formatCurrency } from '@/lib/utils';
 import { StudentFormModal } from '@/components/admin/students/StudentFormModal';
@@ -125,6 +126,29 @@ export default function AdminStudentsPage() {
     setIsFormOpen(true);
   };
 
+  const handleExport = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (semesterFilter && semesterFilter !== 'all') params.set('semester', semesterFilter);
+      if (collegeFilter && collegeFilter !== 'all') params.set('college', collegeFilter);
+
+      const res = await fetch(`/api/admin/students/export?${params}`);
+      if (!res.ok) throw new Error('Export failed');
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `students-${Date.now()}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error exporting students:', err);
+      alert('Failed to export student data. Please try again.');
+    }
+  };
+
   return (
     <div className="space-y-10 animate-fade-up">
       {/* Header */}
@@ -139,6 +163,15 @@ export default function AdminStudentsPage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            onClick={handleExport}
+            size="sm"
+            className="border-white/5 bg-white/5 hover:bg-white/10 hover:border-acid-green/50 text-[10px] font-mono uppercase tracking-widest h-10"
+          >
+            <Download className="w-3.5 h-3.5 mr-2" />
+            Export Registry
+          </Button>
           <Button 
             onClick={() => {
               setEditingStudent(null);

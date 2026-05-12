@@ -20,6 +20,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const course = searchParams.get('course') || '';
     const paymentStatus = searchParams.get('paymentStatus') || '';
+    const search = searchParams.get('search') || '';
+    const enrollmentStatus = searchParams.get('enrollmentStatus') || '';
 
     let query: any = {};
 
@@ -29,6 +31,21 @@ export async function GET(request: Request) {
 
     if (paymentStatus) {
       query.paymentStatus = paymentStatus;
+    }
+
+    if (search) {
+      query.$or = [
+        { studentName: { $regex: search, $options: 'i' } },
+        { studentEmail: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
+        { collegeName: { $regex: search, $options: 'i' } },
+        { rollNumber: { $regex: search, $options: 'i' } },
+        { enrollmentId: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    if (enrollmentStatus) {
+      query.enrollmentStatus = enrollmentStatus;
     }
 
     const enrollments = await Enrollment.find(query)
@@ -49,8 +66,14 @@ export async function GET(request: Request) {
       'City',
       'Course',
       'Amount',
+      'Original Amount',
+      'Discount',
+      'Coupon Code',
+      'Payment Method',
+      'Payment Reference',
       'Payment Status',
       'Enrollment Status',
+      'Admin Note',
       'Payment Date',
       'Created At',
     ];
@@ -58,7 +81,7 @@ export async function GET(request: Request) {
     const rows = enrollments.map((e: any) => [
       e.enrollmentId,
       e.studentName,
-      e.email,
+      e.studentEmail,
       e.phone,
       e.whatsappNumber || e.phone,
       e.collegeName,
@@ -68,8 +91,14 @@ export async function GET(request: Request) {
       e.city,
       e.courseId?.title || e.courseName,
       e.paymentAmount || '',
+      e.originalAmount || '',
+      e.discountAmount || 0,
+      e.couponCode || '',
+      e.paymentMethod || '',
+      e.paymentReferenceId || '',
       e.paymentStatus,
       e.enrollmentStatus,
+      e.adminNote || '',
       e.paymentDate ? new Date(e.paymentDate).toLocaleDateString() : '',
       new Date(e.createdAt).toLocaleDateString(),
     ]);
